@@ -210,6 +210,44 @@ router.get('/profile', verifyToken, async (req, res) => {
   }
 });
 
+// Create van user (temporary endpoint for testing)
+router.post('/create-van', async (req, res) => {
+  try {
+    // Check if user already exists
+    const existingUser = await User.findOne({ username: 'van' });
+    if (existingUser) {
+      return res.json({
+        success: true,
+        message: 'User van already exists'
+      });
+    }
+
+    // Create new user
+    const user = new User({
+      username: 'van',
+      password: 'van',
+      role: 'ROLE_TEACHER',
+      schoolId: 'van_school',
+      email: 'van@school.com'
+    });
+
+    await user.save();
+
+    console.log('✅ Created van user with encoded password');
+    res.json({
+      success: true,
+      message: 'User van created successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Error creating van user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create user: ' + error.message
+    });
+  }
+});
+
 // Test password encoding
 router.get('/test-encode', async (req, res) => {
   try {
