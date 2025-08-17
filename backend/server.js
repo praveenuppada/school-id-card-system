@@ -16,7 +16,14 @@ const PORT = process.env.PORT || 8081;
 
 // CORS configuration - must come before other middleware
 app.use(cors({
-  origin: ['http://localhost:5175', 'http://localhost:5176', 'http://localhost:5174', 'http://127.0.0.1:5175'],
+  origin: [
+    'http://localhost:5175', 
+    'http://localhost:5176', 
+    'http://localhost:5174', 
+    'http://127.0.0.1:5175',
+    process.env.FRONTEND_URL, // Production frontend URL
+    'https://your-app.vercel.app' // Replace with your actual Vercel URL
+  ].filter(Boolean), // Remove undefined values
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
