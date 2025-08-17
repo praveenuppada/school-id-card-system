@@ -211,7 +211,7 @@ router.get('/profile', verifyToken, async (req, res) => {
 });
 
 // Create van user (temporary endpoint for testing)
-router.post('/create-van', async (req, res) => {
+router.get('/create-van', async (req, res) => {
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ username: 'van' });
