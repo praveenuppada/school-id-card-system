@@ -22,7 +22,7 @@ app.use(cors({
     'http://localhost:5174', 
     'http://127.0.0.1:5175',
     process.env.FRONTEND_URL, // Production frontend URL
-    'https://your-app.vercel.app' // Replace with your actual Vercel URL
+    'https://school-id-card-system-3atbg97bs.vercel.app' // Your Vercel URL
   ].filter(Boolean), // Remove undefined values
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
