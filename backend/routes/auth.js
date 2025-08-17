@@ -9,9 +9,11 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log('🔐 Login attempt for username:', username);
 
     // Validate input
     if (!username || !password) {
+      console.log('❌ Missing username or password');
       return res.status(400).json({
         success: false,
         message: 'Username and password are required'
@@ -20,7 +22,18 @@ router.post('/login', async (req, res) => {
 
     // Find user by username
     const user = await User.findOne({ username });
+    console.log('🔍 User found:', user ? 'Yes' : 'No');
+    if (user) {
+      console.log('👤 User details:', {
+        id: user._id,
+        username: user.username,
+        role: user.role,
+        schoolId: user.schoolId
+      });
+    }
+    
     if (!user) {
+      console.log('❌ User not found');
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
@@ -29,7 +42,9 @@ router.post('/login', async (req, res) => {
 
     // Check password
     const isPasswordValid = await user.comparePassword(password);
+    console.log('🔑 Password valid:', isPasswordValid);
     if (!isPasswordValid) {
+      console.log('❌ Invalid password');
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
