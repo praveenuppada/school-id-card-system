@@ -1,6 +1,31 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
+// Detect environment and set API URL accordingly
+const getApiUrl = () => {
+  console.log('🌐 Environment Detection:');
+  console.log('Hostname:', window.location.hostname);
+  console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+  console.log('Is Vercel:', window.location.hostname.includes('vercel.app'));
+  
+  // If environment variable is set, use it
+  if (import.meta.env.VITE_API_URL) {
+    console.log('Using VITE_API_URL:', import.meta.env.VITE_API_URL);
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // If running on Vercel (production), use Railway backend
+  if (window.location.hostname.includes('vercel.app')) {
+    console.log('Using Railway backend for Vercel');
+    return 'https://web-production-6c52b.up.railway.app/api';
+  }
+  
+  // Default to localhost for development
+  console.log('Using localhost for development');
+  return 'http://localhost:8081/api';
+};
+
+const API_BASE_URL = getApiUrl();
+console.log('🔗 Final API_BASE_URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
