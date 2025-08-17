@@ -18,6 +18,7 @@ export default function LoginTeacher() {
     }
     try {
       console.log("🔐 Teacher login attempt:", { username, password });
+      console.log("🌐 API URL:", import.meta.env.VITE_API_URL || 'http://localhost:8081/api');
       const data = await login(username, password);
       console.log("✅ Teacher login successful:", data);
       authLogin(data.token, data.roles, data.user);
@@ -25,6 +26,9 @@ export default function LoginTeacher() {
     } catch (err) {
       console.error("❌ Teacher login error:", err);
       console.error("❌ Error response:", err.response);
+      console.error("❌ Error message:", err.message);
+      console.error("❌ Error status:", err.response?.status);
+      console.error("❌ Error data:", err.response?.data);
       setError("Invalid credentials");
     }
   };
