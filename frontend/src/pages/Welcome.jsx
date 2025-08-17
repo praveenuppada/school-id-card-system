@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function Welcome() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('home');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -212,12 +213,52 @@ export default function Welcome() {
             {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
-                onClick={() => setActiveSection('home')}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="px-3 py-2 bg-yellow-400 text-white rounded-md text-sm font-medium"
               >
                 Menu
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-200">
+            <div className="px-4 py-2 space-y-1">
+              <button
+                onClick={() => { setActiveSection('home'); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeSection === 'home'
+                    ? 'bg-yellow-400 text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                }`}
+              >
+                Home
+              </button>
+              <button
+                onClick={() => { setActiveSection('about'); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeSection === 'about'
+                    ? 'bg-yellow-400 text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                }`}
+              >
+                About
+              </button>
+              <button
+                onClick={() => { setActiveSection('contact'); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeSection === 'contact'
+                    ? 'bg-yellow-400 text-white'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                }`}
+              >
+                Contact
+              </button>
+            </div>
+          </div>
+        )}
           </div>
         </div>
       </header>

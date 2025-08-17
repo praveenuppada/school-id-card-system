@@ -369,43 +369,43 @@ export default function TeacherDashboard() {
     const photo = studentPhotos[studentId];
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-3">
         {activeCamera === studentId ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <video
               ref={videoRef}
               autoPlay
               playsInline
-              className="w-32 h-32 object-cover rounded border"
+              className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded border mx-auto"
             />
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => capturePhoto(studentId)}
-                className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                className="px-4 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 font-medium"
               >
                 📸 Capture
               </button>
               <button
                 onClick={stopCamera}
-                className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                className="px-4 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600 font-medium"
               >
                 ❌ Cancel
               </button>
             </div>
           </div>
         ) : photo ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <img
               src={photo.data}
               alt="Student photo"
-              className="w-32 h-32 object-cover rounded border"
+              className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded border mx-auto"
             />
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => savePhoto(studentId)}
                 disabled={photo.status === 'saved'}
-                className={`px-3 py-1 rounded text-sm ${
+                className={`px-4 py-2 rounded text-sm font-medium ${
                   photo.status === 'saved'
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 text-white hover:bg-blue-600'
@@ -415,25 +415,25 @@ export default function TeacherDashboard() {
               </button>
               <button
                 onClick={() => retakePhoto(studentId)}
-                className="px-3 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600"
+                className="px-4 py-2 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600 font-medium"
               >
                 📷 Retake
               </button>
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            <div className="w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded flex items-center justify-center">
+          <div className="space-y-3">
+            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded flex items-center justify-center mx-auto">
               <span className="text-gray-400 text-sm">No Photo</span>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => startCamera(studentId)}
-                className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                className="px-4 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 font-medium"
               >
                 📷 Take Photo
               </button>
-              <label className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 cursor-pointer">
+              <label className="px-4 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 cursor-pointer font-medium text-center">
                 📁 Choose File
                 <input
                   type="file"
@@ -452,24 +452,35 @@ export default function TeacherDashboard() {
   return (
     <div className="flex min-h-screen bg-yellow-50">
       <Sidebar role="TEACHER" />
-      <div className="flex-1 p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="flex-1 p-4 sm:p-6">
+        {/* Mobile Header */}
+        <div className="block sm:hidden mb-4">
+          <h1 className="text-xl font-bold text-yellow-600 mb-2">
+            {(() => {
+              const schoolName = user?.schoolName || user?.school?.name || 
+                                profile?.schoolName || profile?.school?.name ||
+                                localStorage.getItem('teacherSchoolName') || 
+                                "Teacher Dashboard";
+              return schoolName;
+            })()}
+          </h1>
+          <button
+            onClick={submitAllRecords}
+            className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-base"
+          >
+            📤 Submit All Records
+          </button>
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden sm:flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-yellow-600">
               {(() => {
-                // Get school name from multiple sources
                 const schoolName = user?.schoolName || user?.school?.name || 
                                   profile?.schoolName || profile?.school?.name ||
                                   localStorage.getItem('teacherSchoolName') || 
                                   "Teacher Dashboard";
-                console.log("🏫 School name being displayed:", schoolName);
-                console.log("👤 User data:", user);
-                console.log("👤 User schoolName:", user?.schoolName);
-                console.log("👤 User school:", user?.school);
-                console.log("📋 Profile data:", profile);
-                console.log("📋 Profile schoolName:", profile?.schoolName);
-                console.log("📋 Profile school:", profile?.school);
-                console.log("🏫 localStorage teacherSchoolName:", localStorage.getItem('teacherSchoolName'));
                 return schoolName;
               })()}
             </h1>
@@ -490,7 +501,7 @@ export default function TeacherDashboard() {
           <select
             value={selectedClass}
             onChange={(e) => handleClassChange(e.target.value)}
-            className="w-full max-w-xs border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-base"
           >
             <option value="">Choose a class...</option>
             {Array.isArray(classes) && classes.map((c) => (
@@ -502,7 +513,8 @@ export default function TeacherDashboard() {
         {/* Students Table */}
         {Array.isArray(students) && students.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
@@ -553,10 +565,47 @@ export default function TeacherDashboard() {
               </table>
             </div>
 
+            {/* Mobile Cards */}
+            <div className="md:hidden">
+              {getPaginatedStudents().map((student) => (
+                <div key={student._id || student.id} className="border-b border-gray-200 p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{student.fullName}</h3>
+                      <p className="text-sm text-gray-500">ID: {student.photoId}</p>
+                      <p className="text-sm text-gray-500">Class: {student.className}</p>
+                    </div>
+                    <div className="text-right">
+                      {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          📤 Submitted
+                        </span>
+                      ) : studentPhotos[student._id || student.id]?.status === 'saved' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          ✅ Saved
+                        </span>
+                      ) : studentPhotos[student._id || student.id] ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          📸 Captured
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          ⏳ Pending
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <PhotoUploadComponent student={student} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
             {/* Pagination */}
             {getTotalPages() > 1 && (
               <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                <div className="flex-1 flex justify-between sm:hidden">
+                <div className="flex-1 flex justify-between">
                   <button
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
@@ -564,45 +613,16 @@ export default function TeacherDashboard() {
                   >
                     Previous
                   </button>
+                  <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                    Page {currentPage} of {getTotalPages()}
+                  </span>
                   <button
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === getTotalPages()}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
                     Next
                   </button>
-                </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
-                      <span className="font-medium">
-                        {Math.min(currentPage * itemsPerPage, students.length)}
-                      </span>{' '}
-                      of <span className="font-medium">{students.length}</span> students
-                    </p>
-                  </div>
-                  <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                      <button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                      >
-                        Previous
-                      </button>
-                      <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                        Page {currentPage} of {getTotalPages()}
-                      </span>
-                      <button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        disabled={currentPage === getTotalPages()}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                      >
-                        Next
-                      </button>
-                    </nav>
-                  </div>
                 </div>
               </div>
             )}
