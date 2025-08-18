@@ -530,7 +530,7 @@ export default function TeacherDashboard() {
       
       {/* Main Content Container - Proper layout */}
       <div className="flex-1 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16 overflow-x-hidden">
           
           {/* Header Section - Compact and professional */}
           <div className="mb-6">
@@ -540,6 +540,10 @@ export default function TeacherDashboard() {
                   {user?.schoolName || user?.school?.name || profile?.schoolName || profile?.school?.name || localStorage.getItem('teacherSchoolName') || "School Dashboard"}
                 </h1>
                 <p className="text-sm text-gray-500">Teacher Portal</p>
+                {/* Debug info - remove after testing */}
+                <p className="text-xs text-gray-400 mt-1">
+                  Debug: user.schoolName={user?.schoolName}, profile.schoolName={profile?.schoolName}, localStorage={localStorage.getItem('teacherSchoolName')}
+                </p>
               </div>
               
               {/* Action Button - Compact spacing */}

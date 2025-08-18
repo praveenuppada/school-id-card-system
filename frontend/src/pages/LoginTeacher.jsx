@@ -73,7 +73,7 @@ export default function LoginTeacher() {
       {/* Decorative yellow shape */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
       
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 overflow-x-hidden">
         <div className="max-w-md w-full">
           <div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-100">
             {/* HARSHA ID SOLUTIONS Text */}

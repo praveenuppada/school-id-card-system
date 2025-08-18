@@ -17,14 +17,15 @@ import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}
-        >
+    <div className="overflow-x-hidden">
+      <AuthProvider>
+        <NotificationProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/login-admin" element={<LoginAdmin />} />
@@ -47,8 +48,9 @@ export default function App() {
 
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-      </NotificationProvider>
-    </AuthProvider>
+          </BrowserRouter>
+        </NotificationProvider>
+      </AuthProvider>
+    </div>
   );
 }

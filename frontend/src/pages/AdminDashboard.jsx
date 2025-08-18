@@ -432,7 +432,7 @@ export default function AdminDashboard() {
       
       {/* Main Content Container - Proper layout */}
       <div className="flex-1 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16 overflow-x-hidden">
           
           {/* Header Section - Compact and professional */}
           <div className="mb-6">
@@ -444,12 +444,7 @@ export default function AdminDashboard() {
               
               {/* Action Buttons - Compact spacing */}
               <div className="flex flex-col sm:flex-row gap-2">
-                <button
-                  onClick={() => navigate('/admin/view-schools')}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                >
-                  📊 View Schools
-                </button>
+                {/* No action buttons needed - all functions available in sidebar */}
               </div>
             </div>
           </div>
