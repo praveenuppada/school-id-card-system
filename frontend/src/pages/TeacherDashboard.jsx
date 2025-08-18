@@ -62,6 +62,14 @@ export default function TeacherDashboard() {
   useEffect(() => {
     loadProfile();
     loadClasses();
+    
+    // Cleanup function to stop camera when component unmounts
+    return () => {
+      if (cameraStream) {
+        console.log("🧹 Cleaning up camera stream on unmount");
+        stopCamera();
+      }
+    };
   }, []);
 
   const loadProfile = async () => {
@@ -161,6 +169,12 @@ export default function TeacherDashboard() {
   const startCamera = async (studentId) => {
     try {
       console.log("📸 Starting camera for student:", studentId);
+      
+      // Stop any existing camera first
+      if (cameraStream) {
+        stopCamera();
+      }
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           width: { ideal: 640 },
@@ -171,9 +185,24 @@ export default function TeacherDashboard() {
       console.log("📸 Camera stream obtained:", stream);
       setCameraStream(stream);
       setActiveCamera(studentId);
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         console.log("📸 Video element updated with stream");
+        
+        // Wait for video to load
+        videoRef.current.onloadedmetadata = () => {
+          console.log("📸 Video metadata loaded, dimensions:", videoRef.current.videoWidth, "x", videoRef.current.videoHeight);
+        };
+        
+        videoRef.current.onerror = (error) => {
+          console.error("❌ Video element error:", error);
+          alert("Camera video stream error. Please try again.");
+          stopCamera();
+        };
+      } else {
+        console.error("❌ Video ref not available");
+        alert("Camera initialization failed. Please try again.");
       }
     } catch (error) {
       console.error("❌ Error accessing camera:", error);
@@ -189,15 +218,17 @@ export default function TeacherDashboard() {
     }
   };
 
-  const capturePhoto = (studentId) => {
+  const capturePhoto = (studentId, retryCount = 0) => {
+    const maxRetries = 50; // Maximum 5 seconds (50 * 100ms)
+    
     if (videoRef.current && canvasRef.current) {
-      console.log("📸 Capturing photo for student:", studentId);
+      console.log("📸 Capturing photo for student:", studentId, "Retry:", retryCount);
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
       
-      // Wait for video to be ready
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      // Check if video has valid dimensions
+      if (video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 2) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0);
@@ -223,13 +254,18 @@ export default function TeacherDashboard() {
         
         // Show success message
         alert("Photo captured successfully! Click 'Save' to upload it.");
+      } else if (retryCount < maxRetries) {
+        console.log("❌ Video not ready, waiting... (Retry:", retryCount + 1, "/", maxRetries, ")");
+        setTimeout(() => capturePhoto(studentId, retryCount + 1), 100);
       } else {
-        console.log("❌ Video not ready, waiting...");
-        setTimeout(() => capturePhoto(studentId), 100);
+        console.error("❌ Video never became ready after", maxRetries, "retries");
+        alert("Camera failed to initialize properly. Please try again or use file upload instead.");
+        stopCamera();
       }
     } else {
       console.error("❌ Video or canvas ref not available");
       alert("Camera not ready. Please try again.");
+      stopCamera();
     }
   };
 
@@ -472,9 +508,9 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-yellow-50">
+    <div className="flex min-h-screen bg-yellow-50 overflow-x-hidden">
       <Sidebar role="TEACHER" />
-      <div className="flex-1 p-4 sm:p-6 ml-0 md:ml-64">
+      <div className="flex-1 p-4 sm:p-6 ml-0 md:ml-64 overflow-x-hidden">
         {/* Mobile Header */}
         <div className="block sm:hidden mb-4">
           <h1 className="text-xl font-bold text-yellow-600 mb-2">
@@ -537,32 +573,32 @@ export default function TeacherDashboard() {
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo Upload</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo ID</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo Upload</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {getPaginatedStudents().map((student) => (
                     <tr key={student._id || student.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-3 sm:px-6 py-4 text-sm font-medium text-gray-900">
                         {student.photoId}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-3 sm:px-6 py-4 text-sm text-gray-900">
                         {student.fullName}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-3 sm:px-6 py-4 text-sm text-gray-500">
                         {student.className}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4">
                         <PhotoUploadComponent student={student} />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4">
                         {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             📤 Submitted
