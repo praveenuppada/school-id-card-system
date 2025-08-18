@@ -417,28 +417,71 @@ export default function TeacherDashboard() {
 
   // Global cleanup function to prevent memory leaks
   const cleanupResources = () => {
+    console.log("🧹 Starting cleanup...");
+    
     // Clean up any existing object URLs
     if (window.currentObjectUrl) {
+      console.log("🧹 Cleaning up object URL");
       URL.revokeObjectURL(window.currentObjectUrl);
       window.currentObjectUrl = null;
     }
     
     // Clean up any existing FileReader
     if (window.currentFileReader) {
-      window.currentFileReader.abort();
+      console.log("🧹 Cleaning up FileReader");
+      try {
+        window.currentFileReader.abort();
+      } catch (e) {
+        console.log("🧹 FileReader already aborted");
+      }
       window.currentFileReader = null;
     }
     
     // Clear any existing timeouts
     if (window.currentTimeout) {
+      console.log("🧹 Cleaning up timeout");
       clearTimeout(window.currentTimeout);
       window.currentTimeout = null;
     }
     
     // Force garbage collection if available
     if (window.gc) {
+      console.log("🧹 Forcing garbage collection");
       window.gc();
     }
+    
+    // Clear any remaining references
+    if (window.currentImage) {
+      console.log("🧹 Cleaning up image reference");
+      window.currentImage = null;
+    }
+    
+    if (window.currentCanvas) {
+      console.log("🧹 Cleaning up canvas reference");
+      window.currentCanvas = null;
+    }
+    
+    console.log("🧹 Cleanup completed");
+  };
+
+  // Force fresh start for each photo upload
+  const forceFreshStart = () => {
+    console.log("🔄 Forcing fresh start...");
+    
+    // Clear all global references
+    window.currentObjectUrl = null;
+    window.currentFileReader = null;
+    window.currentTimeout = null;
+    window.currentImage = null;
+    window.currentCanvas = null;
+    
+    // Force garbage collection
+    if (window.gc) {
+      window.gc();
+    }
+    
+    // Small delay to ensure cleanup
+    return new Promise(resolve => setTimeout(resolve, 100));
   };
 
   const handleFileUpload = async (studentId, file) => {
@@ -469,40 +512,55 @@ export default function TeacherDashboard() {
       // Clean up any existing resources before processing new file
       cleanupResources();
       
-      // For Android, use the simplest possible approach
+      // For Android, force a completely fresh start for each photo
       if (isAndroid) {
-        console.log("📱 Using ultra-simple Android file handling");
+        console.log("📱 Using FRESH START Android file handling");
         
-        // Create a simple promise-based FileReader
-        const readFileAsDataURL = (file) => {
+        // Force fresh start before processing
+        await forceFreshStart();
+        
+        // Create a completely isolated FileReader for each photo
+        const processAndroidPhoto = async (file) => {
           return new Promise((resolve, reject) => {
+            console.log("📱 Creating fresh FileReader instance...");
+            
+            // Create a completely new FileReader instance
             const reader = new FileReader();
             
-            reader.onload = () => {
-              console.log("📱 Android FileReader success");
-              resolve(reader.result);
+            // Set up event handlers
+            reader.onload = (event) => {
+              console.log("📱 Fresh FileReader onload triggered");
+              try {
+                const result = event.target.result;
+                console.log("📱 Fresh FileReader result length:", result.length);
+                resolve(result);
+              } catch (error) {
+                console.error("📱 Fresh FileReader result processing error:", error);
+                reject(error);
+              }
             };
             
-            reader.onerror = () => {
-              console.error("📱 Android FileReader error");
-              reject(new Error("FileReader failed"));
+            reader.onerror = (error) => {
+              console.error("📱 Fresh FileReader error:", error);
+              reject(new Error("Fresh FileReader failed"));
             };
             
             reader.onabort = () => {
-              console.error("📱 Android FileReader aborted");
-              reject(new Error("FileReader aborted"));
+              console.error("📱 Fresh FileReader aborted");
+              reject(new Error("Fresh FileReader aborted"));
             };
             
-            // Start reading immediately
+            // Start reading with a fresh instance
+            console.log("📱 Starting fresh FileReader...");
             reader.readAsDataURL(file);
           });
         };
         
         try {
-          console.log("📱 Starting ultra-simple Android file read...");
-          const dataUrl = await readFileAsDataURL(file);
+          console.log("📱 Processing Android photo with fresh start...");
+          const dataUrl = await processAndroidPhoto(file);
           
-          console.log("📱 Android file read successful, length:", dataUrl.length);
+          console.log("📱 Android photo processed successfully, length:", dataUrl.length);
           
           // Save the photo immediately
           const updatedPhotos = {
@@ -522,35 +580,51 @@ export default function TeacherDashboard() {
           localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
           console.log("💾 Immediately saved uploaded file to localStorage");
           
-        } catch (androidError) {
-          console.error("❌ Android ultra-simple method failed:", androidError);
+          // Force cleanup after successful upload
+          cleanupResources();
           
-          // Last resort: try to create a simple blob URL
+        } catch (androidError) {
+          console.error("❌ Android fresh start method failed:", androidError);
+          
+          // Try one more time with a different approach
           try {
-            console.log("📱 Trying Android blob URL method...");
-            const blobUrl = URL.createObjectURL(file);
+            console.log("📱 Trying Android alternative method...");
             
-            // Convert blob URL to data URL using fetch
-            const response = await fetch(blobUrl);
-            const blob = await response.blob();
+            // Create a completely new approach using a different method
+            const alternativeReader = new FileReader();
             
-            const reader = new FileReader();
-            const dataUrl = await new Promise((resolve, reject) => {
-              reader.onload = () => resolve(reader.result);
-              reader.onerror = () => reject(new Error("Blob conversion failed"));
-              reader.readAsDataURL(blob);
+            const alternativeDataUrl = await new Promise((resolve, reject) => {
+              alternativeReader.onload = (e) => {
+                console.log("📱 Alternative method success");
+                resolve(e.target.result);
+              };
+              
+              alternativeReader.onerror = () => {
+                console.error("📱 Alternative method failed");
+                reject(new Error("Alternative method failed"));
+              };
+              
+              // Use a different reading method
+              alternativeReader.readAsArrayBuffer(file);
             });
             
-            // Clean up blob URL
-            URL.revokeObjectURL(blobUrl);
+            // Convert ArrayBuffer to base64
+            const arrayBuffer = alternativeDataUrl;
+            const bytes = new Uint8Array(arrayBuffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+              binary += String.fromCharCode(bytes[i]);
+            }
+            const base64 = btoa(binary);
+            const finalDataUrl = `data:${file.type};base64,${base64}`;
             
-            console.log("📱 Android blob method successful, length:", dataUrl.length);
+            console.log("📱 Alternative method successful, length:", finalDataUrl.length);
             
             // Save the photo
             const updatedPhotos = {
               ...studentPhotos,
               [studentId]: {
-                data: dataUrl,
+                data: finalDataUrl,
                 timestamp: new Date().toISOString(),
                 status: 'uploaded',
                 filename: file.name
@@ -558,13 +632,16 @@ export default function TeacherDashboard() {
             };
             
             setStudentPhotos(updatedPhotos);
-            console.log("📁 Android blob method successful for student:", studentId);
+            console.log("📁 Android alternative method successful for student:", studentId);
             
             localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
             console.log("💾 Immediately saved uploaded file to localStorage");
             
-          } catch (blobError) {
-            console.error("❌ Android blob method also failed:", blobError);
+            // Force cleanup after successful upload
+            cleanupResources();
+            
+          } catch (alternativeError) {
+            console.error("❌ Android alternative method also failed:", alternativeError);
             alert("Android: Unable to process image. Please try a different image or restart the app.");
           }
         }
