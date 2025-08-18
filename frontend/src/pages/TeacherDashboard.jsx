@@ -72,6 +72,24 @@ export default function TeacherDashboard() {
     };
   }, []);
 
+  // Handle video stream setup when activeCamera changes
+  useEffect(() => {
+    if (activeCamera && cameraStream && videoRef.current) {
+      console.log("📸 Setting up video stream for active camera");
+      videoRef.current.srcObject = cameraStream;
+      
+      videoRef.current.onloadedmetadata = () => {
+        console.log("📸 Video metadata loaded, dimensions:", videoRef.current.videoWidth, "x", videoRef.current.videoHeight);
+      };
+      
+      videoRef.current.onerror = (error) => {
+        console.error("❌ Video element error:", error);
+        alert("Camera video stream error. Please try again.");
+        stopCamera();
+      };
+    }
+  }, [activeCamera, cameraStream]);
+
   const loadProfile = async () => {
     try {
       const res = await getProfile();
@@ -186,24 +204,6 @@ export default function TeacherDashboard() {
       setCameraStream(stream);
       setActiveCamera(studentId);
       
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        console.log("📸 Video element updated with stream");
-        
-        // Wait for video to load
-        videoRef.current.onloadedmetadata = () => {
-          console.log("📸 Video metadata loaded, dimensions:", videoRef.current.videoWidth, "x", videoRef.current.videoHeight);
-        };
-        
-        videoRef.current.onerror = (error) => {
-          console.error("❌ Video element error:", error);
-          alert("Camera video stream error. Please try again.");
-          stopCamera();
-        };
-      } else {
-        console.error("❌ Video ref not available");
-        alert("Camera initialization failed. Please try again.");
-      }
     } catch (error) {
       console.error("❌ Error accessing camera:", error);
       alert("Unable to access camera. Please check permissions and try again.");
@@ -421,7 +421,7 @@ export default function TeacherDashboard() {
     const photo = studentPhotos[studentId];
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {activeCamera === studentId ? (
           <div className="space-y-4">
             <div className="flex justify-center">
@@ -433,16 +433,16 @@ export default function TeacherDashboard() {
               />
             </div>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => capturePhoto(studentId)}
-                className="px-4 py-3 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
+                className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
               >
                 📸 Capture
               </button>
               <button
                 onClick={stopCamera}
-                className="px-4 py-3 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 font-medium transition-colors"
+                className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 font-medium transition-colors"
               >
                 ❌ Cancel
               </button>
@@ -457,11 +457,11 @@ export default function TeacherDashboard() {
                 className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border-2 border-gray-300"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => savePhoto(studentId)}
                 disabled={photo.status === 'saved'}
-                className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   photo.status === 'saved'
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 text-white hover:bg-blue-600'
@@ -471,7 +471,7 @@ export default function TeacherDashboard() {
               </button>
               <button
                 onClick={() => retakePhoto(studentId)}
-                className="px-4 py-3 bg-yellow-500 text-white rounded-lg text-sm hover:bg-yellow-600 font-medium transition-colors"
+                className="px-3 py-2 bg-yellow-500 text-white rounded-lg text-sm hover:bg-yellow-600 font-medium transition-colors"
               >
                 📷 Retake
               </button>
@@ -484,14 +484,14 @@ export default function TeacherDashboard() {
                 <span className="text-gray-400 text-sm text-center">No Photo</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => startCamera(studentId)}
-                className="px-4 py-3 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
+                className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
               >
                 📷 Take Photo
               </button>
-              <label className="px-4 py-3 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 cursor-pointer font-medium text-center transition-colors">
+              <label className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 cursor-pointer font-medium text-center transition-colors">
                 📁 Choose File
                 <input
                   type="file"
@@ -510,10 +510,10 @@ export default function TeacherDashboard() {
   return (
     <div className="flex min-h-screen bg-yellow-50 overflow-x-hidden">
       <Sidebar role="TEACHER" />
-      <div className="flex-1 p-4 sm:p-6 ml-0 md:ml-64 overflow-x-hidden">
+      <div className="flex-1 p-2 sm:p-4 ml-0 md:ml-64 overflow-x-hidden">
         {/* Mobile Header */}
-        <div className="block sm:hidden mb-4">
-          <h1 className="text-xl font-bold text-yellow-600 mb-2">
+        <div className="block sm:hidden mb-3">
+          <h1 className="text-lg font-bold text-yellow-600 mb-2">
             {(() => {
               const schoolName = user?.schoolName || user?.school?.name || 
                                 profile?.schoolName || profile?.school?.name ||
@@ -524,14 +524,14 @@ export default function TeacherDashboard() {
           </h1>
           <button
             onClick={submitAllRecords}
-            className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-base"
+            className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
           >
             📤 Submit All Records
           </button>
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden sm:flex justify-between items-center mb-6">
+        <div className="hidden sm:flex justify-between items-center mb-4">
           <div>
             <h1 className="text-2xl font-bold text-yellow-600">
               {(() => {
@@ -554,12 +554,12 @@ export default function TeacherDashboard() {
         </div>
         
         {/* Class Selection */}
-        <div className="bg-white rounded-lg p-4 mb-6 shadow-sm">
+        <div className="bg-white rounded-lg p-3 mb-4 shadow-sm">
           <label className="block text-sm font-medium text-gray-700 mb-2">Select Class</label>
           <select
             value={selectedClass}
             onChange={(e) => handleClassChange(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-base"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"
           >
             <option value="">Choose a class...</option>
             {Array.isArray(classes) && classes.map((c) => (
@@ -576,29 +576,29 @@ export default function TeacherDashboard() {
               <table className="w-full min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo ID</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo Upload</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo ID</th>
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo Upload</th>
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {getPaginatedStudents().map((student) => (
                     <tr key={student._id || student.id} className="hover:bg-gray-50">
-                      <td className="px-3 sm:px-6 py-4 text-sm font-medium text-gray-900">
+                      <td className="px-2 sm:px-4 py-3 text-sm font-medium text-gray-900">
                         {student.photoId}
                       </td>
-                      <td className="px-3 sm:px-6 py-4 text-sm text-gray-900">
+                      <td className="px-2 sm:px-4 py-3 text-sm text-gray-900">
                         {student.fullName}
                       </td>
-                      <td className="px-3 sm:px-6 py-4 text-sm text-gray-500">
+                      <td className="px-2 sm:px-4 py-3 text-sm text-gray-500">
                         {student.className}
                       </td>
-                      <td className="px-3 sm:px-6 py-4">
+                      <td className="px-2 sm:px-4 py-3">
                         <PhotoUploadComponent student={student} />
                       </td>
-                      <td className="px-3 sm:px-6 py-4">
+                      <td className="px-2 sm:px-4 py-3">
                         {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             📤 Submitted
@@ -626,7 +626,7 @@ export default function TeacherDashboard() {
             {/* Mobile Cards */}
             <div className="md:hidden">
               {getPaginatedStudents().map((student) => (
-                <div key={student._id || student.id} className="border-b border-gray-200 p-4 bg-white">
+                <div key={student._id || student.id} className="border-b border-gray-200 p-3 bg-white">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">{student.fullName}</h3>
@@ -664,7 +664,7 @@ export default function TeacherDashboard() {
 
             {/* Pagination */}
             {getTotalPages() > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="bg-white px-3 py-2 flex items-center justify-between border-t border-gray-200 sm:px-4">
                 <div className="flex-1 flex justify-between">
                   <button
                     onClick={() => setCurrentPage(currentPage - 1)}

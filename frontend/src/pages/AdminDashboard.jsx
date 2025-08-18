@@ -404,37 +404,37 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-yellow-50">
+    <div className="min-h-screen bg-yellow-50 overflow-x-hidden">
       <Sidebar role="ADMIN" />
-      <div className="p-4 sm:p-8 ml-0 md:ml-64">
+      <div className="p-2 sm:p-4 ml-0 md:ml-64 overflow-x-hidden">
                   {/* Mobile Header */}
-          <div className="block sm:hidden mb-4">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-lg font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
+          <div className="block sm:hidden mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <h1 className="text-base font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
               <NotificationBell />
             </div>
             
             {/* Mobile ID Card Logo */}
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-3">
-                <div className="text-white text-2xl font-bold">ID</div>
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-2">
+                <div className="text-white text-xl font-bold">ID</div>
               </div>
-              <h1 className="text-xl font-bold text-gray-800 mb-1">Admin Dashboard</h1>
-              <p className="text-sm text-gray-600">A Complete ID World</p>
+              <h1 className="text-lg font-bold text-gray-800 mb-1">Admin Dashboard</h1>
+              <p className="text-xs text-gray-600">A Complete ID World</p>
             </div>
           
           {/* Mobile Quick Stats */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <div className="bg-white p-3 rounded-lg shadow border border-gray-100 text-center">
-              <div className="text-xl font-bold text-yellow-600">{stats.totalSchools}</div>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="bg-white p-2 rounded-lg shadow border border-gray-100 text-center">
+              <div className="text-lg font-bold text-yellow-600">{stats.totalSchools}</div>
               <div className="text-xs text-gray-600">Schools</div>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow border border-gray-100 text-center">
-              <div className="text-xl font-bold text-blue-600">{stats.totalClasses}</div>
+            <div className="bg-white p-2 rounded-lg shadow border border-gray-100 text-center">
+              <div className="text-lg font-bold text-blue-600">{stats.totalClasses}</div>
               <div className="text-xs text-gray-600">Classes</div>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow border border-gray-100 text-center">
-              <div className="text-xl font-bold text-green-600">{stats.totalStudents}</div>
+            <div className="bg-white p-2 rounded-lg shadow border border-gray-100 text-center">
+              <div className="text-lg font-bold text-green-600">{stats.totalStudents}</div>
               <div className="text-xs text-gray-600">Students</div>
             </div>
           </div>
@@ -442,33 +442,33 @@ export default function AdminDashboard() {
 
                   {/* Desktop Header */}
           <div className="hidden sm:block">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-xl font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
               <NotificationBell />
             </div>
 
             {/* Desktop ID Card Logo */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-6">
-                <div className="text-white text-4xl font-bold">ID</div>
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-4">
+                <div className="text-white text-3xl font-bold">ID</div>
               </div>
-              <h1 className="text-4xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
-              <p className="text-lg text-gray-600">A Complete ID World</p>
+              <h1 className="text-2xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+              <p className="text-base text-gray-600">A Complete ID World</p>
             </div>
           
           {/* Desktop Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-yellow-600 mb-2">{stats.totalSchools}</div>
-              <div className="text-gray-600">Total Schools</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 text-center">
+              <div className="text-2xl font-bold text-yellow-600 mb-1">{stats.totalSchools}</div>
+              <div className="text-sm text-gray-600">Total Schools</div>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">{stats.totalClasses}</div>
-              <div className="text-gray-600">Total Classes</div>
+            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 text-center">
+              <div className="text-2xl font-bold text-blue-600 mb-1">{stats.totalClasses}</div>
+              <div className="text-sm text-gray-600">Total Classes</div>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">{stats.totalStudents}</div>
-              <div className="text-gray-600">Total Students</div>
+            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 text-center">
+              <div className="text-2xl font-bold text-green-600 mb-1">{stats.totalStudents}</div>
+              <div className="text-sm text-gray-600">Total Students</div>
             </div>
           </div>
         </div>

@@ -84,18 +84,18 @@ export default function Welcome() {
         );
       default: // home
         return (
-          <div className="text-center max-w-4xl mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto px-2">
             {/* Welcome Text - Above Logo */}
-            <div className="text-center mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">Welcome to Student ID Management</h2>
-              <p className="text-sm sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+            <div className="text-center mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Welcome to Student ID Management</h2>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed max-w-2xl mx-auto">
                 Streamline your school's student identification process with our comprehensive digital platform. 
                 Manage student records, track photo uploads, and generate ID cards efficiently.
               </p>
             </div>
             
             {/* HARSHA ID SOLUTIONS Logo in Card */}
-            <div className="bg-white shadow-xl rounded-2xl p-4 sm:p-8 mb-6 border border-gray-100 transform hover:scale-105 transition-transform duration-300 overflow-hidden">
+            <div className="bg-white shadow-xl rounded-2xl p-3 sm:p-6 mb-4 border border-gray-100 transform hover:scale-105 transition-transform duration-300 overflow-hidden">
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-2">
                 {/* HARSHA letters - Responsive */}
                 <div className="flex flex-wrap justify-center space-x-1 sm:space-x-2">
@@ -135,14 +135,14 @@ export default function Welcome() {
             </div>
             
             {/* Tagline */}
-            <div className="border-t-2 border-b-2 border-red-500 py-2 sm:py-3 mb-6">
-              <p className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 text-center">A COMPLETE ID WORLD.....</p>
+            <div className="border-t-2 border-b-2 border-red-500 py-2 mb-4">
+              <p className="text-base sm:text-lg font-semibold text-gray-800 text-center">A COMPLETE ID WORLD.....</p>
             </div>
             
-            <p className="text-base sm:text-lg text-blue-600 font-medium mb-6 sm:mb-8 text-center">Welcome to the Students</p>
+            <p className="text-sm sm:text-base text-blue-600 font-medium mb-4 text-center">Welcome to the Students</p>
 
             {/* Login Buttons */}
-            <div className="space-y-3 sm:space-y-4 w-full max-w-sm mx-auto">
+            <div className="space-y-3 w-full max-w-sm mx-auto">
               <button
                 onClick={() => navigate("/login-teacher")}
                 className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-semibold rounded-xl shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base md:text-lg"
@@ -168,7 +168,7 @@ export default function Welcome() {
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-6 sm:mt-8 w-full max-w-sm mx-auto">
+            <div className="mt-4 w-full max-w-sm mx-auto">
               <a
                 href="https://wa.me/918977219777"
                 target="_blank"
@@ -195,14 +195,14 @@ export default function Welcome() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
-            <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2">
+            <div className="flex flex-col items-center space-y-1">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-yellow-500 rounded flex items-center justify-center">
                   <span className="text-white font-bold text-sm">H</span>
                 </div>
-                <span className="text-blue-500 font-bold text-base sm:text-lg">ARSHA ID SOLUTIONS</span>
+                <span className="text-blue-500 font-bold text-base sm:text-lg">Harsha ID Solutions</span>
               </div>
-              <div className="text-center sm:text-left">
+              <div className="text-center">
                 <p className="text-xs font-semibold text-gray-800">A COMPLETE ID WORLD.....</p>
               </div>
             </div>
@@ -307,8 +307,8 @@ export default function Welcome() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-16 overflow-x-hidden">
-        <div className="w-full max-w-4xl">
+      <main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-2 py-4 sm:py-8 overflow-x-hidden">
+        <div className="w-full max-w-3xl">
           {renderContent()}
         </div>
       </main>
