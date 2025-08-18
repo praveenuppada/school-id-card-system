@@ -31,7 +31,7 @@ export default function LoginAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden" style={{ overflowX: 'hidden', maxWidth: '100vw' }}>
+    <div className="min-h-screen bg-white overflow-x-hidden login-page" style={{ overflowX: 'hidden', maxWidth: '100vw' }}>
       {/* Decorative yellow shape */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
       

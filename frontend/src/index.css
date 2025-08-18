@@ -25,17 +25,42 @@ html, body, #root {
 /* Prevent mobile UI shrinking */
 @media (max-width: 768px) {
   html, body, #root {
-    min-width: 320px;
-    min-height: 100vh;
+    min-width: 320px !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    height: 100vh !important;
   }
   
   .min-h-screen {
     min-height: 100vh !important;
+    height: 100vh !important;
   }
   
   /* Prevent zoom on input focus */
   input, select, textarea {
     font-size: 16px !important;
+  }
+  
+  /* Force fixed UI - prevent shrinking */
+  .welcome-page, .login-page {
+    min-width: 320px !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    height: 100vh !important;
+  }
+  
+  /* Prevent viewport scaling */
+  * {
+    min-width: 0;
+  }
+  
+  /* Force container sizes */
+  .max-w-4xl {
+    min-width: 320px !important;
+  }
+  
+  .max-w-md {
+    min-width: 280px !important;
   }
 }
 

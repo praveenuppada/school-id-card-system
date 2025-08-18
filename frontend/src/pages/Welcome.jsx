@@ -94,7 +94,7 @@ export default function Welcome() {
               </p>
             </div>
             
-            {/* HARSHA ID SOLUTIONS Logo in Card */}
+            {/* HARSHA ID SOLUTIONS Logo in Card - Exact as per image */}
             <div className="bg-white shadow-2xl rounded-3xl p-6 sm:p-8 mb-8 border border-gray-100 transform hover:scale-105 transition-all duration-300 overflow-hidden">
               <div className="flex flex-col items-center justify-center space-y-4">
                 {/* HARSHA letters - Exact as per image */}
@@ -137,16 +137,13 @@ export default function Welcome() {
                 {/* Tagline with red lines */}
                 <div className="text-center">
                   <div className="w-16 h-0.5 bg-red-500 mx-auto mb-2"></div>
-                  <p className="text-black font-bold text-sm">A Complete ID World</p>
+                  <p className="text-black font-bold text-sm">A COMPLETE ID WORLD....</p>
                   <div className="w-16 h-0.5 bg-red-500 mx-auto mt-2"></div>
                 </div>
               </div>
             </div>
             
-            {/* Tagline */}
-            <div className="border-t-2 border-b-2 border-red-500 py-3 mb-6">
-              <p className="text-lg sm:text-xl font-bold text-gray-900 text-center">A Complete ID World</p>
-            </div>
+
 
             {/* Login Buttons */}
             <div className="space-y-4 w-full max-w-md mx-auto">
@@ -192,7 +189,7 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-white overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-white overflow-x-hidden welcome-page">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full opacity-10 transform translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-yellow-300 rounded-full opacity-10 transform -translate-x-1/2 translate-y-1/2"></div>
