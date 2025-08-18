@@ -137,6 +137,18 @@ export default function TeacherDashboard() {
       
       console.log("📚 Final classes data:", classesData);
       setClasses(classesData);
+      
+      // Try to get school name from classes response
+      if (res.data?.schoolName) {
+        console.log("📚 School name from classes:", res.data.schoolName);
+        localStorage.setItem('teacherSchoolName', res.data.schoolName);
+      } else if (res.data?.school?.name) {
+        console.log("📚 School name from classes school object:", res.data.school.name);
+        localStorage.setItem('teacherSchoolName', res.data.school.name);
+      } else if (res.data?.data?.schoolName) {
+        console.log("📚 School name from classes data:", res.data.data.schoolName);
+        localStorage.setItem('teacherSchoolName', res.data.data.schoolName);
+      }
     } catch (error) {
       console.error("Error loading classes:", error);
       setClasses([]); // Ensure classes is always an array
@@ -540,10 +552,7 @@ export default function TeacherDashboard() {
                   {user?.schoolName || user?.school?.name || profile?.schoolName || profile?.school?.name || localStorage.getItem('teacherSchoolName') || "School Dashboard"}
                 </h1>
                 <p className="text-sm text-gray-500">Teacher Portal</p>
-                {/* Debug info - remove after testing */}
-                <p className="text-xs text-gray-400 mt-1">
-                  Debug: user.schoolName={user?.schoolName}, profile.schoolName={profile?.schoolName}, localStorage={localStorage.getItem('teacherSchoolName')}
-                </p>
+
               </div>
               
               {/* Action Button - Compact spacing */}

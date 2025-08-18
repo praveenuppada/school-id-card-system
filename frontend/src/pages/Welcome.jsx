@@ -97,39 +97,39 @@ export default function Welcome() {
             {/* HARSHA ID SOLUTIONS Logo in Card */}
             <div className="bg-white shadow-2xl rounded-3xl p-6 sm:p-8 mb-8 border border-gray-100 transform hover:scale-105 transition-all duration-300 overflow-hidden">
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-6">
-                {/* HARSHA letters - Responsive */}
-                <div className="flex flex-wrap justify-center space-x-2 sm:space-x-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">H</span>
+                {/* HARSHA letters - Smaller and more compact */}
+                <div className="flex flex-wrap justify-center space-x-1 sm:space-x-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">H</span>
                   </div>
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">A</span>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">A</span>
                   </div>
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">R</span>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">R</span>
                   </div>
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">S</span>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">S</span>
                   </div>
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">H</span>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">H</span>
                   </div>
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">A</span>
-                  </div>
-                </div>
-                
-                {/* ID Card Icon - Responsive */}
-                <div className="relative mx-4 sm:mx-6">
-                  <div className="w-16 h-12 sm:w-20 sm:h-16 md:w-24 md:h-20 bg-white border-2 border-gray-800 rounded-xl flex items-center justify-center relative shadow-lg">
-                    <span className="text-orange-600 font-bold text-lg sm:text-xl md:text-2xl">ID</span>
-                    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-8 sm:w-10 md:w-12 h-2 bg-gray-800 rounded-t-lg"></div>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">A</span>
                   </div>
                 </div>
                 
-                {/* SOLUTIONS - Responsive */}
-                <div className="mx-4 sm:mx-6">
-                  <span className="text-blue-600 font-bold text-xl sm:text-2xl md:text-3xl">SOLUTIONS</span>
+                {/* ID Card Icon - Smaller */}
+                <div className="relative mx-2 sm:mx-3">
+                  <div className="w-12 h-8 sm:w-16 sm:h-12 md:w-20 md:h-16 bg-white border-2 border-gray-800 rounded-lg flex items-center justify-center relative shadow-lg">
+                    <span className="text-orange-600 font-bold text-sm sm:text-base md:text-lg">ID</span>
+                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-6 sm:w-8 md:w-10 h-1 bg-gray-800 rounded-t-lg"></div>
+                  </div>
+                </div>
+                
+                {/* SOLUTIONS - Smaller */}
+                <div className="mx-2 sm:mx-3">
+                  <span className="text-blue-600 font-bold text-base sm:text-lg md:text-xl">SOLUTIONS</span>
                 </div>
               </div>
             </div>
@@ -195,12 +195,12 @@ export default function Welcome() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-lg">H</span>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center shadow-sm">
+                <span className="text-white font-bold text-sm">H</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-gray-900 font-bold text-lg leading-tight">Harsha ID Solutions</span>
+                <span className="text-gray-900 font-bold text-sm leading-tight">Harsha ID Solutions</span>
                 <span className="text-xs text-gray-500 font-medium">A COMPLETE ID WORLD.....</span>
               </div>
             </div>
