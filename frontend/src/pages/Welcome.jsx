@@ -89,39 +89,40 @@ export default function Welcome() {
             <div className="bg-white shadow-xl rounded-2xl p-8 mb-8 border border-gray-100 transform hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-center">
                 <div className="flex items-center space-x-3">
-                {/* HARSHA letters */}
-                <div className="flex space-x-2">
-                  <div className="w-16 h-16 bg-red-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-2xl">H</span>
+                  {/* HARSHA letters */}
+                  <div className="flex space-x-2">
+                    <div className="w-16 h-16 bg-red-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-2xl">H</span>
+                    </div>
+                    <div className="w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-2xl">A</span>
+                    </div>
+                    <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-2xl">R</span>
+                    </div>
+                    <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-2xl">S</span>
+                    </div>
+                    <div className="w-16 h-16 bg-orange-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-2xl">H</span>
+                    </div>
+                    <div className="w-16 h-16 bg-yellow-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-2xl">A</span>
+                    </div>
                   </div>
-                  <div className="w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-2xl">A</span>
+                  
+                  {/* ID Card Icon */}
+                  <div className="relative ml-4">
+                    <div className="w-20 h-16 bg-white border-2 border-black rounded-lg flex items-center justify-center relative">
+                      <span className="text-orange-500 font-bold text-2xl">ID</span>
+                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-black rounded-t-lg"></div>
+                    </div>
                   </div>
-                  <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-2xl">R</span>
+                  
+                  {/* SOLUTIONS */}
+                  <div className="ml-4">
+                    <span className="text-blue-500 font-bold text-3xl">SOLUTIONS</span>
                   </div>
-                  <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-2xl">S</span>
-                  </div>
-                  <div className="w-16 h-16 bg-orange-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-2xl">H</span>
-                  </div>
-                  <div className="w-16 h-16 bg-yellow-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-2xl">A</span>
-                  </div>
-                </div>
-                
-                {/* ID Card Icon */}
-                <div className="relative ml-4">
-                  <div className="w-20 h-16 bg-white border-2 border-black rounded-lg flex items-center justify-center relative">
-                    <span className="text-orange-500 font-bold text-2xl">ID</span>
-                    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-black rounded-t-lg"></div>
-                  </div>
-                </div>
-                
-                {/* SOLUTIONS */}
-                <div className="ml-4">
-                  <span className="text-blue-500 font-bold text-3xl">SOLUTIONS</span>
                 </div>
               </div>
             </div>
