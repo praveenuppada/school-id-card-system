@@ -469,101 +469,30 @@ export default function TeacherDashboard() {
       // Clean up any existing resources before processing new file
       cleanupResources();
       
-      // For Android, use a different approach to avoid FileReader issues
+      // For Android, use a completely different approach
       if (isAndroid) {
         console.log("📱 Using Android-specific file handling");
         
+        // Method 1: Direct FileReader with minimal processing
         try {
-          // Method 1: Try using URL.createObjectURL for Android
-          const objectUrl = URL.createObjectURL(file);
-          window.currentObjectUrl = objectUrl; // Track for cleanup
-          console.log("📱 Created object URL:", objectUrl);
-          
-          // Convert object URL to data URL using canvas
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          
-          img.onload = () => {
-            try {
-              console.log("📱 Image loaded successfully");
-              
-              // Create canvas to convert to data URL
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              
-              // Set canvas size to image size
-              canvas.width = img.naturalWidth;
-              canvas.height = img.naturalHeight;
-              
-              // Draw image to canvas
-              ctx.drawImage(img, 0, 0);
-              
-              // Convert to data URL with compression
-              const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-              console.log("📱 Converted to data URL, length:", dataUrl.length);
-              
-              // Clean up resources
-              cleanupResources();
-              
-              // Save the photo
-              const updatedPhotos = {
-                ...studentPhotos,
-                [studentId]: {
-                  data: dataUrl,
-                  timestamp: new Date().toISOString(),
-                  status: 'uploaded',
-                  filename: file.name
-                }
-              };
-              
-              setStudentPhotos(updatedPhotos);
-              console.log("📁 Android file uploaded successfully for student:", studentId);
-              
-              // Force save to localStorage immediately
-              localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-              console.log("💾 Immediately saved uploaded file to localStorage");
-              
-              // Clear canvas and image references
-              canvas.width = 0;
-              canvas.height = 0;
-              img.src = '';
-              
-            } catch (canvasError) {
-              console.error("❌ Canvas conversion error:", canvasError);
-              cleanupResources();
-              alert("Android: Error processing image. Please try a different image.");
-            }
-          };
-          
-          img.onerror = (error) => {
-            console.error("❌ Image loading error:", error);
-            cleanupResources();
-            alert("Android: Error loading image. Please try a different image.");
-          };
-          
-          // Set source to load image
-          img.src = objectUrl;
-          
-        } catch (objectUrlError) {
-          console.error("❌ Object URL creation error:", objectUrlError);
-          
-          // Method 2: Fallback to FileReader with timeout
-          console.log("📱 Falling back to FileReader method");
-          
           const reader = new FileReader();
-          window.currentFileReader = reader; // Track for cleanup
-          let timeoutId;
+          window.currentFileReader = reader;
           
           reader.onload = (e) => {
-            clearTimeout(timeoutId);
             try {
-              console.log("📱 FileReader onload triggered");
+              console.log("📱 Android FileReader onload triggered");
               
               if (!e.target.result || typeof e.target.result !== 'string') {
                 throw new Error("Invalid image data received");
               }
               
-              console.log("📱 Data URL length:", e.target.result.length);
+              console.log("📱 Android Data URL length:", e.target.result.length);
+              console.log("📱 Android Data URL starts with:", e.target.result.substring(0, 50));
+              
+              // Accept any data URL format for Android
+              if (!e.target.result.startsWith('data:')) {
+                console.log("⚠️ Android: Non-standard data URL, but accepting it");
+              }
               
               // Clean up resources
               cleanupResources();
@@ -579,36 +508,99 @@ export default function TeacherDashboard() {
               };
               
               setStudentPhotos(updatedPhotos);
-              console.log("📁 Android FileReader fallback successful for student:", studentId);
+              console.log("📁 Android file uploaded successfully for student:", studentId);
               
+              // Force save to localStorage immediately
               localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
               console.log("💾 Immediately saved uploaded file to localStorage");
               
             } catch (error) {
-              console.error("❌ Android FileReader fallback error:", error);
+              console.error("❌ Android FileReader error:", error);
               cleanupResources();
               alert("Android: Error processing image. Please try a different image.");
             }
           };
           
           reader.onerror = (error) => {
-            clearTimeout(timeoutId);
             console.error("❌ Android FileReader error:", error);
             cleanupResources();
             alert("Android: Error reading file. Please try a different image.");
           };
           
-          // Set timeout for FileReader
-          timeoutId = setTimeout(() => {
-            console.error("❌ Android FileReader timeout");
+          reader.onabort = () => {
+            console.error("❌ Android FileReader aborted");
             cleanupResources();
-            alert("Android: File reading timed out. Please try a smaller image.");
-          }, 8000); // 8 second timeout
+            alert("Android: File reading was cancelled. Please try again.");
+          };
           
-          window.currentTimeout = timeoutId; // Track for cleanup
-          
-          // Start reading
+          // Start reading with minimal processing
+          console.log("📱 Starting Android FileReader...");
           reader.readAsDataURL(file);
+          
+        } catch (fileReaderError) {
+          console.error("❌ Android FileReader creation error:", fileReaderError);
+          
+          // Method 2: Try with ArrayBuffer as fallback
+          try {
+            console.log("📱 Trying Android ArrayBuffer method...");
+            const reader = new FileReader();
+            window.currentFileReader = reader;
+            
+            reader.onload = (e) => {
+              try {
+                console.log("📱 Android ArrayBuffer onload triggered");
+                
+                // Convert ArrayBuffer to base64
+                const arrayBuffer = e.target.result;
+                const bytes = new Uint8Array(arrayBuffer);
+                let binary = '';
+                for (let i = 0; i < bytes.byteLength; i++) {
+                  binary += String.fromCharCode(bytes[i]);
+                }
+                const base64 = btoa(binary);
+                const dataUrl = `data:${file.type};base64,${base64}`;
+                
+                console.log("📱 Android ArrayBuffer converted to data URL, length:", dataUrl.length);
+                
+                // Clean up resources
+                cleanupResources();
+                
+                const updatedPhotos = {
+                  ...studentPhotos,
+                  [studentId]: {
+                    data: dataUrl,
+                    timestamp: new Date().toISOString(),
+                    status: 'uploaded',
+                    filename: file.name
+                  }
+                };
+                
+                setStudentPhotos(updatedPhotos);
+                console.log("📁 Android ArrayBuffer method successful for student:", studentId);
+                
+                localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+                console.log("💾 Immediately saved uploaded file to localStorage");
+                
+              } catch (arrayBufferError) {
+                console.error("❌ Android ArrayBuffer conversion error:", arrayBufferError);
+                cleanupResources();
+                alert("Android: Error processing image. Please try a different image.");
+              }
+            };
+            
+            reader.onerror = (error) => {
+              console.error("❌ Android ArrayBuffer error:", error);
+              cleanupResources();
+              alert("Android: Error reading file. Please try a different image.");
+            };
+            
+            reader.readAsArrayBuffer(file);
+            
+          } catch (arrayBufferCreationError) {
+            console.error("❌ Android ArrayBuffer creation error:", arrayBufferCreationError);
+            cleanupResources();
+            alert("Android: Unable to process image. Please try a different image or restart the app.");
+          }
         }
         
       } else {
