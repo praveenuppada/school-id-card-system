@@ -431,128 +431,182 @@ export default function TeacherDashboard() {
         return;
       }
       
-      // Accept any file size - no compression
-      const processedFile = file;
-      
-      // Create a new FileReader instance with better error handling
-      const reader = new FileReader();
-      
-      reader.onload = (e) => {
+      // For Android, use a different approach to avoid FileReader issues
+      if (isAndroid) {
+        console.log("📱 Using Android-specific file handling");
+        
         try {
-          console.log("📁 FileReader onload triggered");
+          // Method 1: Try using URL.createObjectURL for Android
+          const objectUrl = URL.createObjectURL(file);
+          console.log("📱 Created object URL:", objectUrl);
           
-          // Validate that we got a valid data URL
-          if (!e.target.result || typeof e.target.result !== 'string') {
-            throw new Error("Invalid image data received");
-          }
+          // Convert object URL to data URL using canvas
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
           
-          console.log("📁 Data URL length:", e.target.result.length);
-          console.log("📁 Data URL starts with:", e.target.result.substring(0, 50));
-          
-          // Check if the data URL is valid - be more lenient for Android
-          if (!e.target.result.startsWith('data:image/') && 
-              !e.target.result.startsWith('data:application/') && 
-              !e.target.result.startsWith('data:') && 
-              !isAndroid) {
-            throw new Error("Invalid image format - not a valid data URL");
-          }
-          
-          // For Android, be more lenient with data URL validation
-          if (isAndroid && !e.target.result.startsWith('data:')) {
-            console.log("⚠️ Android device - accepting non-standard data URL format");
-          }
-          
-          const updatedPhotos = {
-            ...studentPhotos,
-            [studentId]: {
-              data: e.target.result,
-              timestamp: new Date().toISOString(),
-              status: 'uploaded',
-              filename: processedFile.name
+          img.onload = () => {
+            try {
+              console.log("📱 Image loaded successfully");
+              
+              // Create canvas to convert to data URL
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              
+              // Set canvas size to image size
+              canvas.width = img.naturalWidth;
+              canvas.height = img.naturalHeight;
+              
+              // Draw image to canvas
+              ctx.drawImage(img, 0, 0);
+              
+              // Convert to data URL
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+              console.log("📱 Converted to data URL, length:", dataUrl.length);
+              
+              // Clean up object URL
+              URL.revokeObjectURL(objectUrl);
+              
+              // Save the photo
+              const updatedPhotos = {
+                ...studentPhotos,
+                [studentId]: {
+                  data: dataUrl,
+                  timestamp: new Date().toISOString(),
+                  status: 'uploaded',
+                  filename: file.name
+                }
+              };
+              
+              setStudentPhotos(updatedPhotos);
+              console.log("📁 Android file uploaded successfully for student:", studentId);
+              
+              // Force save to localStorage immediately
+              localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+              console.log("💾 Immediately saved uploaded file to localStorage");
+              
+            } catch (canvasError) {
+              console.error("❌ Canvas conversion error:", canvasError);
+              alert("Android: Error processing image. Please try a different image.");
             }
           };
           
-          setStudentPhotos(updatedPhotos);
-          console.log("📁 File uploaded successfully for student:", studentId);
+          img.onerror = (error) => {
+            console.error("❌ Image loading error:", error);
+            URL.revokeObjectURL(objectUrl);
+            alert("Android: Error loading image. Please try a different image.");
+          };
           
-          // Force save to localStorage immediately
-          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-          console.log("💾 Immediately saved uploaded file to localStorage");
+          // Set source to load image
+          img.src = objectUrl;
           
-        } catch (error) {
-          console.error("❌ Error creating photo preview:", error);
-          console.error("❌ Error details:", error.message);
+        } catch (objectUrlError) {
+          console.error("❌ Object URL creation error:", objectUrlError);
           
-          // Android-specific error message
-          if (isAndroid) {
-            alert("Android: Error processing image. Please try again or use a different image.");
-          } else {
+          // Method 2: Fallback to FileReader with timeout
+          console.log("📱 Falling back to FileReader method");
+          
+          const reader = new FileReader();
+          let timeoutId;
+          
+          reader.onload = (e) => {
+            clearTimeout(timeoutId);
+            try {
+              console.log("📱 FileReader onload triggered");
+              
+              if (!e.target.result || typeof e.target.result !== 'string') {
+                throw new Error("Invalid image data received");
+              }
+              
+              console.log("📱 Data URL length:", e.target.result.length);
+              
+              const updatedPhotos = {
+                ...studentPhotos,
+                [studentId]: {
+                  data: e.target.result,
+                  timestamp: new Date().toISOString(),
+                  status: 'uploaded',
+                  filename: file.name
+                }
+              };
+              
+              setStudentPhotos(updatedPhotos);
+              console.log("📁 Android FileReader fallback successful for student:", studentId);
+              
+              localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+              console.log("💾 Immediately saved uploaded file to localStorage");
+              
+            } catch (error) {
+              console.error("❌ Android FileReader fallback error:", error);
+              alert("Android: Error processing image. Please try a different image.");
+            }
+          };
+          
+          reader.onerror = (error) => {
+            clearTimeout(timeoutId);
+            console.error("❌ Android FileReader error:", error);
+            alert("Android: Error reading file. Please try a different image.");
+          };
+          
+          // Set timeout for FileReader
+          timeoutId = setTimeout(() => {
+            console.error("❌ Android FileReader timeout");
+            alert("Android: File reading timed out. Please try a smaller image.");
+          }, 10000); // 10 second timeout
+          
+          // Start reading
+          reader.readAsDataURL(file);
+        }
+        
+      } else {
+        // For non-Android devices, use the original FileReader method
+        console.log("📱 Using standard FileReader for non-Android device");
+        
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+          try {
+            console.log("📁 FileReader onload triggered");
+            
+            if (!e.target.result || typeof e.target.result !== 'string') {
+              throw new Error("Invalid image data received");
+            }
+            
+            console.log("📁 Data URL length:", e.target.result.length);
+            
+            const updatedPhotos = {
+              ...studentPhotos,
+              [studentId]: {
+                data: e.target.result,
+                timestamp: new Date().toISOString(),
+                status: 'uploaded',
+                filename: file.name
+              }
+            };
+            
+            setStudentPhotos(updatedPhotos);
+            console.log("📁 File uploaded successfully for student:", studentId);
+            
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+            console.log("💾 Immediately saved uploaded file to localStorage");
+            
+          } catch (error) {
+            console.error("❌ Error creating photo preview:", error);
             alert("Error processing image. Please try again with a different image or format.");
           }
-        }
-      };
-      
-      reader.onerror = (error) => {
-        console.error("❌ Error reading file:", error);
-        console.error("❌ FileReader error details:", {
-          error: error.target.error,
-          readyState: error.target.readyState
-        });
+        };
         
-        // Android-specific error message
-        if (isAndroid) {
-          alert("Android: Error reading file. Please try again or use a different image.");
-        } else {
+        reader.onerror = (error) => {
+          console.error("❌ Error reading file:", error);
           alert("Error reading file. Please try again with a different image or format.");
-        }
-      };
-      
-      reader.onabort = () => {
-        console.error("❌ File reading was aborted");
-        alert("File reading was cancelled. Please try again.");
-      };
-      
-      reader.onloadstart = () => {
-        console.log("📁 FileReader started reading file");
-      };
-      
-      reader.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = (event.loaded / event.total) * 100;
-          console.log(`📁 File reading progress: ${progress.toFixed(1)}%`);
-        }
-      };
-      
-      reader.onloadend = () => {
-        console.log("📁 FileReader finished reading file");
-      };
-      
-      // Start reading the file with maximum quality
-      console.log("📁 Starting to read file as data URL...");
-      
-      // For Android, try different reading methods if needed
-      if (isAndroid) {
-        try {
-          reader.readAsDataURL(processedFile);
-        } catch (androidError) {
-          console.error("❌ Android FileReader error:", androidError);
-          // Fallback for Android
-          try {
-            reader.readAsArrayBuffer(processedFile);
-          } catch (fallbackError) {
-            console.error("❌ Android fallback error:", fallbackError);
-            alert("Android: Unable to read image file. Please try a different image.");
-          }
-        }
-      } else {
-        reader.readAsDataURL(processedFile);
+        };
+        
+        reader.readAsDataURL(file);
       }
       
     } catch (error) {
       console.error("❌ Error handling file upload:", error);
       console.error("❌ Error stack:", error.stack);
       
-      // Android-specific error message
       const isAndroid = /Android/i.test(navigator.userAgent);
       if (isAndroid) {
         alert("Android: Error uploading file. Please try again or use a different image.");
