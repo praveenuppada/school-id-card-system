@@ -273,8 +273,6 @@ export default function Welcome() {
             </div>
           </div>
         )}
-          </div>
-        </div>
       </header>
 
       {/* Main Content */}
