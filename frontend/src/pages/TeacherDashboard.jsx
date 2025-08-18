@@ -376,7 +376,7 @@ export default function TeacherDashboard() {
 
 
 
-  const submitAllRecords = async () => {
+  const handleSubmitAllRecords = async () => {
     const savedPhotos = Object.entries(studentPhotos).filter(([_, photo]) => photo?.status === 'saved');
     
     if (savedPhotos.length === 0) {
@@ -413,6 +413,23 @@ export default function TeacherDashboard() {
       console.log("📤 After submission - photos:", updatedPhotos);
     } catch (error) {
       console.error("Error submitting records:", error);
+    }
+  };
+
+  const handleClearAllPhotos = async () => {
+    try {
+      // Clear local photos
+      setStudentPhotos({});
+      localStorage.removeItem('teacherStudentPhotos');
+      
+      // You can add API call here to delete records from backend
+      // await deleteAllRecords();
+      
+      console.log("All photos cleared successfully");
+    } catch (error) {
+      console.error("Error clearing photos:", error);
+    } finally {
+      setShowDeleteConfirmation(false);
     }
   };
 
@@ -508,252 +525,287 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar role="TEACHER" />
-      <div className="flex-1 p-4 sm:p-6 ml-0 md:ml-64 max-w-full">
-        {/* Mobile Header */}
-        <div className="block sm:hidden mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">
-                {(() => {
-                  const schoolName = user?.schoolName || user?.school?.name || 
-                                    profile?.schoolName || profile?.school?.name ||
-                                    localStorage.getItem('teacherSchoolName') || 
-                                    "School Dashboard";
-                  return schoolName;
-                })()}
-              </h1>
-              <p className="text-xs text-gray-500">Teacher Portal</p>
+      
+      {/* Main Content Container - Following Amazon's structure */}
+      <div className="ml-0 md:ml-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          
+          {/* Header Section - Like Amazon's page headers */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-4 sm:mb-0">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {user?.schoolName || user?.school?.name || profile?.schoolName || profile?.school?.name || localStorage.getItem('teacherSchoolName') || "School Dashboard"}
+                </h1>
+                <p className="mt-1 text-sm text-gray-500">Teacher Portal</p>
+              </div>
+              
+              {/* Action Button - Like Amazon's primary actions */}
+              <div className="flex-shrink-0">
+                <button
+                  onClick={handleSubmitAllRecords}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                >
+                  📋 Submit All Records
+                </button>
+              </div>
             </div>
-            <button
-              onClick={submitAllRecords}
-              className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm shadow-sm"
-            >
-              📤 Submit All
-            </button>
           </div>
-        </div>
 
-        {/* Desktop Header */}
-        <div className="hidden sm:flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {(() => {
-                const schoolName = user?.schoolName || user?.school?.name || 
-                                  profile?.schoolName || profile?.school?.name ||
-                                  localStorage.getItem('teacherSchoolName') || 
-                                  "School Dashboard";
-                return schoolName;
-              })()}
-            </h1>
-            <p className="text-sm text-gray-500">Teacher Portal</p>
+          {/* Class Selection - Like Amazon's filter sections */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div className="px-6 py-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Select Class</label>
+              <select
+                value={selectedClass}
+                onChange={(e) => handleClassChange(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors"
+              >
+                <option value="">Choose a class...</option>
+                {Array.isArray(classes) && classes.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={submitAllRecords}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-sm"
-            >
-              📤 Submit All Records
-            </button>
-          </div>
-        </div>
-        
-        {/* Class Selection */}
-        <div className="bg-white rounded-lg p-4 mb-6 shadow-sm border border-gray-100">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Select Class</label>
-          <select
-            value={selectedClass}
-            onChange={(e) => handleClassChange(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors"
-          >
-            <option value="">Choose a class...</option>
-            {Array.isArray(classes) && classes.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
 
-        {/* Students Table */}
-        {Array.isArray(students) && students.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
-            {/* Desktop Table */}
-            <div className="hidden md:block">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo ID</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo Upload</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
-                  {getPaginatedStudents().map((student) => (
-                    <tr key={student._id || student.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {student.photoId}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {student.fullName}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {student.className}
-                      </td>
-                      <td className="px-6 py-4">
-                        <PhotoUploadComponent student={student} />
-                      </td>
-                      <td className="px-6 py-4">
+          {/* Students Content - Like Amazon's product listings */}
+          {Array.isArray(students) && students.length > 0 && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              
+              {/* Desktop Table - Like Amazon's product tables */}
+              <div className="hidden md:block">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo ID</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo Upload</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {getPaginatedStudents().map((student) => (
+                      <tr key={student._id || student.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          {student.photoId}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          {student.fullName}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          {student.className}
+                        </td>
+                        <td className="px-6 py-4">
+                          <PhotoUploadComponent student={student} />
+                        </td>
+                        <td className="px-6 py-4">
+                          {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              ✅ Submitted
+                            </span>
+                          ) : studentPhotos[student._id || student.id]?.status === 'saved' ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              💾 Saved
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                              ⏳ Pending
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards - Like Amazon's mobile product cards */}
+              <div className="md:hidden">
+                {getPaginatedStudents().map((student) => (
+                  <div key={student._id || student.id} className="border-b border-gray-200 p-4 last:border-b-0">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{student.fullName}</h3>
+                        <div className="space-y-1">
+                          <p className="text-sm text-gray-600">📋 ID: {student.photoId}</p>
+                          <p className="text-sm text-gray-600">🏫 Class: {student.className}</p>
+                        </div>
+                      </div>
+                      <div className="ml-4">
                         {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            📤 Submitted
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ✅ Submitted
                           </span>
                         ) : studentPhotos[student._id || student.id]?.status === 'saved' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            ✅ Saved
-                          </span>
-                        ) : studentPhotos[student._id || student.id] ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            📸 Captured
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            💾 Saved
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                             ⏳ Pending
                           </span>
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Cards */}
-            <div className="md:hidden">
-              {getPaginatedStudents().map((student) => (
-                <div key={student._id || student.id} className="border-b border-gray-200 p-3 bg-white">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{student.fullName}</h3>
-                      <div className="space-y-1">
-                        <p className="text-sm text-gray-600">📋 ID: {student.photoId}</p>
-                        <p className="text-sm text-gray-600">🏫 Class: {student.className}</p>
                       </div>
                     </div>
-                    <div className="ml-3">
-                      {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                          📤 Submitted
-                        </span>
-                      ) : studentPhotos[student._id || student.id]?.status === 'saved' ? (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                          ✅ Saved
-                        </span>
-                      ) : studentPhotos[student._id || student.id] ? (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                          📸 Captured
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                          ⏳ Pending
-                        </span>
-                      )}
+                    <div className="mt-4">
+                      <PhotoUploadComponent student={student} />
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <PhotoUploadComponent student={student} />
+                ))}
+              </div>
+
+              {/* Pagination - Like Amazon's pagination */}
+              {getTotalPages() > 1 && (
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    <button
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === 1
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage(Math.min(getTotalPages(), currentPage + 1))}
+                      disabled={currentPage === getTotalPages()}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === getTotalPages()
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
+                        <span className="font-medium">
+                          {Math.min(currentPage * itemsPerPage, students.length)}
+                        </span>{' '}
+                        of <span className="font-medium">{students.length}</span> results
+                      </p>
+                    </div>
+                    <div>
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        <button
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-l-md border text-sm font-medium ${
+                            currentPage === 1
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-white text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          Previous
+                        </button>
+                        {Array.from({ length: getTotalPages() }, (_, i) => i + 1).map((page) => (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                              page === currentPage
+                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                        <button
+                          onClick={() => setCurrentPage(Math.min(getTotalPages(), currentPage + 1))}
+                          disabled={currentPage === getTotalPages()}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-r-md border text-sm font-medium ${
+                            currentPage === getTotalPages()
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-white text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          Next
+                        </button>
+                      </nav>
+                    </div>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
+          )}
 
-            {/* Pagination */}
-            {getTotalPages() > 1 && (
-              <div className="bg-white px-6 py-4 flex items-center justify-between border-t border-gray-100">
-                <div className="flex-1 flex justify-between">
-                  <button
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Previous
-                  </button>
-                  <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                    Page {currentPage} of {getTotalPages()}
-                  </span>
-                  <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={currentPage === getTotalPages()}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
+          {/* Empty State - Like Amazon's empty states */}
+          {Array.isArray(students) && students.length === 0 && selectedClass && (
+            <div className="text-center py-12">
+              <div className="mx-auto h-12 w-12 text-gray-400">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
               </div>
-            )}
-          </div>
-        )}
-
-        {selectedClass && students.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No students found in this class.</p>
-          </div>
-        )}
-
-        {/* Confirmation Card */}
-        {showConfirmationCard && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
-              <div className="text-green-500 text-6xl mb-4">✅</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Data Sent Successfully!</h3>
-              <p className="text-gray-600 mb-6">
-                All student records have been successfully sent to the admin.
-              </p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={() => setShowConfirmationCard(false)}
-                  className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  Continue
-                </button>
-
-              </div>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No students found</h3>
+              <p className="mt-1 text-sm text-gray-500">No students are registered in this class.</p>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Delete Confirmation Card */}
-        {showDeleteConfirmation && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
-              <div className="text-red-500 text-6xl mb-4">⚠️</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Delete All Records</h3>
-              <p className="text-gray-600 mb-6">
-                This will permanently delete ALL records for this school!
-                <br /><br />
-                • All student photos will be deleted<br />
-                • All Excel data will be removed<br />
-                • This action cannot be undone!
-              </p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={() => setShowDeleteConfirmation(false)}
-                  className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteAllRecords}
-                  className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                >
-                  Delete All Records
-                </button>
+          {/* No Class Selected State */}
+          {!selectedClass && (
+            <div className="text-center py-12">
+              <div className="mx-auto h-12 w-12 text-gray-400">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
               </div>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">Select a class</h3>
+              <p className="mt-1 text-sm text-gray-500">Choose a class from the dropdown above to view students.</p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
+      {/* Confirmation Cards */}
+      {showConfirmationCard && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Records Submitted Successfully!</h3>
+            <p className="text-sm text-gray-600 mb-6">All student photos have been submitted to the admin for review.</p>
+            <button
+              onClick={() => setShowConfirmationCard(false)}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Clear All Photos?</h3>
+            <p className="text-sm text-gray-600 mb-6">This will remove all uploaded photos. This action cannot be undone.</p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowDeleteConfirmation(false)}
+                className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleClearAllPhotos}
+                className="flex-1 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

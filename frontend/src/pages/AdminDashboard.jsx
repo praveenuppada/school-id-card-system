@@ -406,372 +406,377 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar role="ADMIN" />
-      <div className="p-4 sm:p-6 ml-0 md:ml-64 max-w-full">
-                  {/* Mobile Header */}
-          <div className="block sm:hidden mb-3">
-            <div className="flex items-center justify-between mb-3">
-              <h1 className="text-base font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
-              <NotificationBell />
-            </div>
-            
-            {/* Mobile ID Card Logo */}
-            <div className="text-center mb-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-2">
-                <div className="text-white text-xl font-bold">ID</div>
-              </div>
-              <h1 className="text-lg font-bold text-gray-800 mb-1">Admin Dashboard</h1>
-              <p className="text-xs text-gray-600">A Complete ID World</p>
-            </div>
+      
+      {/* Main Content Container - Following Amazon's structure */}
+      <div className="ml-0 md:ml-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           
-          {/* Mobile Quick Stats */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <div className="bg-white p-2 rounded-lg shadow border border-gray-100 text-center">
-              <div className="text-lg font-bold text-yellow-600">{stats.totalSchools}</div>
-              <div className="text-xs text-gray-600">Schools</div>
-            </div>
-            <div className="bg-white p-2 rounded-lg shadow border border-gray-100 text-center">
-              <div className="text-lg font-bold text-blue-600">{stats.totalClasses}</div>
-              <div className="text-xs text-gray-600">Classes</div>
-            </div>
-            <div className="bg-white p-2 rounded-lg shadow border border-gray-100 text-center">
-              <div className="text-lg font-bold text-green-600">{stats.totalStudents}</div>
-              <div className="text-xs text-gray-600">Students</div>
+          {/* Header Section - Like Amazon's page headers */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-4 sm:mb-0">
+                <h1 className="text-2xl font-bold text-gray-900">HARSHA ID SOLUTIONS</h1>
+                <p className="mt-1 text-sm text-gray-500">A Complete ID World</p>
+              </div>
+              
+              {/* Action Buttons - Like Amazon's primary actions */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={handleDownloadAllPhotos}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                >
+                  📥 Download All Photos
+                </button>
+                <button
+                  onClick={handleDownloadExcel}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                >
+                  📊 Download Excel
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-                  {/* Desktop Header */}
-          <div className="hidden sm:block">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-xl font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
-              <NotificationBell />
-            </div>
-
-            {/* Desktop ID Card Logo */}
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-4">
-                <div className="text-white text-3xl font-bold">ID</div>
+          {/* Quick Stats - Like Amazon's dashboard stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Total Students</dt>
+                      <dd className="text-lg font-medium text-gray-900">{students.length}</dd>
+                    </dl>
+                  </div>
+                </div>
               </div>
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
-              <p className="text-base text-gray-600">A Complete ID World</p>
             </div>
-          
-          {/* Desktop Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 text-center">
-              <div className="text-2xl font-bold text-yellow-600 mb-1">{stats.totalSchools}</div>
-              <div className="text-sm text-gray-600">Total Schools</div>
+
+            <div className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Photos Uploaded</dt>
+                      <dd className="text-lg font-medium text-gray-900">{students.filter(s => s.photoUploaded).length}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 text-center">
-              <div className="text-2xl font-bold text-blue-600 mb-1">{stats.totalClasses}</div>
-              <div className="text-sm text-gray-600">Total Classes</div>
-            </div>
-            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 text-center">
-              <div className="text-2xl font-bold text-green-600 mb-1">{stats.totalStudents}</div>
-              <div className="text-sm text-gray-600">Total Students</div>
+
+            <div className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Pending Photos</dt>
+                      <dd className="text-lg font-medium text-gray-900">{students.filter(s => !s.photoUploaded).length}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Students List */}
-        {students.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold">Students</h3>
-              <p className="text-sm text-gray-600">
-                Showing {getPaginatedStudents().length} of {students.length} students
-              </p>
-            </div>
-            
-            {/* Desktop Table */}
-            <div className="hidden md:block">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Photo ID
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Full Name
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Class
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Photo Status
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
-                  {getPaginatedStudents().map((student) => (
-                    <tr key={student.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {student.photoId}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {student.fullName}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {student.className}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {student.photoUploaded ? (
-                          <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">✅ Uploaded</span>
-                        ) : (
-                          <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">❌ Pending</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => openPhotoEditor(student)}
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            ✂️ Crop
-                          </button>
-                          {student.photoUrl && (
-                            <button
-                              onClick={() => downloadPhoto(student)}
-                              className="text-green-600 hover:text-green-900"
-                            >
-                              📥 Download
-                            </button>
-                          )}
-                        </div>
-                      </td>
+          {/* Students Content - Like Amazon's product listings */}
+          {Array.isArray(students) && students.length > 0 && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              
+              {/* Desktop Table - Like Amazon's product tables */}
+              <div className="hidden md:block">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo ID</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo Status</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {getPaginatedStudents().map((student) => (
+                      <tr key={student.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          {student.photoId}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          {student.fullName}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          {student.className}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          {student.photoUploaded ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              ✅ Uploaded
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              ❌ Pending
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => openPhotoEditor(student)}
+                              className="text-blue-600 hover:text-blue-900 font-medium"
+                            >
+                              ✂️ Crop
+                            </button>
+                            {student.photoUrl && (
+                              <button
+                                onClick={() => downloadPhoto(student)}
+                                className="text-green-600 hover:text-green-900 font-medium"
+                              >
+                                📥 Download
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Mobile Cards */}
-            <div className="md:hidden">
-              {getPaginatedStudents().map((student) => (
-                <div key={student.id} className="border-b border-gray-200 p-4 bg-white">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{student.fullName}</h3>
-                      <div className="space-y-1">
-                        <p className="text-sm text-gray-600">📋 ID: {student.photoId}</p>
-                        <p className="text-sm text-gray-600">🏫 Class: {student.className}</p>
+              {/* Mobile Cards - Like Amazon's mobile product cards */}
+              <div className="md:hidden">
+                {getPaginatedStudents().map((student) => (
+                  <div key={student.id} className="border-b border-gray-200 p-4 last:border-b-0">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{student.fullName}</h3>
+                        <div className="space-y-1">
+                          <p className="text-sm text-gray-600">📋 ID: {student.photoId}</p>
+                          <p className="text-sm text-gray-600">🏫 Class: {student.className}</p>
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        {student.photoUploaded ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ✅ Uploaded
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            ❌ Pending
+                          </span>
+                        )}
                       </div>
                     </div>
-                    <div className="ml-3">
-                      {student.photoUploaded ? (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                          ✅ Uploaded
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                          ❌ Pending
-                        </span>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => openPhotoEditor(student)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 font-medium transition-colors"
+                      >
+                        ✂️ Crop Photo
+                      </button>
+                      {student.photoUrl && (
+                        <button
+                          onClick={() => downloadPhoto(student)}
+                          className="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 font-medium transition-colors"
+                        >
+                          📥 Download
+                        </button>
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-3">
+                ))}
+              </div>
+
+              {/* Pagination - Like Amazon's pagination */}
+              {getTotalPages() > 1 && (
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                  <div className="flex-1 flex justify-between sm:hidden">
                     <button
-                      onClick={() => openPhotoEditor(student)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 font-medium transition-colors"
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === 1
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
                     >
-                      ✂️ Crop Photo
+                      Previous
                     </button>
-                    {student.photoUrl && (
-                      <button
-                        onClick={() => downloadPhoto(student)}
-                        className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
-                      >
-                        📥 Download
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setCurrentPage(Math.min(getTotalPages(), currentPage + 1))}
+                      disabled={currentPage === getTotalPages()}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === getTotalPages()
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
+                        <span className="font-medium">
+                          {Math.min(currentPage * itemsPerPage, students.length)}
+                        </span>{' '}
+                        of <span className="font-medium">{students.length}</span> results
+                      </p>
+                    </div>
+                    <div>
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        <button
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-l-md border text-sm font-medium ${
+                            currentPage === 1
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-white text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          Previous
+                        </button>
+                        {Array.from({ length: getTotalPages() }, (_, i) => i + 1).map((page) => (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                              page === currentPage
+                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                        <button
+                          onClick={() => setCurrentPage(Math.min(getTotalPages(), currentPage + 1))}
+                          disabled={currentPage === getTotalPages()}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-r-md border text-sm font-medium ${
+                            currentPage === getTotalPages()
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-white text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          Next
+                        </button>
+                      </nav>
+                    </div>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Photo Editor Modal */}
-        {selectedPhoto && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white p-4 sm:p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Crop Photo for {selectedPhoto.fullName}</h3>
+          {/* Empty State - Like Amazon's empty states */}
+          {Array.isArray(students) && students.length === 0 && (
+            <div className="text-center py-12">
+              <div className="mx-auto h-12 w-12 text-gray-400">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No students found</h3>
+              <p className="mt-1 text-sm text-gray-500">No students have been registered yet.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Photo Editor Modal */}
+      {selectedPhoto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-medium text-gray-900">Crop Photo - {selectedPhoto.fullName}</h3>
                 <button
-                  onClick={() => {
-                    setSelectedPhoto(null);
-                    setCropData(null);
-                  }}
-                  className="text-gray-500 hover:text-gray-700 p-2"
+                  onClick={closePhotoEditor}
+                  className="text-gray-400 hover:text-gray-600"
                 >
-                  ❌ Cancel
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
               
-              {/* Instructions */}
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800 font-medium mb-2">📝 How to Crop:</p>
-                <ul className="text-xs text-blue-700 space-y-1">
-                  <li>• <strong>Drag corners</strong> (yellow circles) to resize from corners</li>
-                  <li>• <strong>Drag edges</strong> (yellow rectangles) to resize from sides</li>
-                  <li>• <strong>Click and drag</strong> inside the crop area to move it</li>
-                  <li>• <strong>Use Reset</strong> to return to default crop</li>
-                </ul>
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-2">Drag the corners to crop the photo. Click and drag the center to move the crop area.</p>
+                <div className="text-xs text-gray-500">
+                  Crop: {Math.round(cropData?.x || 25)}x{Math.round(cropData?.y || 25)} - {Math.round(cropData?.width || 50)}x{Math.round(cropData?.height || 50)}
+                </div>
               </div>
-              
-              <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden mb-4 crop-container">
+
+              <div className="relative crop-container mb-6">
                 <img
                   src={selectedPhoto.photoUrl}
-                  alt={selectedPhoto.fullName}
-                  className="w-full h-auto"
+                  alt="Student photo"
+                  className="max-w-full h-auto"
+                  style={{ maxHeight: '400px' }}
                   id="cropImage"
                   crossOrigin="anonymous"
                 />
-                
-                {/* Crop Overlay */}
                 <div
-                  className="absolute inset-0 pointer-events-none"
+                  className="absolute border-2 border-yellow-400 cursor-move"
                   style={{
                     left: `${cropData?.x || 25}%`,
                     top: `${cropData?.y || 25}%`,
                     width: `${cropData?.width || 50}%`,
                     height: `${cropData?.height || 50}%`,
-                    border: '3px solid #ffd700',
-                    boxSizing: 'border-box',
                     boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
                   }}
+                  onMouseDown={handleCropDrag}
                 >
-                  {/* Grid Lines */}
-                  <div className="absolute top-0 left-1/3 w-px h-full bg-yellow-400 opacity-50"></div>
-                  <div className="absolute top-0 left-2/3 w-px h-full bg-yellow-400 opacity-50"></div>
-                  <div className="absolute left-0 top-1/3 w-full h-px bg-yellow-400 opacity-50"></div>
-                  <div className="absolute left-0 top-2/3 w-full h-px bg-yellow-400 opacity-50"></div>
-                  
-                  {/* Move Area - Click and drag to move the entire crop */}
-                  <div
-                    className="absolute inset-0 cursor-move"
-                    style={{
-                      left: '10%',
-                      top: '10%',
-                      width: '80%',
-                      height: '80%'
-                    }}
-                    onMouseDown={(e) => handleCropDrag(e, 'move')}
-                  />
-                </div>
-                
-                {/* Corner Handles */}
-                <div
-                  className="absolute w-6 h-6 bg-yellow-500 border-2 border-white rounded-full cursor-nw-resize shadow-lg hover:bg-yellow-400 transition-colors"
-                  style={{
-                    left: `${cropData?.x || 25}%`,
-                    top: `${cropData?.y || 25}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onMouseDown={(e) => handleCropDrag(e, 'topLeft')}
-                />
-                <div
-                  className="absolute w-6 h-6 bg-yellow-500 border-2 border-white rounded-full cursor-ne-resize shadow-lg hover:bg-yellow-400 transition-colors"
-                  style={{
-                    left: `${cropData?.x + cropData?.width || 75}%`,
-                    top: `${cropData?.y || 25}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onMouseDown={(e) => handleCropDrag(e, 'topRight')}
-                />
-                <div
-                  className="absolute w-6 h-6 bg-yellow-500 border-2 border-white rounded-full cursor-sw-resize shadow-lg hover:bg-yellow-400 transition-colors"
-                  style={{
-                    left: `${cropData?.x || 25}%`,
-                    top: `${cropData?.y + cropData?.height || 75}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onMouseDown={(e) => handleCropDrag(e, 'bottomLeft')}
-                />
-                <div
-                  className="absolute w-6 h-6 bg-yellow-500 border-2 border-white rounded-full cursor-se-resize shadow-lg hover:bg-yellow-400 transition-colors"
-                  style={{
-                    left: `${cropData?.x + cropData?.width || 75}%`,
-                    top: `${cropData?.y + cropData?.height || 75}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onMouseDown={(e) => handleCropDrag(e, 'bottomRight')}
-                />
-                
-                {/* Edge Handles */}
-                <div
-                  className="absolute w-4 h-6 bg-yellow-500 border-2 border-white rounded cursor-n-resize shadow-lg hover:bg-yellow-400 transition-colors"
-                  style={{
-                    left: `${cropData?.x + (cropData?.width || 50) / 2}%`,
-                    top: `${cropData?.y || 25}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onMouseDown={(e) => handleCropDrag(e, 'top')}
-                />
-                <div
-                  className="absolute w-4 h-6 bg-yellow-500 border-2 border-white rounded cursor-s-resize shadow-lg hover:bg-yellow-400 transition-colors"
-                  style={{
-                    left: `${cropData?.x + (cropData?.width || 50) / 2}%`,
-                    top: `${cropData?.y + cropData?.height || 75}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onMouseDown={(e) => handleCropDrag(e, 'bottom')}
-                />
-                <div
-                  className="absolute w-6 h-4 bg-yellow-500 border-2 border-white rounded cursor-w-resize shadow-lg hover:bg-yellow-400 transition-colors"
-                  style={{
-                    left: `${cropData?.x || 25}%`,
-                    top: `${cropData?.y + (cropData?.height || 50) / 2}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onMouseDown={(e) => handleCropDrag(e, 'left')}
-                />
-                <div
-                  className="absolute w-6 h-4 bg-yellow-500 border-2 border-white rounded cursor-e-resize shadow-lg hover:bg-yellow-400 transition-colors"
-                  style={{
-                    left: `${cropData?.x + cropData?.width || 75}%`,
-                    top: `${cropData?.y + (cropData?.height || 50) / 2}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onMouseDown={(e) => handleCropDrag(e, 'right')}
-                />
-              </div>
-              
-              {/* Crop Info */}
-              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-700">Position:</span>
-                    <span className="ml-2 text-gray-600">X: {Math.round(cropData?.x || 25)}%, Y: {Math.round(cropData?.y || 25)}%</span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Size:</span>
-                    <span className="ml-2 text-gray-600">W: {Math.round(cropData?.width || 50)}%, H: {Math.round(cropData?.height || 50)}%</span>
-                  </div>
+                  <div className="absolute -top-3 -left-3 w-6 h-6 bg-yellow-400 rounded-full cursor-nw-resize shadow-lg hover:bg-yellow-300 transition-colors" data-handle="top-left"></div>
+                  <div className="absolute -top-3 -right-3 w-6 h-6 bg-yellow-400 rounded-full cursor-ne-resize shadow-lg hover:bg-yellow-300 transition-colors" data-handle="top-right"></div>
+                  <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-yellow-400 rounded-full cursor-sw-resize shadow-lg hover:bg-yellow-300 transition-colors" data-handle="bottom-left"></div>
+                  <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-yellow-400 rounded-full cursor-se-resize shadow-lg hover:bg-yellow-300 transition-colors" data-handle="bottom-right"></div>
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-yellow-400 rounded-full cursor-n-resize shadow-lg hover:bg-yellow-300 transition-colors" data-handle="top"></div>
+                  <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-yellow-400 rounded-full cursor-s-resize shadow-lg hover:bg-yellow-300 transition-colors" data-handle="bottom"></div>
+                  <div className="absolute -left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-yellow-400 rounded-full cursor-w-resize shadow-lg hover:bg-yellow-300 transition-colors" data-handle="left"></div>
+                  <div className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-yellow-400 rounded-full cursor-e-resize shadow-lg hover:bg-yellow-300 transition-colors" data-handle="right"></div>
                 </div>
               </div>
-              
-              <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+
+              <div className="flex justify-end space-x-3">
                 <button
-                  onClick={() => setCropData({ x: 25, y: 25, width: 50, height: 50 })}
-                  className="px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium transition-colors"
+                  onClick={closePhotoEditor}
+                  className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
-                  🔄 Reset
+                  Cancel
                 </button>
                 <button
                   onClick={saveCroppedPhoto}
-                  className="px-4 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium transition-colors"
+                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
-                  💾 Save Changes
+                  Save Cropped Photo
                 </button>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
