@@ -88,7 +88,7 @@ export default function Welcome() {
             {/* HARSHA ID SOLUTIONS Logo in Card */}
             <div className="bg-white shadow-xl rounded-2xl p-8 mb-8 border border-gray-100 transform hover:scale-105 transition-transform duration-300">
               <div className="flex items-center justify-center">
-              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3">
                 {/* HARSHA letters */}
                 <div className="flex space-x-2">
                   <div className="w-16 h-16 bg-red-500 rounded-lg flex items-center justify-center">
@@ -130,6 +130,7 @@ export default function Welcome() {
             <div className="border-t-2 border-b-2 border-red-500 py-3 mt-6">
               <p className="text-2xl font-semibold text-gray-800 text-center">A COMPLETE ID WORLD.....</p>
             </div>
+                </div>
               </div>
             </div>
             
