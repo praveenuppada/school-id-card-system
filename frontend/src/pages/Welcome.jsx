@@ -84,71 +84,71 @@ export default function Welcome() {
         );
       default: // home
         return (
-          <div className="text-center max-w-3xl mx-auto px-2">
+          <div className="text-center max-w-4xl mx-auto">
             {/* Welcome Text - Above Logo */}
-            <div className="text-center mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Welcome to Student ID Management</h2>
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed max-w-2xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Welcome to Student ID Management</h2>
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
                 Streamline your school's student identification process with our comprehensive digital platform. 
                 Manage student records, track photo uploads, and generate ID cards efficiently.
               </p>
             </div>
             
             {/* HARSHA ID SOLUTIONS Logo in Card */}
-            <div className="bg-white shadow-xl rounded-2xl p-3 sm:p-6 mb-4 border border-gray-100 transform hover:scale-105 transition-transform duration-300 overflow-hidden">
-              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-2">
+            <div className="bg-white shadow-2xl rounded-3xl p-6 sm:p-8 mb-8 border border-gray-100 transform hover:scale-105 transition-all duration-300 overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-6">
                 {/* HARSHA letters - Responsive */}
-                <div className="flex flex-wrap justify-center space-x-1 sm:space-x-2">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-red-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm sm:text-lg md:text-2xl">H</span>
+                <div className="flex flex-wrap justify-center space-x-2 sm:space-x-3">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">H</span>
                   </div>
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm sm:text-lg md:text-2xl">A</span>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">A</span>
                   </div>
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-green-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm sm:text-lg md:text-2xl">R</span>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">R</span>
                   </div>
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm sm:text-lg md:text-2xl">S</span>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">S</span>
                   </div>
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-orange-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm sm:text-lg md:text-2xl">H</span>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">H</span>
                   </div>
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-yellow-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm sm:text-lg md:text-2xl">A</span>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg sm:text-xl md:text-2xl">A</span>
                   </div>
                 </div>
                 
                 {/* ID Card Icon - Responsive */}
-                <div className="relative mx-2 sm:mx-4">
-                  <div className="w-12 h-10 sm:w-16 sm:h-12 md:w-20 md:h-16 bg-white border-2 border-black rounded-lg flex items-center justify-center relative">
-                    <span className="text-orange-500 font-bold text-sm sm:text-lg md:text-2xl">ID</span>
-                    <div className="absolute -top-1 sm:-top-2 left-1/2 transform -translate-x-1/2 w-6 sm:w-8 md:w-10 h-1 sm:h-1.5 md:h-2 bg-black rounded-t-lg"></div>
+                <div className="relative mx-4 sm:mx-6">
+                  <div className="w-16 h-12 sm:w-20 sm:h-16 md:w-24 md:h-20 bg-white border-2 border-gray-800 rounded-xl flex items-center justify-center relative shadow-lg">
+                    <span className="text-orange-600 font-bold text-lg sm:text-xl md:text-2xl">ID</span>
+                    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-8 sm:w-10 md:w-12 h-2 bg-gray-800 rounded-t-lg"></div>
                   </div>
                 </div>
                 
                 {/* SOLUTIONS - Responsive */}
-                <div className="mx-2 sm:mx-4">
-                  <span className="text-blue-500 font-bold text-lg sm:text-xl md:text-3xl">SOLUTIONS</span>
+                <div className="mx-4 sm:mx-6">
+                  <span className="text-blue-600 font-bold text-xl sm:text-2xl md:text-3xl">SOLUTIONS</span>
                 </div>
               </div>
             </div>
             
             {/* Tagline */}
-            <div className="border-t-2 border-b-2 border-red-500 py-2 mb-4">
-              <p className="text-base sm:text-lg font-semibold text-gray-800 text-center">A COMPLETE ID WORLD.....</p>
+            <div className="border-t-2 border-b-2 border-red-500 py-3 mb-6">
+              <p className="text-lg sm:text-xl font-bold text-gray-900 text-center">A COMPLETE ID WORLD.....</p>
             </div>
             
-            <p className="text-sm sm:text-base text-blue-600 font-medium mb-4 text-center">Welcome to the Students</p>
+            <p className="text-base sm:text-lg text-blue-600 font-semibold mb-8 text-center">Welcome to the Students</p>
 
             {/* Login Buttons */}
-            <div className="space-y-3 w-full max-w-sm mx-auto">
+            <div className="space-y-4 w-full max-w-md mx-auto">
               <button
                 onClick={() => navigate("/login-teacher")}
-                className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-semibold rounded-xl shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base md:text-lg"
+                className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-2xl shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
               >
-                <div className="flex items-center justify-center space-x-2">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center justify-center space-x-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span>Teacher Login</span>
@@ -156,10 +156,10 @@ export default function Welcome() {
               </button>
               <button
                 onClick={() => navigate("/login-admin")}
-                className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-semibold rounded-xl shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base md:text-lg"
+                className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-2xl shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
               >
-                <div className="flex items-center justify-center space-x-2">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center justify-center space-x-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                   <span>Admin Login</span>
@@ -168,14 +168,14 @@ export default function Welcome() {
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-4 w-full max-w-sm mx-auto">
+            <div className="mt-6 w-full max-w-md mx-auto">
               <a
                 href="https://wa.me/918977219777"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center px-4 sm:px-6 py-3 bg-green-500 text-white font-semibold rounded-xl shadow-lg hover:bg-green-600 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base md:text-lg"
+                className="w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-2xl shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
               >
-                <span className="text-base sm:text-lg mr-2">📱</span>
+                <span className="text-lg mr-3">📱</span>
                 <span>WhatsApp: +91 8977219777</span>
               </a>
             </div>
@@ -191,50 +191,48 @@ export default function Welcome() {
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-yellow-300 rounded-full opacity-10 transform -translate-x-1/2 translate-y-1/2"></div>
       
       {/* Navigation Header */}
-      <header className="relative z-20 bg-white/80 backdrop-blur-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+      <header className="relative z-20 bg-white shadow-sm border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <div className="flex flex-col items-center space-y-1">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-yellow-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">H</span>
-                </div>
-                <span className="text-blue-500 font-bold text-base sm:text-lg">Harsha ID Solutions</span>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center shadow-sm">
+                <span className="text-white font-bold text-lg">H</span>
               </div>
-              <div className="text-center">
-                <p className="text-xs font-semibold text-gray-800">A COMPLETE ID WORLD.....</p>
+              <div className="flex flex-col">
+                <span className="text-gray-900 font-bold text-lg leading-tight">Harsha ID Solutions</span>
+                <span className="text-xs text-gray-500 font-medium">A COMPLETE ID WORLD.....</span>
               </div>
             </div>
 
             {/* Navigation Menu */}
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex items-center space-x-1">
               <button
                 onClick={() => setActiveSection('home')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeSection === 'home'
-                    ? 'bg-yellow-400 text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                    ? 'bg-yellow-500 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 Home
               </button>
               <button
                 onClick={() => setActiveSection('about')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeSection === 'about'
-                    ? 'bg-yellow-400 text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                    ? 'bg-yellow-500 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 About
               </button>
               <button
                 onClick={() => setActiveSection('contact')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeSection === 'contact'
-                    ? 'bg-yellow-400 text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                    ? 'bg-yellow-500 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 Contact
@@ -245,9 +243,11 @@ export default function Welcome() {
             <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="px-3 py-2 bg-yellow-400 text-white rounded-md text-sm font-medium"
+                className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
               >
-                Menu
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </button>
             </div>
           </div>
@@ -255,50 +255,50 @@ export default function Welcome() {
 
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
-            <div className="px-4 py-3 space-y-2">
+          <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
+            <div className="px-4 py-4 space-y-1">
               <button
                 onClick={() => { setActiveSection('home'); setMobileMenuOpen(false); }}
-                className={`w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeSection === 'home'
-                    ? 'bg-yellow-400 text-white'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-yellow-50'
+                    ? 'bg-yellow-500 text-white shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                🏠 Home
+                Home
               </button>
               <button
                 onClick={() => { setActiveSection('about'); setMobileMenuOpen(false); }}
-                className={`w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeSection === 'about'
-                    ? 'bg-yellow-400 text-white'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-yellow-50'
+                    ? 'bg-yellow-500 text-white shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                ℹ️ About
+                About
               </button>
               <button
                 onClick={() => { setActiveSection('contact'); setMobileMenuOpen(false); }}
-                className={`w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeSection === 'contact'
-                    ? 'bg-yellow-400 text-white'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-yellow-50'
+                    ? 'bg-yellow-500 text-white shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                📞 Contact
+                Contact
               </button>
-              <div className="border-t border-gray-200 pt-3 mt-3">
+              <div className="border-t border-gray-100 pt-3 mt-3 space-y-2">
                 <button
                   onClick={() => navigate('/login-admin')}
-                  className="w-full px-4 py-3 bg-yellow-400 text-white font-semibold rounded-lg hover:bg-yellow-500 transition-colors text-base"
+                  className="w-full px-4 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 text-sm shadow-sm"
                 >
-                  👨‍💼 Admin Login
+                  Admin Login
                 </button>
                 <button
                   onClick={() => navigate('/login-teacher')}
-                  className="w-full px-4 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors text-base mt-2"
+                  className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm shadow-sm"
                 >
-                  👩‍🏫 Teacher Login
+                  Teacher Login
                 </button>
               </div>
             </div>
@@ -307,8 +307,8 @@ export default function Welcome() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-2 py-4 sm:py-8 overflow-x-hidden">
-        <div className="w-full max-w-3xl">
+      <main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden">
+        <div className="w-full max-w-4xl">
           {renderContent()}
         </div>
       </main>

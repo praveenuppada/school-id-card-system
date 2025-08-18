@@ -512,41 +512,47 @@ export default function TeacherDashboard() {
       <Sidebar role="TEACHER" />
       <div className="flex-1 p-2 sm:p-4 ml-0 md:ml-64 overflow-x-hidden">
         {/* Mobile Header */}
-        <div className="block sm:hidden mb-3">
-          <h1 className="text-lg font-bold text-yellow-600 mb-2">
-            {(() => {
-              const schoolName = user?.schoolName || user?.school?.name || 
-                                profile?.schoolName || profile?.school?.name ||
-                                localStorage.getItem('teacherSchoolName') || 
-                                "Teacher Dashboard";
-              return schoolName;
-            })()}
-          </h1>
-          <button
-            onClick={submitAllRecords}
-            className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
-          >
-            📤 Submit All Records
-          </button>
+        <div className="block sm:hidden mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">
+                {(() => {
+                  const schoolName = user?.schoolName || user?.school?.name || 
+                                    profile?.schoolName || profile?.school?.name ||
+                                    localStorage.getItem('teacherSchoolName') || 
+                                    "School Dashboard";
+                  return schoolName;
+                })()}
+              </h1>
+              <p className="text-xs text-gray-500">Teacher Portal</p>
+            </div>
+            <button
+              onClick={submitAllRecords}
+              className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm shadow-sm"
+            >
+              📤 Submit All
+            </button>
+          </div>
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden sm:flex justify-between items-center mb-4">
+        <div className="hidden sm:flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-yellow-600">
+            <h1 className="text-2xl font-bold text-gray-900">
               {(() => {
                 const schoolName = user?.schoolName || user?.school?.name || 
                                   profile?.schoolName || profile?.school?.name ||
                                   localStorage.getItem('teacherSchoolName') || 
-                                  "Teacher Dashboard";
+                                  "School Dashboard";
                 return schoolName;
               })()}
             </h1>
+            <p className="text-sm text-gray-500">Teacher Portal</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={submitAllRecords}
-              className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-sm"
             >
               📤 Submit All Records
             </button>
