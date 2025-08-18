@@ -469,136 +469,102 @@ export default function TeacherDashboard() {
       // Clean up any existing resources before processing new file
       cleanupResources();
       
-      // For Android, use a completely different approach
+      // For Android, use the simplest possible approach
       if (isAndroid) {
-        console.log("📱 Using Android-specific file handling");
+        console.log("📱 Using ultra-simple Android file handling");
         
-        // Method 1: Direct FileReader with minimal processing
+        // Create a simple promise-based FileReader
+        const readFileAsDataURL = (file) => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = () => {
+              console.log("📱 Android FileReader success");
+              resolve(reader.result);
+            };
+            
+            reader.onerror = () => {
+              console.error("📱 Android FileReader error");
+              reject(new Error("FileReader failed"));
+            };
+            
+            reader.onabort = () => {
+              console.error("📱 Android FileReader aborted");
+              reject(new Error("FileReader aborted"));
+            };
+            
+            // Start reading immediately
+            reader.readAsDataURL(file);
+          });
+        };
+        
         try {
-          const reader = new FileReader();
-          window.currentFileReader = reader;
+          console.log("📱 Starting ultra-simple Android file read...");
+          const dataUrl = await readFileAsDataURL(file);
           
-          reader.onload = (e) => {
-            try {
-              console.log("📱 Android FileReader onload triggered");
-              
-              if (!e.target.result || typeof e.target.result !== 'string') {
-                throw new Error("Invalid image data received");
-              }
-              
-              console.log("📱 Android Data URL length:", e.target.result.length);
-              console.log("📱 Android Data URL starts with:", e.target.result.substring(0, 50));
-              
-              // Accept any data URL format for Android
-              if (!e.target.result.startsWith('data:')) {
-                console.log("⚠️ Android: Non-standard data URL, but accepting it");
-              }
-              
-              // Clean up resources
-              cleanupResources();
-              
-              const updatedPhotos = {
-                ...studentPhotos,
-                [studentId]: {
-                  data: e.target.result,
-                  timestamp: new Date().toISOString(),
-                  status: 'uploaded',
-                  filename: file.name
-                }
-              };
-              
-              setStudentPhotos(updatedPhotos);
-              console.log("📁 Android file uploaded successfully for student:", studentId);
-              
-              // Force save to localStorage immediately
-              localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-              console.log("💾 Immediately saved uploaded file to localStorage");
-              
-            } catch (error) {
-              console.error("❌ Android FileReader error:", error);
-              cleanupResources();
-              alert("Android: Error processing image. Please try a different image.");
+          console.log("📱 Android file read successful, length:", dataUrl.length);
+          
+          // Save the photo immediately
+          const updatedPhotos = {
+            ...studentPhotos,
+            [studentId]: {
+              data: dataUrl,
+              timestamp: new Date().toISOString(),
+              status: 'uploaded',
+              filename: file.name
             }
           };
           
-          reader.onerror = (error) => {
-            console.error("❌ Android FileReader error:", error);
-            cleanupResources();
-            alert("Android: Error reading file. Please try a different image.");
-          };
+          setStudentPhotos(updatedPhotos);
+          console.log("📁 Android file uploaded successfully for student:", studentId);
           
-          reader.onabort = () => {
-            console.error("❌ Android FileReader aborted");
-            cleanupResources();
-            alert("Android: File reading was cancelled. Please try again.");
-          };
+          // Force save to localStorage immediately
+          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+          console.log("💾 Immediately saved uploaded file to localStorage");
           
-          // Start reading with minimal processing
-          console.log("📱 Starting Android FileReader...");
-          reader.readAsDataURL(file);
+        } catch (androidError) {
+          console.error("❌ Android ultra-simple method failed:", androidError);
           
-        } catch (fileReaderError) {
-          console.error("❌ Android FileReader creation error:", fileReaderError);
-          
-          // Method 2: Try with ArrayBuffer as fallback
+          // Last resort: try to create a simple blob URL
           try {
-            console.log("📱 Trying Android ArrayBuffer method...");
-            const reader = new FileReader();
-            window.currentFileReader = reader;
+            console.log("📱 Trying Android blob URL method...");
+            const blobUrl = URL.createObjectURL(file);
             
-            reader.onload = (e) => {
-              try {
-                console.log("📱 Android ArrayBuffer onload triggered");
-                
-                // Convert ArrayBuffer to base64
-                const arrayBuffer = e.target.result;
-                const bytes = new Uint8Array(arrayBuffer);
-                let binary = '';
-                for (let i = 0; i < bytes.byteLength; i++) {
-                  binary += String.fromCharCode(bytes[i]);
-                }
-                const base64 = btoa(binary);
-                const dataUrl = `data:${file.type};base64,${base64}`;
-                
-                console.log("📱 Android ArrayBuffer converted to data URL, length:", dataUrl.length);
-                
-                // Clean up resources
-                cleanupResources();
-                
-                const updatedPhotos = {
-                  ...studentPhotos,
-                  [studentId]: {
-                    data: dataUrl,
-                    timestamp: new Date().toISOString(),
-                    status: 'uploaded',
-                    filename: file.name
-                  }
-                };
-                
-                setStudentPhotos(updatedPhotos);
-                console.log("📁 Android ArrayBuffer method successful for student:", studentId);
-                
-                localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-                console.log("💾 Immediately saved uploaded file to localStorage");
-                
-              } catch (arrayBufferError) {
-                console.error("❌ Android ArrayBuffer conversion error:", arrayBufferError);
-                cleanupResources();
-                alert("Android: Error processing image. Please try a different image.");
+            // Convert blob URL to data URL using fetch
+            const response = await fetch(blobUrl);
+            const blob = await response.blob();
+            
+            const reader = new FileReader();
+            const dataUrl = await new Promise((resolve, reject) => {
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = () => reject(new Error("Blob conversion failed"));
+              reader.readAsDataURL(blob);
+            });
+            
+            // Clean up blob URL
+            URL.revokeObjectURL(blobUrl);
+            
+            console.log("📱 Android blob method successful, length:", dataUrl.length);
+            
+            // Save the photo
+            const updatedPhotos = {
+              ...studentPhotos,
+              [studentId]: {
+                data: dataUrl,
+                timestamp: new Date().toISOString(),
+                status: 'uploaded',
+                filename: file.name
               }
             };
             
-            reader.onerror = (error) => {
-              console.error("❌ Android ArrayBuffer error:", error);
-              cleanupResources();
-              alert("Android: Error reading file. Please try a different image.");
-            };
+            setStudentPhotos(updatedPhotos);
+            console.log("📁 Android blob method successful for student:", studentId);
             
-            reader.readAsArrayBuffer(file);
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+            console.log("💾 Immediately saved uploaded file to localStorage");
             
-          } catch (arrayBufferCreationError) {
-            console.error("❌ Android ArrayBuffer creation error:", arrayBufferCreationError);
-            cleanupResources();
+          } catch (blobError) {
+            console.error("❌ Android blob method also failed:", blobError);
             alert("Android: Unable to process image. Please try a different image or restart the app.");
           }
         }
