@@ -224,38 +224,52 @@ export default function Welcome() {
 
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200">
-            <div className="px-4 py-2 space-y-1">
+          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
+            <div className="px-4 py-3 space-y-2">
               <button
                 onClick={() => { setActiveSection('home'); setMobileMenuOpen(false); }}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                   activeSection === 'home'
                     ? 'bg-yellow-400 text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-yellow-50'
                 }`}
               >
-                Home
+                🏠 Home
               </button>
               <button
                 onClick={() => { setActiveSection('about'); setMobileMenuOpen(false); }}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                   activeSection === 'about'
                     ? 'bg-yellow-400 text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-yellow-50'
                 }`}
               >
-                About
+                ℹ️ About
               </button>
               <button
                 onClick={() => { setActiveSection('contact'); setMobileMenuOpen(false); }}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                   activeSection === 'contact'
                     ? 'bg-yellow-400 text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-yellow-50'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-yellow-50'
                 }`}
               >
-                Contact
+                📞 Contact
               </button>
+              <div className="border-t border-gray-200 pt-3 mt-3">
+                <button
+                  onClick={() => navigate('/login-admin')}
+                  className="w-full px-4 py-3 bg-yellow-400 text-white font-semibold rounded-lg hover:bg-yellow-500 transition-colors text-base"
+                >
+                  👨‍💼 Admin Login
+                </button>
+                <button
+                  onClick={() => navigate('/login-teacher')}
+                  className="w-full px-4 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors text-base mt-2"
+                >
+                  👩‍🏫 Teacher Login
+                </button>
+              </div>
             </div>
           </div>
         )}

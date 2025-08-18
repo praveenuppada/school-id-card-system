@@ -406,34 +406,70 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-yellow-600">Admin Dashboard</h1>
-          <NotificationBell />
+      <main className="flex-1 p-4 sm:p-8">
+        {/* Mobile Header */}
+        <div className="block sm:hidden mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-bold text-yellow-600">Admin Dashboard</h1>
+            <NotificationBell />
+          </div>
+          
+          {/* Mobile ID Card Logo */}
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-3">
+              <div className="text-white text-2xl font-bold">ID</div>
+            </div>
+            <h1 className="text-xl font-bold text-gray-800 mb-1">Harsha ID Solutions</h1>
+            <p className="text-sm text-gray-600">School ID Card Management</p>
+          </div>
+          
+          {/* Mobile Quick Stats */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="bg-white p-3 rounded-lg shadow border border-gray-100 text-center">
+              <div className="text-xl font-bold text-yellow-600">{stats.totalSchools}</div>
+              <div className="text-xs text-gray-600">Schools</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow border border-gray-100 text-center">
+              <div className="text-xl font-bold text-blue-600">{stats.totalClasses}</div>
+              <div className="text-xs text-gray-600">Classes</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow border border-gray-100 text-center">
+              <div className="text-xl font-bold text-green-600">{stats.totalStudents}</div>
+              <div className="text-xs text-gray-600">Students</div>
+            </div>
+          </div>
         </div>
 
-        {/* ID Card Logo */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-6">
-            <div className="text-white text-4xl font-bold">ID</div>
+        {/* Desktop Header */}
+        <div className="hidden sm:block">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold text-yellow-600">Admin Dashboard</h1>
+            <NotificationBell />
           </div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Harsha ID Solutions</h1>
-          <p className="text-lg text-gray-600">School ID Card Management System</p>
-        </div>
-        
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-            <div className="text-3xl font-bold text-yellow-600 mb-2">{stats.totalSchools}</div>
-            <div className="text-gray-600">Total Schools</div>
+
+          {/* Desktop ID Card Logo */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-6">
+              <div className="text-white text-4xl font-bold">ID</div>
+            </div>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Harsha ID Solutions</h1>
+            <p className="text-lg text-gray-600">School ID Card Management System</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">{stats.totalClasses}</div>
-            <div className="text-gray-600">Total Classes</div>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">{stats.totalStudents}</div>
-            <div className="text-gray-600">Total Students</div>
+          
+          {/* Desktop Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+              <div className="text-3xl font-bold text-yellow-600 mb-2">{stats.totalSchools}</div>
+              <div className="text-gray-600">Total Schools</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">{stats.totalClasses}</div>
+              <div className="text-gray-600">Total Classes</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">{stats.totalStudents}</div>
+              <div className="text-gray-600">Total Students</div>
+            </div>
           </div>
         </div>
 
@@ -447,7 +483,8 @@ export default function AdminDashboard() {
               </p>
             </div>
             
-            <div className="overflow-x-auto">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -510,13 +547,57 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden">
+              {getPaginatedStudents().map((student) => (
+                <div key={student.id} className="border-b border-gray-200 p-4 bg-white">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{student.fullName}</h3>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600">📋 ID: {student.photoId}</p>
+                        <p className="text-sm text-gray-600">🏫 Class: {student.className}</p>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      {student.photoUploaded ? (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                          ✅ Uploaded
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                          ❌ Pending
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <button
+                      onClick={() => openPhotoEditor(student)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 font-medium transition-colors"
+                    >
+                      ✂️ Crop Photo
+                    </button>
+                    {student.photoUrl && (
+                      <button
+                        onClick={() => downloadPhoto(student)}
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
+                      >
+                        📥 Download
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
         {/* Photo Editor Modal */}
         {selectedPhoto && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg max-w-4xl w-full mx-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white p-4 sm:p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Crop Photo for {selectedPhoto.fullName}</h3>
                 <button
@@ -524,7 +605,7 @@ export default function AdminDashboard() {
                     setSelectedPhoto(null);
                     setCropData(null);
                   }}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 p-2"
                 >
                   ❌ Cancel
                 </button>
@@ -599,18 +680,18 @@ export default function AdminDashboard() {
                 />
               </div>
               
-              <div className="mt-6 flex justify-end gap-3">
+              <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
                 <button
                   onClick={() => setCropData({ x: 25, y: 25, width: 50, height: 50 })}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  className="px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium transition-colors"
                 >
-                  Reset
+                  🔄 Reset
                 </button>
                 <button
                   onClick={saveCroppedPhoto}
-                  className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                  className="px-4 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium transition-colors"
                 >
-                  Save Changes
+                  💾 Save Changes
                 </button>
               </div>
             </div>

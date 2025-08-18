@@ -369,43 +369,47 @@ export default function TeacherDashboard() {
     const photo = studentPhotos[studentId];
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-4">
         {activeCamera === studentId ? (
-          <div className="space-y-3">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded border mx-auto"
-            />
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border-2 border-gray-300"
+              />
+            </div>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => capturePhoto(studentId)}
-                className="px-4 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 font-medium"
+                className="px-4 py-3 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
               >
                 📸 Capture
               </button>
               <button
                 onClick={stopCamera}
-                className="px-4 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600 font-medium"
+                className="px-4 py-3 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 font-medium transition-colors"
               >
                 ❌ Cancel
               </button>
             </div>
           </div>
         ) : photo ? (
-          <div className="space-y-3">
-            <img
-              src={photo.data}
-              alt="Student photo"
-              className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded border mx-auto"
-            />
-            <div className="flex flex-col sm:flex-row gap-2">
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <img
+                src={photo.data}
+                alt="Student photo"
+                className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border-2 border-gray-300"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => savePhoto(studentId)}
                 disabled={photo.status === 'saved'}
-                className={`px-4 py-2 rounded text-sm font-medium ${
+                className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                   photo.status === 'saved'
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 text-white hover:bg-blue-600'
@@ -415,25 +419,27 @@ export default function TeacherDashboard() {
               </button>
               <button
                 onClick={() => retakePhoto(studentId)}
-                className="px-4 py-2 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600 font-medium"
+                className="px-4 py-3 bg-yellow-500 text-white rounded-lg text-sm hover:bg-yellow-600 font-medium transition-colors"
               >
                 📷 Retake
               </button>
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded flex items-center justify-center mx-auto">
-              <span className="text-gray-400 text-sm">No Photo</span>
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                <span className="text-gray-400 text-sm text-center">No Photo</span>
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => startCamera(studentId)}
-                className="px-4 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 font-medium"
+                className="px-4 py-3 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
               >
                 📷 Take Photo
               </button>
-              <label className="px-4 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 cursor-pointer font-medium text-center">
+              <label className="px-4 py-3 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 cursor-pointer font-medium text-center transition-colors">
                 📁 Choose File
                 <input
                   type="file"
@@ -568,34 +574,36 @@ export default function TeacherDashboard() {
             {/* Mobile Cards */}
             <div className="md:hidden">
               {getPaginatedStudents().map((student) => (
-                <div key={student._id || student.id} className="border-b border-gray-200 p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{student.fullName}</h3>
-                      <p className="text-sm text-gray-500">ID: {student.photoId}</p>
-                      <p className="text-sm text-gray-500">Class: {student.className}</p>
+                <div key={student._id || student.id} className="border-b border-gray-200 p-4 bg-white">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{student.fullName}</h3>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600">📋 ID: {student.photoId}</p>
+                        <p className="text-sm text-gray-600">🏫 Class: {student.className}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
+                    <div className="ml-3">
                       {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                           📤 Submitted
                         </span>
                       ) : studentPhotos[student._id || student.id]?.status === 'saved' ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                           ✅ Saved
                         </span>
                       ) : studentPhotos[student._id || student.id] ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
                           📸 Captured
                         </span>
                       ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
                           ⏳ Pending
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="mt-3">
+                  <div className="mt-4">
                     <PhotoUploadComponent student={student} />
                   </div>
                 </div>
