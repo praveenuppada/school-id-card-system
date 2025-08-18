@@ -188,13 +188,21 @@ export default function UploadExcel() {
   };
 
   return (
-    <div className="min-h-screen bg-yellow-50">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar role="ADMIN" />
-      <div className="p-4 sm:p-8 ml-0 md:ml-64">
-        <h1 className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-6">Upload Excel</h1>
+      
+      {/* Main Content Container - Fixed width and no extra spacing */}
+      <div className="ml-0 md:ml-64 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+          
+          {/* Header Section - Compact and professional */}
+          <div className="mb-6">
+            <h1 className="text-xl font-bold text-gray-900">Upload Excel</h1>
+            <p className="text-sm text-gray-500">Upload student data from Excel files</p>
+          </div>
 
-        {/* School Selection */}
-        <div className="bg-white shadow-lg rounded-lg p-4 sm:p-6 mb-6">
+          {/* School Selection */}
+          <div className="bg-white shadow-sm rounded-lg p-4 mb-4 border border-gray-200">
           <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Select School</h2>
           <select
             value={selectedSchool}
@@ -216,13 +224,13 @@ export default function UploadExcel() {
           </p>
         </div>
 
-        {/* Drag and Drop */}
-        <div
-          onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
-          className="border-4 border-dashed border-yellow-400 rounded-lg p-6 sm:p-8 bg-white shadow-md mb-6 text-center cursor-pointer"
-          onClick={() => document.getElementById("excelInput").click()}
-        >
+          {/* Drag and Drop */}
+          <div
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+            className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-white shadow-sm mb-4 text-center cursor-pointer hover:border-gray-400 transition-colors"
+            onClick={() => document.getElementById("excelInput").click()}
+          >
           <p className="text-base sm:text-lg text-gray-600">Drag & Drop your Excel file here</p>
           <p className="text-sm text-gray-500 mt-2">or click to select file</p>
           <input
@@ -234,9 +242,9 @@ export default function UploadExcel() {
           />
         </div>
 
-        {/* Preview with Pagination */}
-        {Object.keys(previewData).length > 0 && (
-          <div className="bg-white shadow-lg rounded-lg p-4 sm:p-6">
+          {/* Preview with Pagination */}
+          {Object.keys(previewData).length > 0 && (
+            <div className="bg-white shadow-sm rounded-lg p-4 border border-gray-200">
             {Object.keys(previewData).map((sheetName) => {
               const pageData = getPageData(sheetName);
               const totalPages = getTotalPages(sheetName);
@@ -256,12 +264,12 @@ export default function UploadExcel() {
                   </div>
                   
                   {/* Desktop Table */}
-                  <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full border border-gray-300 text-left">
+                  <div className="hidden md:block">
+                    <table className="w-full border border-gray-200 text-left">
                       <thead>
-                        <tr className="bg-yellow-100">
+                        <tr className="bg-gray-50">
                           {headers.map((header) => (
-                            <th key={header} className="border p-2 font-semibold">
+                            <th key={header} className="border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                               {header}
                             </th>
                           ))}
@@ -271,7 +279,7 @@ export default function UploadExcel() {
                         {pageData.map((row, idx) => (
                           <tr key={idx} className="hover:bg-gray-50">
                             {headers.map((header) => (
-                              <td key={header} className="border p-2">
+                              <td key={header} className="border border-gray-200 px-4 py-2 text-sm text-gray-900">
                                 {row[header] || ""}
                               </td>
                             ))}

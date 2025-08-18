@@ -586,13 +586,21 @@ export default function ViewSchools() {
   };
 
   return (
-    <div className="flex min-h-screen bg-yellow-50">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar role="ADMIN" />
-      <div className="flex-1 p-4 sm:p-6 ml-0 md:ml-64">
-        <h1 className="text-xl sm:text-2xl font-bold text-yellow-600 mb-4">View Schools</h1>
-        
-        {/* School Selection */}
-        <div className="bg-white rounded-lg p-4 mb-6 shadow-sm">
+      
+      {/* Main Content Container - Fixed width and no extra spacing */}
+      <div className="ml-0 md:ml-64 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+          
+          {/* Header Section - Compact and professional */}
+          <div className="mb-6">
+            <h1 className="text-xl font-bold text-gray-900">View Schools</h1>
+            <p className="text-sm text-gray-500">Manage and view school data</p>
+          </div>
+          
+          {/* School Selection */}
+          <div className="bg-white rounded-lg p-4 mb-4 shadow-sm border border-gray-200">
           <h2 className="text-base sm:text-lg font-semibold mb-3">Select School</h2>
           <div className="max-w-md">
             <select
@@ -610,11 +618,11 @@ export default function ViewSchools() {
           </div>
         </div>
 
-        {selectedSchool && (
-          <div className="bg-white rounded-lg shadow-sm">
-            {/* School Header */}
-            <div className="p-4 sm:p-6 border-b border-gray-200">
-              <div className="flex flex-col gap-4">
+          {selectedSchool && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              {/* School Header */}
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex flex-col gap-3">
                 <div>
                   <h2 className="text-lg sm:text-xl font-bold text-gray-800">
                     {schools.find(s => (s.id || s._id || s.schoolId) === selectedSchool)?.name || selectedSchool}
@@ -623,24 +631,24 @@ export default function ViewSchools() {
                     {schoolData.schoolInfo?.classes?.length || classes.length} Classes • {schoolData.schoolInfo?.totalStudents || schoolData.originalExcel?.length || 0} Total Students
                   </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     onClick={() => handleDownload(downloadExcel, 'excel')}
-                    className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
                     disabled={!selectedSchool}
                   >
                     📊 Download Excel
                   </button>
                   <button
                     onClick={() => handleDownload(downloadPhotos, 'photos')}
-                    className="px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
                     disabled={!selectedSchool}
                   >
                     📦 Download Photos
                   </button>
                   <button
                     onClick={handleDeleteSchool}
-                    className="px-4 py-3 bg-red-800 text-white rounded-lg hover:bg-red-900 transition-colors text-sm font-medium"
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
                     disabled={!selectedSchool}
                   >
                     🏫 Delete School

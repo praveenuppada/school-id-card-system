@@ -97,20 +97,24 @@ export default function RegisterSchool() {
   };
 
   return (
-    <div className="flex min-h-screen bg-yellow-50">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar role="ADMIN" />
-      <div className="flex-1 p-4 sm:p-8 ml-0 md:ml-64">
-        <h1 className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-6">Register School</h1>
-        
-        <div className="max-w-2xl w-full">
-          <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8 border border-gray-100">
-            <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Register School</h1>
-              <p className="text-gray-600">Create a new school with teacher credentials</p>
-            </div>
+      
+      {/* Main Content Container - Fixed width and no extra spacing */}
+      <div className="ml-0 md:ml-64 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+          
+          {/* Header Section - Compact and professional */}
+          <div className="mb-6">
+            <h1 className="text-xl font-bold text-gray-900">Register School</h1>
+            <p className="text-sm text-gray-500">Create a new school with teacher credentials</p>
+          </div>
+          
+          <div className="max-w-2xl">
+            <div className="bg-white shadow-sm rounded-lg p-6 border border-gray-200">
             
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Username *
@@ -170,11 +174,11 @@ export default function RegisterSchool() {
 
               </div>
               
-              <div className="flex space-x-4 pt-4">
+              <div className="flex space-x-3 pt-4">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 py-3 bg-yellow-400 text-white font-semibold rounded-xl shadow-lg hover:bg-yellow-500 transition-colors duration-200 disabled:opacity-50"
+                  className="flex-1 py-2 px-4 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
@@ -192,19 +196,17 @@ export default function RegisterSchool() {
                 <button
                   type="button"
                   onClick={() => navigate("/admin")}
-                  className="px-8 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
                 >
                   Cancel
                 </button>
               </div>
-              
-
             </form>
             
-            <div className="mt-6 text-center">
+            <div className="mt-4 text-center">
               <button
                 onClick={() => navigate("/admin")}
-                className="text-gray-600 hover:text-yellow-400 transition-colors duration-200"
+                className="text-gray-600 hover:text-blue-600 transition-colors"
               >
                 ← Back to Admin Dashboard
               </button>
