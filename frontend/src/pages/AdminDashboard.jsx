@@ -407,21 +407,21 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-yellow-50">
       <Sidebar role="ADMIN" />
       <div className="p-4 sm:p-8">
-        {/* Mobile Header */}
-        <div className="block sm:hidden mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-bold text-yellow-600">Admin Dashboard</h1>
-            <NotificationBell />
-          </div>
-          
-          {/* Mobile ID Card Logo */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-3">
-              <div className="text-white text-2xl font-bold">ID</div>
+                  {/* Mobile Header */}
+          <div className="block sm:hidden mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-xl font-bold text-yellow-600">Harsha ID Solutions</h1>
+              <NotificationBell />
             </div>
-            <h1 className="text-xl font-bold text-gray-800 mb-1">Harsha ID Solutions</h1>
-            <p className="text-sm text-gray-600">School ID Card Management</p>
-          </div>
+            
+            {/* Mobile ID Card Logo */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-3">
+                <div className="text-white text-2xl font-bold">ID</div>
+              </div>
+              <h1 className="text-xl font-bold text-gray-800 mb-1">Admin Dashboard</h1>
+              <p className="text-sm text-gray-600">A Complete ID World</p>
+            </div>
           
           {/* Mobile Quick Stats */}
           <div className="grid grid-cols-3 gap-3 mb-6">
@@ -440,21 +440,21 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Desktop Header */}
-        <div className="hidden sm:block">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-yellow-600">Admin Dashboard</h1>
-            <NotificationBell />
-          </div>
-
-          {/* Desktop ID Card Logo */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-6">
-              <div className="text-white text-4xl font-bold">ID</div>
+                  {/* Desktop Header */}
+          <div className="hidden sm:block">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold text-yellow-600">Harsha ID Solutions</h1>
+              <NotificationBell />
             </div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Harsha ID Solutions</h1>
-            <p className="text-lg text-gray-600">School ID Card Management System</p>
-          </div>
+
+            {/* Desktop ID Card Logo */}
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg mb-6">
+                <div className="text-white text-4xl font-bold">ID</div>
+              </div>
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+              <p className="text-lg text-gray-600">A Complete ID World</p>
+            </div>
           
           {/* Desktop Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
