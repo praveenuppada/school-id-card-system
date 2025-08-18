@@ -4,6 +4,7 @@ import { registerSchool } from "../services/adminService";
 import { AuthContext } from "../context/AuthContext";
 import SuccessModal from "../components/SuccessModal";
 import { clearUserData } from "../utils/storage";
+import Sidebar from "../components/Sidebar";
 
 export default function RegisterSchool() {
   const navigate = useNavigate();
@@ -96,15 +97,15 @@ export default function RegisterSchool() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Decorative yellow shape */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
-      
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
+    <div className="flex min-h-screen bg-yellow-50">
+      <Sidebar role="ADMIN" />
+      <div className="flex-1 p-4 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-6">Register School</h1>
+        
         <div className="max-w-2xl w-full">
-          <div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-100">
+          <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8 border border-gray-100">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Register School</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Register School</h1>
               <p className="text-gray-600">Create a new school with teacher credentials</p>
             </div>
             

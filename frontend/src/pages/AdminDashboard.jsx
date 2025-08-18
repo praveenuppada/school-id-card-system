@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import NotificationBell from "../components/NotificationBell";
 import { useNotification } from "../context/NotificationContext";
+import Sidebar from "../components/Sidebar";
 import { 
   getSchools, 
   getClasses, 
@@ -263,41 +264,66 @@ export default function AdminDashboard() {
 
   const handleCropDrag = (e, corner) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     const startCropData = { ...cropData };
     const startX = e.clientX;
     const startY = e.clientY;
     
     const handleMouseMove = (e) => {
+      e.preventDefault();
       const deltaX = e.clientX - startX;
       const deltaY = e.clientY - startY;
       
-      // Convert pixel deltas to percentage
-      const containerRect = e.target.getBoundingClientRect();
+      // Get the image container
+      const imageContainer = document.querySelector('.crop-container');
+      if (!imageContainer) return;
+      
+      const containerRect = imageContainer.getBoundingClientRect();
       const deltaXPercent = (deltaX / containerRect.width) * 100;
       const deltaYPercent = (deltaY / containerRect.height) * 100;
       
       let newCropData = { ...startCropData };
       
       switch (corner) {
+        case 'move':
+          // Move the entire crop area
+          newCropData.x = Math.max(0, Math.min(100 - newCropData.width, startCropData.x + deltaXPercent));
+          newCropData.y = Math.max(0, Math.min(100 - newCropData.height, startCropData.y + deltaYPercent));
+          break;
         case 'topLeft':
-          newCropData.x = Math.max(0, Math.min(startCropData.x + deltaXPercent, startCropData.x + startCropData.width - 10));
-          newCropData.y = Math.max(0, Math.min(startCropData.y + deltaYPercent, startCropData.y + startCropData.height - 10));
+          newCropData.x = Math.max(0, Math.min(startCropData.x + startCropData.width - 10, startCropData.x + deltaXPercent));
+          newCropData.y = Math.max(0, Math.min(startCropData.y + startCropData.height - 10, startCropData.y + deltaYPercent));
           newCropData.width = startCropData.width - (newCropData.x - startCropData.x);
           newCropData.height = startCropData.height - (newCropData.y - startCropData.y);
           break;
         case 'topRight':
-          newCropData.y = Math.max(0, Math.min(startCropData.y + deltaYPercent, startCropData.y + startCropData.height - 10));
+          newCropData.y = Math.max(0, Math.min(startCropData.y + startCropData.height - 10, startCropData.y + deltaYPercent));
           newCropData.width = Math.max(10, startCropData.width + deltaXPercent);
           newCropData.height = startCropData.height - (newCropData.y - startCropData.y);
           break;
         case 'bottomLeft':
-          newCropData.x = Math.max(0, Math.min(startCropData.x + deltaXPercent, startCropData.x + startCropData.width - 10));
+          newCropData.x = Math.max(0, Math.min(startCropData.x + startCropData.width - 10, startCropData.x + deltaXPercent));
           newCropData.width = startCropData.width - (newCropData.x - startCropData.x);
           newCropData.height = Math.max(10, startCropData.height + deltaYPercent);
           break;
         case 'bottomRight':
           newCropData.width = Math.max(10, startCropData.width + deltaXPercent);
           newCropData.height = Math.max(10, startCropData.height + deltaYPercent);
+          break;
+        case 'top':
+          newCropData.y = Math.max(0, Math.min(startCropData.y + startCropData.height - 10, startCropData.y + deltaYPercent));
+          newCropData.height = startCropData.height - (newCropData.y - startCropData.y);
+          break;
+        case 'bottom':
+          newCropData.height = Math.max(10, startCropData.height + deltaYPercent);
+          break;
+        case 'left':
+          newCropData.x = Math.max(0, Math.min(startCropData.x + startCropData.width - 10, startCropData.x + deltaXPercent));
+          newCropData.width = startCropData.width - (newCropData.x - startCropData.x);
+          break;
+        case 'right':
+          newCropData.width = Math.max(10, startCropData.width + deltaXPercent);
           break;
       }
       
@@ -378,35 +404,9 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg">
-        <div className="p-6 bg-yellow-500 text-white font-bold text-xl text-center">
-          Harsha ID Solutions
-        </div>
-        <nav className="flex-1 px-4 py-6">
-          {menuItems.map((item, idx) => (
-            <button
-              key={idx}
-              onClick={() => navigate(item.path)}
-              className="w-full text-left px-4 py-3 mb-2 bg-yellow-100 hover:bg-yellow-200 rounded-lg"
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="p-4 border-t border-yellow-200">
-          <button
-            onClick={handleLogout}
-            className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <main className="flex-1 p-4 sm:p-8">
+    <div className="min-h-screen bg-yellow-50">
+      <Sidebar role="ADMIN" />
+      <div className="p-4 sm:p-8">
         {/* Mobile Header */}
         <div className="block sm:hidden mb-4">
           <div className="flex items-center justify-between mb-4">
@@ -611,7 +611,18 @@ export default function AdminDashboard() {
                 </button>
               </div>
               
-              <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden mb-4">
+              {/* Instructions */}
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800 font-medium mb-2">📝 How to Crop:</p>
+                <ul className="text-xs text-blue-700 space-y-1">
+                  <li>• <strong>Drag corners</strong> (yellow circles) to resize from corners</li>
+                  <li>• <strong>Drag edges</strong> (yellow rectangles) to resize from sides</li>
+                  <li>• <strong>Click and drag</strong> inside the crop area to move it</li>
+                  <li>• <strong>Use Reset</strong> to return to default crop</li>
+                </ul>
+              </div>
+              
+              <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden mb-4 crop-container">
                 <img
                   src={selectedPhoto.photoUrl}
                   alt={selectedPhoto.fullName}
@@ -620,7 +631,7 @@ export default function AdminDashboard() {
                   crossOrigin="anonymous"
                 />
                 
-                {/* Crop Overlay - Lines on All Sides */}
+                {/* Crop Overlay */}
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
@@ -628,22 +639,33 @@ export default function AdminDashboard() {
                     top: `${cropData?.y || 25}%`,
                     width: `${cropData?.width || 50}%`,
                     height: `${cropData?.height || 50}%`,
-                    border: '2px solid #ffd700',
-                    boxSizing: 'border-box'
+                    border: '3px solid #ffd700',
+                    boxSizing: 'border-box',
+                    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
                   }}
                 >
-                  {/* Vertical lines */}
-                  <div className="absolute top-0 left-1/3 w-px h-full bg-yellow-400"></div>
-                  <div className="absolute top-0 left-2/3 w-px h-full bg-yellow-400"></div>
+                  {/* Grid Lines */}
+                  <div className="absolute top-0 left-1/3 w-px h-full bg-yellow-400 opacity-50"></div>
+                  <div className="absolute top-0 left-2/3 w-px h-full bg-yellow-400 opacity-50"></div>
+                  <div className="absolute left-0 top-1/3 w-full h-px bg-yellow-400 opacity-50"></div>
+                  <div className="absolute left-0 top-2/3 w-full h-px bg-yellow-400 opacity-50"></div>
                   
-                  {/* Horizontal lines */}
-                  <div className="absolute left-0 top-1/3 w-full h-px bg-yellow-400"></div>
-                  <div className="absolute left-0 top-2/3 w-full h-full h-px bg-yellow-400"></div>
+                  {/* Move Area - Click and drag to move the entire crop */}
+                  <div
+                    className="absolute inset-0 cursor-move"
+                    style={{
+                      left: '10%',
+                      top: '10%',
+                      width: '80%',
+                      height: '80%'
+                    }}
+                    onMouseDown={(e) => handleCropDrag(e, 'move')}
+                  />
                 </div>
                 
-                {/* Draggable Corner Handles */}
+                {/* Corner Handles */}
                 <div
-                  className="absolute w-4 h-4 bg-yellow-500 border-2 border-white rounded-full cursor-nw-resize"
+                  className="absolute w-6 h-6 bg-yellow-500 border-2 border-white rounded-full cursor-nw-resize shadow-lg hover:bg-yellow-400 transition-colors"
                   style={{
                     left: `${cropData?.x || 25}%`,
                     top: `${cropData?.y || 25}%`,
@@ -652,7 +674,7 @@ export default function AdminDashboard() {
                   onMouseDown={(e) => handleCropDrag(e, 'topLeft')}
                 />
                 <div
-                  className="absolute w-4 h-4 bg-yellow-500 border-2 border-white rounded-full cursor-ne-resize"
+                  className="absolute w-6 h-6 bg-yellow-500 border-2 border-white rounded-full cursor-ne-resize shadow-lg hover:bg-yellow-400 transition-colors"
                   style={{
                     left: `${cropData?.x + cropData?.width || 75}%`,
                     top: `${cropData?.y || 25}%`,
@@ -661,7 +683,7 @@ export default function AdminDashboard() {
                   onMouseDown={(e) => handleCropDrag(e, 'topRight')}
                 />
                 <div
-                  className="absolute w-4 h-4 bg-yellow-500 border-2 border-white rounded-full cursor-sw-resize"
+                  className="absolute w-6 h-6 bg-yellow-500 border-2 border-white rounded-full cursor-sw-resize shadow-lg hover:bg-yellow-400 transition-colors"
                   style={{
                     left: `${cropData?.x || 25}%`,
                     top: `${cropData?.y + cropData?.height || 75}%`,
@@ -670,7 +692,7 @@ export default function AdminDashboard() {
                   onMouseDown={(e) => handleCropDrag(e, 'bottomLeft')}
                 />
                 <div
-                  className="absolute w-4 h-4 bg-yellow-500 border-2 border-white rounded-full cursor-se-resize"
+                  className="absolute w-6 h-6 bg-yellow-500 border-2 border-white rounded-full cursor-se-resize shadow-lg hover:bg-yellow-400 transition-colors"
                   style={{
                     left: `${cropData?.x + cropData?.width || 75}%`,
                     top: `${cropData?.y + cropData?.height || 75}%`,
@@ -678,6 +700,58 @@ export default function AdminDashboard() {
                   }}
                   onMouseDown={(e) => handleCropDrag(e, 'bottomRight')}
                 />
+                
+                {/* Edge Handles */}
+                <div
+                  className="absolute w-4 h-6 bg-yellow-500 border-2 border-white rounded cursor-n-resize shadow-lg hover:bg-yellow-400 transition-colors"
+                  style={{
+                    left: `${cropData?.x + (cropData?.width || 50) / 2}%`,
+                    top: `${cropData?.y || 25}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                  onMouseDown={(e) => handleCropDrag(e, 'top')}
+                />
+                <div
+                  className="absolute w-4 h-6 bg-yellow-500 border-2 border-white rounded cursor-s-resize shadow-lg hover:bg-yellow-400 transition-colors"
+                  style={{
+                    left: `${cropData?.x + (cropData?.width || 50) / 2}%`,
+                    top: `${cropData?.y + cropData?.height || 75}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                  onMouseDown={(e) => handleCropDrag(e, 'bottom')}
+                />
+                <div
+                  className="absolute w-6 h-4 bg-yellow-500 border-2 border-white rounded cursor-w-resize shadow-lg hover:bg-yellow-400 transition-colors"
+                  style={{
+                    left: `${cropData?.x || 25}%`,
+                    top: `${cropData?.y + (cropData?.height || 50) / 2}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                  onMouseDown={(e) => handleCropDrag(e, 'left')}
+                />
+                <div
+                  className="absolute w-6 h-4 bg-yellow-500 border-2 border-white rounded cursor-e-resize shadow-lg hover:bg-yellow-400 transition-colors"
+                  style={{
+                    left: `${cropData?.x + cropData?.width || 75}%`,
+                    top: `${cropData?.y + (cropData?.height || 50) / 2}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                  onMouseDown={(e) => handleCropDrag(e, 'right')}
+                />
+              </div>
+              
+              {/* Crop Info */}
+              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-700">Position:</span>
+                    <span className="ml-2 text-gray-600">X: {Math.round(cropData?.x || 25)}%, Y: {Math.round(cropData?.y || 25)}%</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-700">Size:</span>
+                    <span className="ml-2 text-gray-600">W: {Math.round(cropData?.width || 50)}%, H: {Math.round(cropData?.height || 50)}%</span>
+                  </div>
+                </div>
               </div>
               
               <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
@@ -697,7 +771,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

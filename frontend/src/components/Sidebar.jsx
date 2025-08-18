@@ -38,7 +38,7 @@ export default function Sidebar({ role }) {
       )}
 
       {/* Sidebar */}
-      <div className={`${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative inset-y-0 left-0 z-50 w-64 bg-white shadow-lg md:shadow-sm border-r border-gray-100 transition-transform duration-300 ease-in-out`}>
+      <div className={`${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-100 transition-transform duration-300 ease-in-out`}>
         <div className="flex flex-col h-full p-6">
           <div className="mb-8">
             <h2 className="text-xl font-bold text-gray-800 mb-2">Harsha ID Solutions</h2>

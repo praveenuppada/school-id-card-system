@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import { clearUploadData } from "../utils/storage";
+import Sidebar from "../components/Sidebar";
 
 export default function UploadExcel() {
   const navigate = useNavigate();
@@ -187,24 +188,9 @@ export default function UploadExcel() {
   };
 
   return (
-    <div className="min-h-screen flex bg-yellow-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg border-r border-yellow-200 flex flex-col">
-        <div className="p-6 bg-yellow-500 text-white font-bold text-xl text-center">
-          Admin Panel
-        </div>
-        <nav className="flex-1 px-4 py-6">
-          <button
-            onClick={() => navigate("/admin")}
-            className="w-full text-left px-4 py-3 mb-2 bg-yellow-100 hover:bg-yellow-200 rounded-lg"
-          >
-            Back to Dashboard
-          </button>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-8">
+    <div className="min-h-screen bg-yellow-50">
+      <Sidebar role="ADMIN" />
+      <div className="p-4 sm:p-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-6">Upload Excel</h1>
 
         {/* School Selection */}
@@ -436,7 +422,7 @@ export default function UploadExcel() {
           <p>Loading: {loading ? "Yes" : "No"}</p>
           <p>Button disabled: {loading || !file || !selectedSchool ? "Yes" : "No"}</p>
         </div>
-      </main>
+      </div>
       
       {/* Success Modal */}
       <SuccessModal
