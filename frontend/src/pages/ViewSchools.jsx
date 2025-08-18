@@ -1302,5 +1302,5 @@ export default function ViewSchools() {
         )}
       </div>
     </div>
-  );
-}
+  </div>
+);
