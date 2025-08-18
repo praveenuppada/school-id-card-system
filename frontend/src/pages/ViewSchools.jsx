@@ -586,12 +586,12 @@ export default function ViewSchools() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
       <Sidebar role="ADMIN" />
       
-      {/* Main Content Container - Fixed width and no extra spacing */}
-      <div className="ml-0 md:ml-64 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+      {/* Main Content Container - Proper layout */}
+      <div className="flex-1 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16">
           
           {/* Header Section - Compact and professional */}
           <div className="mb-6">

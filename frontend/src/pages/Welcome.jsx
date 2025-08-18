@@ -185,7 +185,7 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-white overflow-x-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full opacity-10 transform translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-yellow-300 rounded-full opacity-10 transform -translate-x-1/2 translate-y-1/2"></div>
@@ -308,7 +308,7 @@ export default function Welcome() {
 
       {/* Main Content */}
       <main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-4xl overflow-x-hidden">
           {renderContent()}
         </div>
       </main>
