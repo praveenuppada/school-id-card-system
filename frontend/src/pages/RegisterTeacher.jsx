@@ -214,18 +214,18 @@ export default function RegisterSchool() {
           </div>
         </div>
       </div>
-      
-      {/* Success Modal */}
-      <SuccessModal
-        isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        title={successData.title}
-        message={successData.message}
-        onConfirm={() => {
-          setShowSuccessModal(false);
-          navigate("/admin");
-        }}
-      />
     </div>
-  );
-}
+      
+    {/* Success Modal */}
+    <SuccessModal
+      isOpen={showSuccessModal}
+      onClose={() => setShowSuccessModal(false)}
+      title={successData.title}
+      message={successData.message}
+      onConfirm={() => {
+        setShowSuccessModal(false);
+        navigate("/admin");
+      }}
+    />
+  </div>
+);
