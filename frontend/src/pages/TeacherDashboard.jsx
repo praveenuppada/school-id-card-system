@@ -528,21 +528,21 @@ export default function TeacherDashboard() {
     <div className="min-h-screen bg-gray-50">
       <Sidebar role="TEACHER" />
       
-      {/* Main Content Container - Following Amazon's structure */}
-      <div className="ml-0 md:ml-64">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Main Content Container - Fixed width and no extra spacing */}
+      <div className="ml-0 md:ml-64 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
           
-          {/* Header Section - Like Amazon's page headers */}
-          <div className="mb-8">
+          {/* Header Section - Compact and professional */}
+          <div className="mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-4 sm:mb-0">
-                <h1 className="text-2xl font-bold text-gray-900">
+              <div className="mb-3 sm:mb-0">
+                <h1 className="text-xl font-bold text-gray-900">
                   {user?.schoolName || user?.school?.name || profile?.schoolName || profile?.school?.name || localStorage.getItem('teacherSchoolName') || "School Dashboard"}
                 </h1>
-                <p className="mt-1 text-sm text-gray-500">Teacher Portal</p>
+                <p className="text-sm text-gray-500">Teacher Portal</p>
               </div>
               
-              {/* Action Button - Like Amazon's primary actions */}
+              {/* Action Button - Compact spacing */}
               <div className="flex-shrink-0">
                 <button
                   onClick={handleSubmitAllRecords}
@@ -554,8 +554,8 @@ export default function TeacherDashboard() {
             </div>
           </div>
 
-          {/* Class Selection - Like Amazon's filter sections */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+          {/* Class Selection - Compact spacing */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
             <div className="px-6 py-4">
               <label className="block text-sm font-medium text-gray-700 mb-3">Select Class</label>
               <select
