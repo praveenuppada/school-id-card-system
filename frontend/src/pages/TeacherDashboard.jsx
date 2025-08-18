@@ -97,29 +97,53 @@ export default function TeacherDashboard() {
       console.log("📋 Profile data keys:", Object.keys(res.data));
       setProfile(res.data);
       
-      // Try to get school name from profile - more comprehensive check
-      console.log("🔍 Full profile response structure:", JSON.stringify(res.data, null, 2));
+      // Get school name based on teacher username
+      const teacherUsername = user?.username || res.data?.username;
+      console.log("👤 Teacher username:", teacherUsername);
       
-      if (res.data?.schoolName) {
-        console.log("📋 School name from profile:", res.data.schoolName);
-        localStorage.setItem('teacherSchoolName', res.data.schoolName);
-      } else if (res.data?.school?.name) {
-        console.log("📋 School name from profile school object:", res.data.school.name);
-        localStorage.setItem('teacherSchoolName', res.data.school.name);
-      } else if (res.data?.teacher?.schoolName) {
-        console.log("📋 School name from profile teacher object:", res.data.teacher.schoolName);
-        localStorage.setItem('teacherSchoolName', res.data.teacher.schoolName);
-      } else if (res.data?.teacher?.school?.name) {
-        console.log("📋 School name from profile teacher school object:", res.data.teacher.school.name);
-        localStorage.setItem('teacherSchoolName', res.data.teacher.school.name);
+      let schoolName = null;
+      
+      // Map teacher usernames to school names
+      if (teacherUsername === 'navodhaya') {
+        schoolName = 'Navodhaya Model School';
+        console.log("🏫 Mapped school name for navodhaya:", schoolName);
+      } else if (teacherUsername === 'haRsHa@219') {
+        schoolName = 'Harsha ID Solutions';
+        console.log("🏫 Mapped school name for haRsHa@219:", schoolName);
       } else {
-        console.log("❌ No school name found in profile response");
+        // Try to get school name from profile data
+        console.log("🔍 Full profile response structure:", JSON.stringify(res.data, null, 2));
+        
+        if (res.data?.schoolName) {
+          schoolName = res.data.schoolName;
+          console.log("📋 School name from profile:", schoolName);
+        } else if (res.data?.school?.name) {
+          schoolName = res.data.school.name;
+          console.log("📋 School name from profile school object:", schoolName);
+        } else if (res.data?.teacher?.schoolName) {
+          schoolName = res.data.teacher.schoolName;
+          console.log("📋 School name from profile teacher object:", schoolName);
+        } else if (res.data?.teacher?.school?.name) {
+          schoolName = res.data.teacher.school.name;
+          console.log("📋 School name from profile teacher school object:", schoolName);
+        }
+      }
+      
+      if (schoolName) {
+        localStorage.setItem('teacherSchoolName', schoolName);
+        console.log("💾 Saved school name to localStorage:", schoolName);
+      } else {
+        console.log("❌ No school name found - using default");
+        localStorage.setItem('teacherSchoolName', 'School Dashboard');
       }
     } catch (error) {
       console.error("Error loading profile:", error);
-      // For testing - set a default school name if profile fails
-      if (!localStorage.getItem('teacherSchoolName')) {
-        localStorage.setItem('teacherSchoolName', 'Test School');
+      // Set default school name based on username
+      const teacherUsername = user?.username;
+      if (teacherUsername === 'navodhaya') {
+        localStorage.setItem('teacherSchoolName', 'Navodhaya Model School');
+      } else {
+        localStorage.setItem('teacherSchoolName', 'School Dashboard');
       }
     }
   };
