@@ -130,9 +130,6 @@ export default function Welcome() {
             <div className="border-t-2 border-b-2 border-red-500 py-3 mt-6">
               <p className="text-2xl font-semibold text-gray-800 text-center">A COMPLETE ID WORLD.....</p>
             </div>
-                </div>
-              </div>
-            </div>
             
             {/* Welcome Text */}
             <div className="text-center mb-8">
