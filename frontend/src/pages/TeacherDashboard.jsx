@@ -69,6 +69,9 @@ export default function TeacherDashboard() {
         console.log("🧹 Cleaning up camera stream on unmount");
         stopCamera();
       }
+      // Clean up all resources to prevent memory leaks
+      console.log("🧹 Cleaning up all resources on component unmount");
+      cleanupResources();
     };
   }, []);
 
@@ -247,6 +250,9 @@ export default function TeacherDashboard() {
     try {
       console.log("📸 Starting camera for student:", studentId);
       
+      // Clean up any existing resources before starting camera
+      cleanupResources();
+      
       // Check if we're on Android
       const isAndroid = /Android/i.test(navigator.userAgent);
       console.log("📱 Device type:", isAndroid ? "Android" : "Other");
@@ -298,6 +304,7 @@ export default function TeacherDashboard() {
           }
         } catch (error) {
           console.error("❌ Error in camera file selection:", error);
+          cleanupResources();
           
           // Android-specific error message
           if (isAndroid) {
@@ -310,6 +317,7 @@ export default function TeacherDashboard() {
       
       input.onerror = (error) => {
         console.error("❌ Camera input error:", error);
+        cleanupResources();
         
         // Android-specific error message
         if (isAndroid) {
@@ -334,6 +342,7 @@ export default function TeacherDashboard() {
       
     } catch (error) {
       console.error("❌ Error accessing camera:", error);
+      cleanupResources();
       
       // Android-specific error message
       const isAndroid = /Android/i.test(navigator.userAgent);
@@ -406,6 +415,32 @@ export default function TeacherDashboard() {
 
 
 
+  // Global cleanup function to prevent memory leaks
+  const cleanupResources = () => {
+    // Clean up any existing object URLs
+    if (window.currentObjectUrl) {
+      URL.revokeObjectURL(window.currentObjectUrl);
+      window.currentObjectUrl = null;
+    }
+    
+    // Clean up any existing FileReader
+    if (window.currentFileReader) {
+      window.currentFileReader.abort();
+      window.currentFileReader = null;
+    }
+    
+    // Clear any existing timeouts
+    if (window.currentTimeout) {
+      clearTimeout(window.currentTimeout);
+      window.currentTimeout = null;
+    }
+    
+    // Force garbage collection if available
+    if (window.gc) {
+      window.gc();
+    }
+  };
+
   const handleFileUpload = async (studentId, file) => {
     try {
       console.log("📁 File upload for student:", studentId, "File:", file);
@@ -431,6 +466,9 @@ export default function TeacherDashboard() {
         return;
       }
       
+      // Clean up any existing resources before processing new file
+      cleanupResources();
+      
       // For Android, use a different approach to avoid FileReader issues
       if (isAndroid) {
         console.log("📱 Using Android-specific file handling");
@@ -438,6 +476,7 @@ export default function TeacherDashboard() {
         try {
           // Method 1: Try using URL.createObjectURL for Android
           const objectUrl = URL.createObjectURL(file);
+          window.currentObjectUrl = objectUrl; // Track for cleanup
           console.log("📱 Created object URL:", objectUrl);
           
           // Convert object URL to data URL using canvas
@@ -459,12 +498,12 @@ export default function TeacherDashboard() {
               // Draw image to canvas
               ctx.drawImage(img, 0, 0);
               
-              // Convert to data URL
-              const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+              // Convert to data URL with compression
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
               console.log("📱 Converted to data URL, length:", dataUrl.length);
               
-              // Clean up object URL
-              URL.revokeObjectURL(objectUrl);
+              // Clean up resources
+              cleanupResources();
               
               // Save the photo
               const updatedPhotos = {
@@ -484,15 +523,21 @@ export default function TeacherDashboard() {
               localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
               console.log("💾 Immediately saved uploaded file to localStorage");
               
+              // Clear canvas and image references
+              canvas.width = 0;
+              canvas.height = 0;
+              img.src = '';
+              
             } catch (canvasError) {
               console.error("❌ Canvas conversion error:", canvasError);
+              cleanupResources();
               alert("Android: Error processing image. Please try a different image.");
             }
           };
           
           img.onerror = (error) => {
             console.error("❌ Image loading error:", error);
-            URL.revokeObjectURL(objectUrl);
+            cleanupResources();
             alert("Android: Error loading image. Please try a different image.");
           };
           
@@ -506,6 +551,7 @@ export default function TeacherDashboard() {
           console.log("📱 Falling back to FileReader method");
           
           const reader = new FileReader();
+          window.currentFileReader = reader; // Track for cleanup
           let timeoutId;
           
           reader.onload = (e) => {
@@ -518,6 +564,9 @@ export default function TeacherDashboard() {
               }
               
               console.log("📱 Data URL length:", e.target.result.length);
+              
+              // Clean up resources
+              cleanupResources();
               
               const updatedPhotos = {
                 ...studentPhotos,
@@ -537,6 +586,7 @@ export default function TeacherDashboard() {
               
             } catch (error) {
               console.error("❌ Android FileReader fallback error:", error);
+              cleanupResources();
               alert("Android: Error processing image. Please try a different image.");
             }
           };
@@ -544,14 +594,18 @@ export default function TeacherDashboard() {
           reader.onerror = (error) => {
             clearTimeout(timeoutId);
             console.error("❌ Android FileReader error:", error);
+            cleanupResources();
             alert("Android: Error reading file. Please try a different image.");
           };
           
           // Set timeout for FileReader
           timeoutId = setTimeout(() => {
             console.error("❌ Android FileReader timeout");
+            cleanupResources();
             alert("Android: File reading timed out. Please try a smaller image.");
-          }, 10000); // 10 second timeout
+          }, 8000); // 8 second timeout
+          
+          window.currentTimeout = timeoutId; // Track for cleanup
           
           // Start reading
           reader.readAsDataURL(file);
@@ -562,6 +616,7 @@ export default function TeacherDashboard() {
         console.log("📱 Using standard FileReader for non-Android device");
         
         const reader = new FileReader();
+        window.currentFileReader = reader; // Track for cleanup
         
         reader.onload = (e) => {
           try {
@@ -572,6 +627,9 @@ export default function TeacherDashboard() {
             }
             
             console.log("📁 Data URL length:", e.target.result.length);
+            
+            // Clean up resources
+            cleanupResources();
             
             const updatedPhotos = {
               ...studentPhotos,
@@ -591,12 +649,14 @@ export default function TeacherDashboard() {
             
           } catch (error) {
             console.error("❌ Error creating photo preview:", error);
+            cleanupResources();
             alert("Error processing image. Please try again with a different image or format.");
           }
         };
         
         reader.onerror = (error) => {
           console.error("❌ Error reading file:", error);
+          cleanupResources();
           alert("Error reading file. Please try again with a different image or format.");
         };
         
@@ -606,6 +666,9 @@ export default function TeacherDashboard() {
     } catch (error) {
       console.error("❌ Error handling file upload:", error);
       console.error("❌ Error stack:", error.stack);
+      
+      // Clean up resources on error
+      cleanupResources();
       
       const isAndroid = /Android/i.test(navigator.userAgent);
       if (isAndroid) {
