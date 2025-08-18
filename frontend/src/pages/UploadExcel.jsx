@@ -431,30 +431,30 @@ export default function UploadExcel() {
           <p>Button disabled: {loading || !file || !selectedSchool ? "Yes" : "No"}</p>
         </div>
       </div>
-      
-      {/* Success Modal */}
-      <SuccessModal
-        isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        title={successData.title}
-        message={successData.message}
-        onConfirm={() => {
-          setShowSuccessModal(false);
-          navigate("/admin");
-        }}
-      />
-      
-      {/* Error Modal */}
-      <ErrorModal
-        isOpen={showErrorModal}
-        onClose={() => setShowErrorModal(false)}
-        title={errorData.title}
-        message={errorData.message}
-        onRetry={() => {
-          setShowErrorModal(false);
-          loadSchools();
-        }}
-      />
     </div>
-  );
-}
+      
+    {/* Success Modal */}
+    <SuccessModal
+      isOpen={showSuccessModal}
+      onClose={() => setShowSuccessModal(false)}
+      title={successData.title}
+      message={successData.message}
+      onConfirm={() => {
+        setShowSuccessModal(false);
+        navigate("/admin");
+      }}
+    />
+    
+    {/* Error Modal */}
+    <ErrorModal
+      isOpen={showErrorModal}
+      onClose={() => setShowErrorModal(false)}
+      title={errorData.title}
+      message={errorData.message}
+      onRetry={() => {
+        setShowErrorModal(false);
+        loadSchools();
+      }}
+    />
+  </div>
+);
