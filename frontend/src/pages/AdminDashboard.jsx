@@ -406,11 +406,11 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-yellow-50">
       <Sidebar role="ADMIN" />
-      <div className="p-4 sm:p-8">
+      <div className="p-4 sm:p-8 ml-0 md:ml-64">
                   {/* Mobile Header */}
           <div className="block sm:hidden mb-4">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-xl font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
+              <h1 className="text-lg font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
               <NotificationBell />
             </div>
             
@@ -443,7 +443,7 @@ export default function AdminDashboard() {
                   {/* Desktop Header */}
           <div className="hidden sm:block">
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
+              <h1 className="text-2xl font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
               <NotificationBell />
             </div>
 

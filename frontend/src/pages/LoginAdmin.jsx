@@ -40,7 +40,7 @@ export default function LoginAdmin() {
           <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8 border border-gray-100">
             {/* HARSHA ID SOLUTIONS Text */}
             <div className="text-center mb-6">
-              <h1 className="text-3xl font-bold text-yellow-600 mb-2">HARSHA ID SOLUTIONS</h1>
+              <h1 className="text-2xl font-bold text-yellow-600 mb-2">HARSHA ID SOLUTIONS</h1>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">Admin Login</h1>
             

@@ -19,7 +19,7 @@ export default function Sidebar({ role }) {
   return (
     <>
                     {/* Mobile Hamburger Menu Button */}
-              <div className="fixed top-4 left-4 z-50">
+              <div className="md:hidden fixed top-4 left-4 z-50">
                 <button
                   onClick={toggleMobileMenu}
                   className="p-2 bg-white rounded-lg shadow-lg border border-gray-200"
@@ -34,11 +34,11 @@ export default function Sidebar({ role }) {
 
               {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={toggleMobileMenu}></div>
+          <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={toggleMobileMenu}></div>
         )}
 
-      {/* Sidebar */}
-      <div className={`${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-100 transition-transform duration-300 ease-in-out`}>
+              {/* Sidebar */}
+        <div className={`${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-100 transition-transform duration-300 ease-in-out`}>
         <div className="flex flex-col h-full p-6">
           <div className="mb-8">
             <h2 className="text-xl font-bold text-gray-800 mb-2">Harsha ID Solutions</h2>
@@ -106,17 +106,28 @@ export default function Sidebar({ role }) {
             )}
           </nav>
           
-          <div className="pt-6">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors duration-200"
-            >
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
-              </svg>
-              Logout
-            </button>
-          </div>
+                            <div className="pt-6 space-y-3">
+                    {/* Call Us Option */}
+                    <a
+                      href="tel:+918977219777"
+                      className="w-full flex items-center justify-center p-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors duration-200"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                      </svg>
+                      Call Us Now +91 8977219777
+                    </a>
+                    
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors duration-200"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
         </div>
       </div>
     </>

@@ -160,6 +160,7 @@ export default function TeacherDashboard() {
   // Camera functions
   const startCamera = async (studentId) => {
     try {
+      console.log("📸 Starting camera for student:", studentId);
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           width: { ideal: 640 },
@@ -167,14 +168,16 @@ export default function TeacherDashboard() {
           facingMode: 'user'
         } 
       });
+      console.log("📸 Camera stream obtained:", stream);
       setCameraStream(stream);
       setActiveCamera(studentId);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        console.log("📸 Video element updated with stream");
       }
     } catch (error) {
-      console.error("Error accessing camera:", error);
-              alert("Unable to access camera. Please check permissions.");
+      console.error("❌ Error accessing camera:", error);
+      alert("Unable to access camera. Please check permissions and try again.");
     }
   };
 
@@ -188,35 +191,45 @@ export default function TeacherDashboard() {
 
   const capturePhoto = (studentId) => {
     if (videoRef.current && canvasRef.current) {
+      console.log("📸 Capturing photo for student:", studentId);
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
       
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0);
-      
-      const photoData = canvas.toDataURL('image/jpeg', 0.8);
-      const updatedPhotos = {
-        ...studentPhotos,
-        [studentId]: {
-          data: photoData,
-          timestamp: new Date().toISOString(),
-          status: 'captured'
-        }
-      };
-      
-      setStudentPhotos(updatedPhotos);
-      console.log("📸 Photo captured, updated studentPhotos:", updatedPhotos);
-      
-      // Force save to localStorage immediately
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-      console.log("💾 Immediately saved captured photo to localStorage");
-      
-      stopCamera();
-      
-      // Show success message
-      alert("Photo captured successfully! Click 'Save' to upload it.");
+      // Wait for video to be ready
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+        
+        const photoData = canvas.toDataURL('image/jpeg', 0.8);
+        const updatedPhotos = {
+          ...studentPhotos,
+          [studentId]: {
+            data: photoData,
+            timestamp: new Date().toISOString(),
+            status: 'captured'
+          }
+        };
+        
+        setStudentPhotos(updatedPhotos);
+        console.log("📸 Photo captured successfully, updated studentPhotos:", updatedPhotos);
+        
+        // Force save to localStorage immediately
+        localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+        console.log("💾 Immediately saved captured photo to localStorage");
+        
+        stopCamera();
+        
+        // Show success message
+        alert("Photo captured successfully! Click 'Save' to upload it.");
+      } else {
+        console.log("❌ Video not ready, waiting...");
+        setTimeout(() => capturePhoto(studentId), 100);
+      }
+    } else {
+      console.error("❌ Video or canvas ref not available");
+      alert("Camera not ready. Please try again.");
     }
   };
 
@@ -461,7 +474,7 @@ export default function TeacherDashboard() {
   return (
     <div className="flex min-h-screen bg-yellow-50">
       <Sidebar role="TEACHER" />
-      <div className="flex-1 p-4 sm:p-6">
+      <div className="flex-1 p-4 sm:p-6 ml-0 md:ml-64">
         {/* Mobile Header */}
         <div className="block sm:hidden mb-4">
           <h1 className="text-xl font-bold text-yellow-600 mb-2">

@@ -588,7 +588,7 @@ export default function ViewSchools() {
   return (
     <div className="flex min-h-screen bg-yellow-50">
       <Sidebar role="ADMIN" />
-      <div className="flex-1 p-4 sm:p-6">
+      <div className="flex-1 p-4 sm:p-6 ml-0 md:ml-64">
         <h1 className="text-xl sm:text-2xl font-bold text-yellow-600 mb-4">View Schools</h1>
         
         {/* School Selection */}
@@ -696,7 +696,7 @@ export default function ViewSchools() {
             </div>
 
             {/* Tab Content */}
-            <div className="p-4 sm:p-6">
+            <div className="p-4 sm:p-6 ml-0 md:ml-64">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600"></div>

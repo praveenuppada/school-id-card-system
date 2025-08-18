@@ -99,7 +99,7 @@ export default function RegisterSchool() {
   return (
     <div className="flex min-h-screen bg-yellow-50">
       <Sidebar role="ADMIN" />
-      <div className="flex-1 p-4 sm:p-8">
+      <div className="flex-1 p-4 sm:p-8 ml-0 md:ml-64">
         <h1 className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-6">Register School</h1>
         
         <div className="max-w-2xl w-full">

@@ -85,8 +85,9 @@ export default function Welcome() {
       default: // home
         return (
           <div className="text-center max-w-2xl mx-auto">
-            {/* HARSHA ID SOLUTIONS Logo */}
-            <div className="flex items-center justify-center mb-8">
+            {/* HARSHA ID SOLUTIONS Logo in Card */}
+            <div className="bg-white shadow-xl rounded-2xl p-8 mb-8 border border-gray-100 transform hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-center">
               <div className="flex items-center space-x-3">
                 {/* HARSHA letters */}
                 <div className="flex space-x-2">
@@ -126,11 +127,11 @@ export default function Welcome() {
             </div>
             
             {/* Tagline */}
-            <div className="border-t-2 border-b-2 border-red-500 py-3 mb-6">
-              <p className="text-2xl font-semibold text-gray-800">A COMPLETE ID WORLD.....</p>
+            <div className="border-t-2 border-b-2 border-red-500 py-3 mt-6">
+              <p className="text-2xl font-semibold text-gray-800 text-center">A COMPLETE ID WORLD.....</p>
             </div>
-            
-            <p className="text-lg text-blue-600 font-medium mb-8">Welcome to the Students</p>
+              </div>
+            </div>
             
             {/* Welcome Text */}
             <div className="text-center mb-8">
@@ -140,6 +141,8 @@ export default function Welcome() {
                 Manage student records, track photo uploads, and generate ID cards efficiently.
               </p>
             </div>
+            
+            <p className="text-lg text-blue-600 font-medium mb-8 text-center">Welcome to the Students</p>
 
             {/* Login Buttons */}
             <div className="space-y-4 w-full max-w-sm mx-auto">
@@ -202,29 +205,8 @@ export default function Welcome() {
                 <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
                   <span className="text-white font-bold text-sm">H</span>
                 </div>
-                <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">A</span>
-                </div>
-                <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">R</span>
-                </div>
-                <div className="w-8 h-8 bg-purple-600 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">S</span>
-                </div>
-                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">H</span>
-                </div>
-                <div className="w-8 h-8 bg-yellow-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">A</span>
-                </div>
               </div>
-              <div className="flex items-center space-x-1">
-                <div className="w-8 h-6 bg-white border border-black rounded flex items-center justify-center relative">
-                  <span className="text-orange-500 font-bold text-xs">ID</span>
-                  <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-1 bg-black rounded-t"></div>
-                </div>
-                <span className="text-blue-500 font-bold text-sm">SOLUTIONS</span>
-              </div>
+              <span className="text-blue-500 font-bold text-lg">ARSHA ID SOLUTIONS</span>
               <div className="border-l border-r border-red-500 px-1">
                 <p className="text-xs font-semibold text-gray-800">A COMPLETE ID WORLD.....</p>
               </div>

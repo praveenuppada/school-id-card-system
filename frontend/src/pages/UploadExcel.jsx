@@ -190,7 +190,7 @@ export default function UploadExcel() {
   return (
     <div className="min-h-screen bg-yellow-50">
       <Sidebar role="ADMIN" />
-      <div className="p-4 sm:p-8">
+      <div className="p-4 sm:p-8 ml-0 md:ml-64">
         <h1 className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-6">Upload Excel</h1>
 
         {/* School Selection */}
