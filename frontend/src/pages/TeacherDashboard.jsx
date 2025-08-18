@@ -713,19 +713,19 @@ export default function TeacherDashboard() {
                 <input
                   type="file"
                   accept="image/*"
-                                          onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            // Validate file before processing
-                            if (!file.type.startsWith('image/')) {
-                              alert("Please select an image file.");
-                              return;
-                            }
-                            
-                            // Accept any file size - no compression
-                            handleFileUpload(studentId, file);
-                          }
-                        }}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      // Validate file before processing
+                      if (!file.type.startsWith('image/')) {
+                        alert("Please select an image file.");
+                        return;
+                      }
+                      
+                      // Accept any file size - no compression
+                      handleFileUpload(studentId, file);
+                    }
+                  }}
                   className="hidden"
                 />
               </label>
@@ -737,12 +737,12 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 flex teacher-dashboard" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
       <Sidebar role="TEACHER" />
       
       {/* Main Content Container - Proper layout */}
-      <div className="flex-1 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16 overflow-x-hidden" style={{ overflowX: 'hidden' }}>
+      <div className="flex-1 w-full" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
           
           {/* Header Section - Compact and professional */}
           <div className="mb-6">

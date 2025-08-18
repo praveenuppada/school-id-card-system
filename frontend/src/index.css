@@ -3,82 +3,183 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Theme customizations */
+/* Cross-platform mobile compatibility fixes */
 html, body {
-  @apply bg-white text-gray-800 overflow-x-hidden;
+  @apply bg-white text-gray-800;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  /* Prevent horizontal scrolling */
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  /* Prevent zoom on iOS */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  /* Prevent pull-to-refresh on iOS */
+  overscroll-behavior: none;
+  /* Hide scrollbars on mobile */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Prevent horizontal scrolling globally */
 * {
   max-width: 100%;
   box-sizing: border-box;
+  /* Prevent horizontal overflow */
+  overflow-x: hidden;
 }
 
-/* Force no horizontal overflow */
-html, body, #root {
+/* Force no horizontal overflow on all elements */
+html, body, #root, .welcome-page, .login-page, .dashboard-page {
   overflow-x: hidden !important;
-  width: 100%;
-  max-width: 100vw;
+  width: 100% !important;
+  max-width: 100vw !important;
+  min-width: 320px !important;
 }
 
-/* Prevent mobile UI shrinking */
+/* Hide Android scroll indicators */
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Hide scrollbars on all browsers */
+* {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+
+/* Mobile-specific fixes */
 @media (max-width: 768px) {
   html, body, #root {
     min-width: 320px !important;
     min-height: 100vh !important;
     width: 100% !important;
     height: 100vh !important;
+    /* Prevent horizontal scroll */
+    overflow-x: hidden !important;
+    /* Prevent zoom on input focus */
+    font-size: 16px !important;
   }
   
-  .min-h-screen {
+  /* Force fixed UI - prevent shrinking */
+  .welcome-page, .login-page, .dashboard-page {
+    min-width: 320px !important;
     min-height: 100vh !important;
+    width: 100% !important;
     height: 100vh !important;
+    overflow-x: hidden !important;
+    /* Prevent pull-to-refresh */
+    overscroll-behavior: none;
+    /* Smooth scrolling */
+    -webkit-overflow-scrolling: touch;
   }
   
   /* Prevent zoom on input focus */
   input, select, textarea {
     font-size: 16px !important;
-  }
-  
-  /* Force fixed UI - prevent shrinking */
-  .welcome-page, .login-page {
-    min-width: 320px !important;
-    min-height: 100vh !important;
-    width: 100% !important;
-    height: 100vh !important;
-  }
-  
-  /* Prevent viewport scaling */
-  * {
-    min-width: 0;
+    /* Prevent iOS zoom */
+    transform: scale(1);
+    /* Prevent Android zoom */
+    -webkit-transform: scale(1);
   }
   
   /* Force container sizes */
-  .max-w-4xl {
+  .max-w-4xl, .max-w-6xl, .max-w-7xl {
     min-width: 320px !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
   
-  .max-w-md {
+  .max-w-md, .max-w-lg, .max-w-xl {
     min-width: 280px !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Prevent viewport scaling issues */
+  * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  /* Fix for Android Chrome */
+  body {
+    /* Prevent Android Chrome from showing scroll indicators */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+  }
+  
+  /* Fix for iOS Safari */
+  html {
+    /* Prevent iOS Safari zoom */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  html, body {
+    /* iOS Safari specific fixes */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    /* Prevent iOS zoom on input focus */
+    font-size: 16px !important;
+  }
+  
+  input, select, textarea {
+    /* Prevent iOS zoom */
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+/* Android-specific fixes */
+@supports not (-webkit-touch-callout: none) {
+  html, body {
+    /* Android specific fixes */
+    -webkit-text-size-adjust: 100%;
+    /* Hide Android scroll indicators */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  /* Hide Android scroll indicators */
+  ::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-yellow-400 rounded-full;
-}
+/* Custom scrollbar for desktop only */
+@media (min-width: 769px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    display: block;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-yellow-500;
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-yellow-400 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-yellow-500;
+  }
 }
 
 /* Focus styles */
@@ -94,4 +195,19 @@ html, body, #root {
 /* Input focus styles */
 .input-field {
   @apply border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200;
+}
+
+/* Prevent horizontal scroll on all pages */
+.welcome-page, .login-page, .dashboard-page, .admin-dashboard, .teacher-dashboard {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  min-width: 320px !important;
+}
+
+/* Force no horizontal scroll on all containers */
+.container, .max-w-4xl, .max-w-6xl, .max-w-7xl, .max-w-md, .max-w-lg, .max-w-xl {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
 }
