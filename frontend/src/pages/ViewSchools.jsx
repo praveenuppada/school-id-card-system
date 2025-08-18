@@ -588,17 +588,17 @@ export default function ViewSchools() {
   return (
     <div className="flex min-h-screen bg-yellow-50">
       <Sidebar role="ADMIN" />
-      <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold text-yellow-600 mb-4">View Schools</h1>
+      <div className="flex-1 p-4 sm:p-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-yellow-600 mb-4">View Schools</h1>
         
         {/* School Selection */}
         <div className="bg-white rounded-lg p-4 mb-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-3">Select School</h2>
+          <h2 className="text-base sm:text-lg font-semibold mb-3">Select School</h2>
           <div className="max-w-md">
             <select
               value={selectedSchool}
               onChange={(e) => handleSelectSchool(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-base"
             >
               <option value="">Choose a school...</option>
               {Array.isArray(schools) && schools.map((s) => (
@@ -614,7 +614,7 @@ export default function ViewSchools() {
           <div className="bg-white rounded-lg shadow-sm">
             {/* School Header */}
             <div className="p-4 sm:p-6 border-b border-gray-200">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <div className="flex flex-col gap-4">
                 <div>
                   <h2 className="text-lg sm:text-xl font-bold text-gray-800">
                     {schools.find(s => (s.id || s._id || s.schoolId) === selectedSchool)?.name || selectedSchool}
@@ -623,24 +623,24 @@ export default function ViewSchools() {
                     {schoolData.schoolInfo?.classes?.length || classes.length} Classes • {schoolData.schoolInfo?.totalStudents || schoolData.originalExcel?.length || 0} Total Students
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <button
                     onClick={() => handleDownload(downloadExcel, 'excel')}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                    className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
                     disabled={!selectedSchool}
                   >
                     📊 Download Excel
                   </button>
                   <button
                     onClick={() => handleDownload(downloadPhotos, 'photos')}
-                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
+                    className="px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
                     disabled={!selectedSchool}
                   >
                     📦 Download Photos
                   </button>
                   <button
                     onClick={handleDeleteSchool}
-                    className="px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 transition-colors text-sm"
+                    className="px-4 py-3 bg-red-800 text-white rounded-lg hover:bg-red-900 transition-colors text-sm font-medium"
                     disabled={!selectedSchool}
                   >
                     🏫 Delete School
@@ -651,10 +651,10 @@ export default function ViewSchools() {
 
             {/* Tabs */}
             <div className="border-b border-gray-200">
-              <nav className="flex flex-wrap space-x-2 sm:space-x-8 px-4 sm:px-6">
+              <nav className="flex flex-wrap gap-1 sm:gap-2 px-4 sm:px-6">
                 <button
                   onClick={() => setActiveTab('overview')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-3 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm ${
                     activeTab === 'overview'
                       ? 'border-yellow-500 text-yellow-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -664,7 +664,7 @@ export default function ViewSchools() {
                 </button>
                 <button
                   onClick={() => setActiveTab('original')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-3 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm ${
                     activeTab === 'original'
                       ? 'border-yellow-500 text-yellow-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -674,7 +674,7 @@ export default function ViewSchools() {
                 </button>
                 <button
                   onClick={() => setActiveTab('updated')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-3 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm ${
                     activeTab === 'updated'
                       ? 'border-yellow-500 text-yellow-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

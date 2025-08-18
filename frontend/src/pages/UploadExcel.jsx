@@ -204,19 +204,19 @@ export default function UploadExcel() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold text-yellow-600 mb-6">Upload Excel</h1>
+      <main className="flex-1 p-4 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-6">Upload Excel</h1>
 
         {/* School Selection */}
-        <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Select School</h2>
+        <div className="bg-white shadow-lg rounded-lg p-4 sm:p-6 mb-6">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Select School</h2>
           <select
             value={selectedSchool}
             onChange={(e) => {
               console.log("School selected:", e.target.value);
               setSelectedSchool(e.target.value);
             }}
-            className="w-full border border-yellow-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full border border-yellow-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-base"
           >
             <option value="">Select a school</option>
             {Array.isArray(schools) && schools.map((school) => (
@@ -234,10 +234,10 @@ export default function UploadExcel() {
         <div
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
-          className="border-4 border-dashed border-yellow-400 rounded-lg p-8 bg-white shadow-md mb-6 text-center cursor-pointer"
+          className="border-4 border-dashed border-yellow-400 rounded-lg p-6 sm:p-8 bg-white shadow-md mb-6 text-center cursor-pointer"
           onClick={() => document.getElementById("excelInput").click()}
         >
-          <p className="text-lg text-gray-600">Drag & Drop your Excel file here</p>
+          <p className="text-base sm:text-lg text-gray-600">Drag & Drop your Excel file here</p>
           <p className="text-sm text-gray-500 mt-2">or click to select file</p>
           <input
             id="excelInput"
@@ -250,7 +250,7 @@ export default function UploadExcel() {
 
         {/* Preview with Pagination */}
         {Object.keys(previewData).length > 0 && (
-          <div className="bg-white shadow-lg rounded-lg p-6">
+          <div className="bg-white shadow-lg rounded-lg p-4 sm:p-6">
             {Object.keys(previewData).map((sheetName) => {
               const pageData = getPageData(sheetName);
               const totalPages = getTotalPages(sheetName);
@@ -260,8 +260,8 @@ export default function UploadExcel() {
 
               return (
                 <div key={sheetName} className="mb-8">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-yellow-600">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                    <h2 className="text-lg sm:text-xl font-bold text-yellow-600 mb-2 sm:mb-0">
                       Sheet: {sheetName}
                     </h2>
                     <span className="text-sm text-gray-500">
@@ -269,8 +269,8 @@ export default function UploadExcel() {
                     </span>
                   </div>
                   
-                  {/* Table */}
-                  <div className="overflow-x-auto">
+                  {/* Desktop Table */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full border border-gray-300 text-left">
                       <thead>
                         <tr className="bg-yellow-100">
@@ -293,6 +293,20 @@ export default function UploadExcel() {
                         ))}
                       </tbody>
                     </table>
+                  </div>
+
+                  {/* Mobile Cards */}
+                  <div className="md:hidden">
+                    {pageData.map((row, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-lg p-4 mb-3 bg-gray-50">
+                        {headers.map((header) => (
+                          <div key={header} className="mb-2">
+                            <span className="font-semibold text-sm text-gray-700">{header}:</span>
+                            <span className="ml-2 text-sm text-gray-600">{row[header] || ""}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
                   </div>
 
                   {/* Pagination */}
