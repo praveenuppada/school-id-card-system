@@ -38,35 +38,9 @@ export default function LoginAdmin() {
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
         <div className="max-w-md w-full">
           <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8 border border-gray-100">
-            {/* HARSHA ID SOLUTIONS Logo */}
-            <div className="flex items-center justify-center mb-6">
-              <div className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-red-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">H</span>
-                </div>
-                <div className="w-10 h-10 bg-blue-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">A</span>
-                </div>
-                <div className="w-10 h-10 bg-green-600 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">R</span>
-                </div>
-                <div className="w-10 h-10 bg-purple-600 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">S</span>
-                </div>
-                <div className="w-10 h-10 bg-orange-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">H</span>
-                </div>
-                <div className="w-10 h-10 bg-yellow-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">A</span>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 ml-3">
-                <div className="w-12 h-10 bg-white border border-black rounded flex items-center justify-center relative">
-                  <span className="text-orange-500 font-bold text-lg">ID</span>
-                  <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-black rounded-t"></div>
-                </div>
-                <span className="text-blue-500 font-bold text-xl">SOLUTIONS</span>
-              </div>
+            {/* HARSHA ID SOLUTIONS Text */}
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-bold text-yellow-600 mb-2">HARSHA ID SOLUTIONS</h1>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">Admin Login</h1>
             

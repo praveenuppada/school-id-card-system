@@ -410,7 +410,7 @@ export default function AdminDashboard() {
                   {/* Mobile Header */}
           <div className="block sm:hidden mb-4">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-xl font-bold text-yellow-600">Harsha ID Solutions</h1>
+              <h1 className="text-xl font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
               <NotificationBell />
             </div>
             
@@ -443,7 +443,7 @@ export default function AdminDashboard() {
                   {/* Desktop Header */}
           <div className="hidden sm:block">
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold text-yellow-600">Harsha ID Solutions</h1>
+              <h1 className="text-3xl font-bold text-yellow-600">HARSHA ID SOLUTIONS</h1>
               <NotificationBell />
             </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import { AuthContext } from "../context/AuthContext";
@@ -9,6 +9,15 @@ export default function LoginTeacher() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showSavePassword, setShowSavePassword] = useState(false);
+
+  // Load saved credentials on component mount
+  useEffect(() => {
+    const savedUsername = localStorage.getItem('teacherUsername');
+    if (savedUsername) {
+      setUsername(savedUsername);
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,6 +30,10 @@ export default function LoginTeacher() {
       console.log("🌐 API URL:", import.meta.env.VITE_API_URL || 'http://localhost:8081/api');
       const data = await login(username, password);
       console.log("✅ Teacher login successful:", data);
+      
+      // Show save password prompt on successful login
+      setShowSavePassword(true);
+      
       authLogin(data.token, data.roles, data.user);
       navigate("/teacher");
     } catch (err) {
@@ -33,6 +46,28 @@ export default function LoginTeacher() {
     }
   };
 
+  const handleSavePassword = () => {
+    localStorage.setItem('teacherUsername', username);
+    localStorage.setItem('teacherPassword', password);
+    setShowSavePassword(false);
+    alert("Password saved successfully! Next time you enter your username, the password will be auto-filled.");
+  };
+
+  const handleUsernameChange = (e) => {
+    const newUsername = e.target.value;
+    setUsername(newUsername);
+    
+    // Check if we have saved credentials for this username
+    const savedUsername = localStorage.getItem('teacherUsername');
+    const savedPassword = localStorage.getItem('teacherPassword');
+    
+    if (savedUsername === newUsername && savedPassword) {
+      if (confirm("Found saved password for this username. Would you like to auto-fill it?")) {
+        setPassword(savedPassword);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Decorative yellow shape */}
@@ -41,35 +76,9 @@ export default function LoginTeacher() {
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
         <div className="max-w-md w-full">
           <div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-100">
-            {/* HARSHA ID SOLUTIONS Logo */}
-            <div className="flex items-center justify-center mb-6">
-              <div className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-red-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">H</span>
-                </div>
-                <div className="w-10 h-10 bg-blue-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">A</span>
-                </div>
-                <div className="w-10 h-10 bg-green-600 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">R</span>
-                </div>
-                <div className="w-10 h-10 bg-purple-600 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">S</span>
-                </div>
-                <div className="w-10 h-10 bg-orange-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">H</span>
-                </div>
-                <div className="w-10 h-10 bg-yellow-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">A</span>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 ml-3">
-                <div className="w-12 h-10 bg-white border border-black rounded flex items-center justify-center relative">
-                  <span className="text-orange-500 font-bold text-lg">ID</span>
-                  <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-black rounded-t"></div>
-                </div>
-                <span className="text-blue-500 font-bold text-xl">SOLUTIONS</span>
-              </div>
+            {/* HARSHA ID SOLUTIONS Text */}
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-bold text-yellow-600 mb-2">HARSHA ID SOLUTIONS</h1>
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Teacher Login</h1>
             
@@ -91,7 +100,7 @@ export default function LoginTeacher() {
                     type="text"
                     placeholder="Username"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={handleUsernameChange}
                     className="w-full pl-10 pr-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-base"
                   />
                 </div>
@@ -133,6 +142,32 @@ export default function LoginTeacher() {
           </div>
         </div>
       </div>
+
+      {/* Save Password Modal */}
+      {showSavePassword && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Save Password?</h3>
+            <p className="text-gray-600 mb-6">
+              Would you like to save your password for automatic login next time?
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={handleSavePassword}
+                className="flex-1 px-4 py-2 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition-colors"
+              >
+                Save Password
+              </button>
+              <button
+                onClick={() => setShowSavePassword(false)}
+                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                Don't Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

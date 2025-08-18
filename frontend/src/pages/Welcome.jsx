@@ -132,23 +132,13 @@ export default function Welcome() {
             
             <p className="text-lg text-blue-600 font-medium mb-8">Welcome to the Students</p>
             
-            {/* ID Card Illustration */}
-            <div className="bg-white shadow-xl rounded-2xl p-8 mb-8 border border-gray-100 transform hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
-                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="w-20 h-12 bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg border-2 border-yellow-400 flex items-center justify-center shadow-md">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-              </div>
+            {/* Welcome Text */}
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">Welcome to Student ID Management</h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Streamline your school's student identification process with our comprehensive digital platform. 
+                Manage student records, track photo uploads, and generate ID cards efficiently.
+              </p>
             </div>
 
             {/* Login Buttons */}

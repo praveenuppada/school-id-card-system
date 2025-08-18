@@ -18,24 +18,24 @@ export default function Sidebar({ role }) {
 
   return (
     <>
-      {/* Mobile Hamburger Menu Button */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
-        <button
-          onClick={toggleMobileMenu}
-          className="p-2 bg-white rounded-lg shadow-lg border border-gray-200"
-        >
-          <div className="w-6 h-6 flex flex-col justify-center items-center">
-            <div className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-1' : ''}`}></div>
-            <div className={`w-5 h-0.5 bg-gray-600 my-1 transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></div>
-            <div className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-1' : ''}`}></div>
-          </div>
-        </button>
-      </div>
+                    {/* Mobile Hamburger Menu Button */}
+              <div className="fixed top-4 left-4 z-50">
+                <button
+                  onClick={toggleMobileMenu}
+                  className="p-2 bg-white rounded-lg shadow-lg border border-gray-200"
+                >
+                  <div className="w-6 h-6 flex flex-col justify-center items-center">
+                    <div className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-1' : ''}`}></div>
+                    <div className={`w-5 h-0.5 bg-gray-600 my-1 transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></div>
+                    <div className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-1' : ''}`}></div>
+                  </div>
+                </button>
+              </div>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={toggleMobileMenu}></div>
-      )}
+              {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={toggleMobileMenu}></div>
+        )}
 
       {/* Sidebar */}
       <div className={`${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-100 transition-transform duration-300 ease-in-out`}>

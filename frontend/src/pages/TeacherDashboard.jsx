@@ -214,6 +214,9 @@ export default function TeacherDashboard() {
       console.log("💾 Immediately saved captured photo to localStorage");
       
       stopCamera();
+      
+      // Show success message
+      alert("Photo captured successfully! Click 'Save' to upload it.");
     }
   };
 
@@ -461,8 +464,7 @@ export default function TeacherDashboard() {
       <div className="flex-1 p-4 sm:p-6">
         {/* Mobile Header */}
         <div className="block sm:hidden mb-4">
-          <h1 className="text-xl font-bold text-yellow-600 mb-2">Harsha ID Solutions</h1>
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+          <h1 className="text-xl font-bold text-yellow-600 mb-2">
             {(() => {
               const schoolName = user?.schoolName || user?.school?.name || 
                                 profile?.schoolName || profile?.school?.name ||
@@ -470,7 +472,7 @@ export default function TeacherDashboard() {
                                 "Teacher Dashboard";
               return schoolName;
             })()}
-          </h2>
+          </h1>
           <button
             onClick={submitAllRecords}
             className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-base"
@@ -482,8 +484,7 @@ export default function TeacherDashboard() {
         {/* Desktop Header */}
         <div className="hidden sm:flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-yellow-600">Harsha ID Solutions</h1>
-            <h2 className="text-lg font-semibold text-gray-700">
+            <h1 className="text-2xl font-bold text-yellow-600">
               {(() => {
                 const schoolName = user?.schoolName || user?.school?.name || 
                                   profile?.schoolName || profile?.school?.name ||
@@ -491,7 +492,7 @@ export default function TeacherDashboard() {
                                   "Teacher Dashboard";
                 return schoolName;
               })()}
-            </h2>
+            </h1>
           </div>
           <div className="flex gap-3">
             <button
