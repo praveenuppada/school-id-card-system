@@ -97,15 +97,23 @@ export default function TeacherDashboard() {
       console.log("📋 Profile data keys:", Object.keys(res.data));
       setProfile(res.data);
       
-      // Try to get school name from profile
-      const schoolName = res.data.schoolName || res.data.school?.name || res.data.schoolName;
-      console.log("📋 School name from profile:", schoolName);
-      console.log("📋 res.data.schoolName:", res.data.schoolName);
-      console.log("📋 res.data.school:", res.data.school);
+      // Try to get school name from profile - more comprehensive check
+      console.log("🔍 Full profile response structure:", JSON.stringify(res.data, null, 2));
       
-      if (schoolName) {
-        localStorage.setItem('teacherSchoolName', schoolName);
-        console.log("📋 Saved school name to localStorage:", schoolName);
+      if (res.data?.schoolName) {
+        console.log("📋 School name from profile:", res.data.schoolName);
+        localStorage.setItem('teacherSchoolName', res.data.schoolName);
+      } else if (res.data?.school?.name) {
+        console.log("📋 School name from profile school object:", res.data.school.name);
+        localStorage.setItem('teacherSchoolName', res.data.school.name);
+      } else if (res.data?.teacher?.schoolName) {
+        console.log("📋 School name from profile teacher object:", res.data.teacher.schoolName);
+        localStorage.setItem('teacherSchoolName', res.data.teacher.schoolName);
+      } else if (res.data?.teacher?.school?.name) {
+        console.log("📋 School name from profile teacher school object:", res.data.teacher.school.name);
+        localStorage.setItem('teacherSchoolName', res.data.teacher.school.name);
+      } else {
+        console.log("❌ No school name found in profile response");
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -138,7 +146,9 @@ export default function TeacherDashboard() {
       console.log("📚 Final classes data:", classesData);
       setClasses(classesData);
       
-      // Try to get school name from classes response
+      // Try to get school name from classes response - more comprehensive check
+      console.log("🔍 Full classes response structure:", JSON.stringify(res.data, null, 2));
+      
       if (res.data?.schoolName) {
         console.log("📚 School name from classes:", res.data.schoolName);
         localStorage.setItem('teacherSchoolName', res.data.schoolName);
@@ -148,6 +158,19 @@ export default function TeacherDashboard() {
       } else if (res.data?.data?.schoolName) {
         console.log("📚 School name from classes data:", res.data.data.schoolName);
         localStorage.setItem('teacherSchoolName', res.data.data.schoolName);
+      } else if (res.data?.teacher?.schoolName) {
+        console.log("📚 School name from teacher object:", res.data.teacher.schoolName);
+        localStorage.setItem('teacherSchoolName', res.data.teacher.schoolName);
+      } else if (res.data?.teacher?.school?.name) {
+        console.log("📚 School name from teacher school object:", res.data.teacher.school.name);
+        localStorage.setItem('teacherSchoolName', res.data.teacher.school.name);
+      } else {
+        console.log("❌ No school name found in classes response");
+        // Try to get from user context or localStorage
+        const storedSchoolName = localStorage.getItem('teacherSchoolName');
+        if (storedSchoolName) {
+          console.log("📚 Using stored school name:", storedSchoolName);
+        }
       }
     } catch (error) {
       console.error("Error loading classes:", error);
@@ -542,7 +565,7 @@ export default function TeacherDashboard() {
       
       {/* Main Content Container - Proper layout */}
       <div className="flex-1 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16 overflow-x-hidden">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16 overflow-x-hidden" style={{ overflowX: 'hidden' }}>
           
           {/* Header Section - Compact and professional */}
           <div className="mb-6">

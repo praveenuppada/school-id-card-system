@@ -308,7 +308,7 @@ export default function Welcome() {
 
       {/* Main Content */}
       <main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden">
-        <div className="w-full max-w-4xl overflow-x-hidden">
+        <div className="w-full max-w-4xl overflow-x-hidden" style={{ overflowX: 'hidden' }}>
           {renderContent()}
         </div>
       </main>
