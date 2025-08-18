@@ -253,9 +253,22 @@ export default function TeacherDashboard() {
       input.accept = 'image/*';
       input.capture = 'environment'; // Use back camera by default
       
-      input.onchange = (e) => {
+      input.onchange = async (e) => {
         const file = e.target.files[0];
         if (file) {
+          // Validate file before processing
+          if (!file.type.startsWith('image/')) {
+            alert("Please select an image file.");
+            return;
+          }
+          
+          // Use the same validation as handleFileUpload
+          if (!file.type.startsWith('image/')) {
+            alert("Please select an image file.");
+            return;
+          }
+          
+          // Accept any file size - no compression
           handleFileUpload(studentId, file);
         }
       };
@@ -327,7 +340,9 @@ export default function TeacherDashboard() {
     }
   };
 
-  const handleFileUpload = (studentId, file) => {
+
+
+  const handleFileUpload = async (studentId, file) => {
     try {
       console.log("📁 File upload for student:", studentId, "File:", file);
       
@@ -342,46 +357,63 @@ export default function TeacherDashboard() {
         return;
       }
       
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size should be less than 5MB.");
-        return;
-      }
+      // Accept any file size - no compression
+      const processedFile = file;
       
+      // Create a new FileReader instance
       const reader = new FileReader();
+      
       reader.onload = (e) => {
         try {
+          // Validate that we got a valid data URL
+          if (!e.target.result || typeof e.target.result !== 'string') {
+            throw new Error("Invalid image data");
+          }
+          
+          // Check if the data URL is valid
+          if (!e.target.result.startsWith('data:image/')) {
+            throw new Error("Invalid image format");
+          }
+          
           const updatedPhotos = {
             ...studentPhotos,
             [studentId]: {
               data: e.target.result,
               timestamp: new Date().toISOString(),
               status: 'uploaded',
-              filename: file.name
+              filename: processedFile.name
             }
           };
           
           setStudentPhotos(updatedPhotos);
-          console.log("📁 File uploaded, updated studentPhotos:", updatedPhotos);
+          console.log("📁 File uploaded successfully for student:", studentId);
           
           // Force save to localStorage immediately
           localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
           console.log("💾 Immediately saved uploaded file to localStorage");
+          
         } catch (error) {
           console.error("❌ Error creating photo preview:", error);
-          alert("Error processing image. Please try again.");
+          alert("Error processing image. Please try again with a different image.");
         }
       };
       
-      reader.onerror = () => {
-        console.error("❌ Error reading file");
-        alert("Error reading file. Please try again.");
+      reader.onerror = (error) => {
+        console.error("❌ Error reading file:", error);
+        alert("Error reading file. Please try again with a different image.");
       };
       
-      reader.readAsDataURL(file);
+      reader.onabort = () => {
+        console.error("❌ File reading was aborted");
+        alert("File reading was cancelled. Please try again.");
+      };
+      
+      // Start reading the file with maximum quality
+      reader.readAsDataURL(processedFile);
+      
     } catch (error) {
       console.error("❌ Error handling file upload:", error);
-      alert("Error uploading file. Please try again.");
+      alert("Error uploading file. Please try again with a different image.");
     }
   };
 
@@ -606,7 +638,19 @@ export default function TeacherDashboard() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => e.target.files[0] && handleFileUpload(studentId, e.target.files[0])}
+                                          onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            // Validate file before processing
+                            if (!file.type.startsWith('image/')) {
+                              alert("Please select an image file.");
+                              return;
+                            }
+                            
+                            // Accept any file size - no compression
+                            handleFileUpload(studentId, file);
+                          }
+                        }}
                   className="hidden"
                 />
               </label>
