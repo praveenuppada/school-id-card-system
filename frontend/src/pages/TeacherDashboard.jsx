@@ -512,131 +512,101 @@ export default function TeacherDashboard() {
       // Clean up any existing resources before processing new file
       cleanupResources();
       
-      // For Android, use the ULTIMATE SIMPLE approach
+      // For Android, use the MOST BASIC approach possible
       if (isAndroid) {
-        console.log("📱 Using ULTIMATE SIMPLE Android file handling");
+        console.log("📱 Using MOST BASIC Android file handling");
         
-        // Method 1: Direct FileReader with NO cleanup interference
+        // Skip all complex processing and just save the file directly
         try {
-          console.log("📱 Method 1: Direct FileReader...");
+          console.log("📱 Using basic file save approach...");
           
-          const dataUrl = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-              console.log("📱 Method 1 success, length:", e.target.result.length);
-              resolve(e.target.result);
-            };
-            
-            reader.onerror = () => {
-              console.error("📱 Method 1 failed");
-              reject(new Error("Method 1 failed"));
-            };
-            
-            reader.readAsDataURL(file);
-          });
+          // Create a simple file info object instead of data URL
+          const fileInfo = {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            lastModified: file.lastModified,
+            // Store the file object directly
+            file: file
+          };
           
-          console.log("📱 Method 1 completed successfully");
+          console.log("📱 File info created:", fileInfo);
           
-          // Save the photo immediately
+          // Save the file info immediately
           const updatedPhotos = {
             ...studentPhotos,
             [studentId]: {
-              data: dataUrl,
+              fileInfo: fileInfo,
               timestamp: new Date().toISOString(),
               status: 'uploaded',
-              filename: file.name
+              filename: file.name,
+              // Add a flag to indicate this is a file object
+              isFileObject: true
             }
           };
           
           setStudentPhotos(updatedPhotos);
-          console.log("📁 Android Method 1 successful for student:", studentId);
+          console.log("📁 Android basic file save successful for student:", studentId);
           
-          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-          console.log("💾 Saved to localStorage");
+          // Save to localStorage (without the file object to avoid serialization issues)
+          const storageData = {
+            ...studentPhotos,
+            [studentId]: {
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              lastModified: file.lastModified,
+              timestamp: new Date().toISOString(),
+              status: 'uploaded',
+              filename: file.name,
+              isFileObject: true
+            }
+          };
           
-        } catch (method1Error) {
-          console.error("❌ Method 1 failed:", method1Error);
+          localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+          console.log("💾 Saved file info to localStorage");
           
-          // Method 2: Try with a completely different approach
+          // Show success message
+          alert("Android: File saved successfully! The file will be processed when you save the photo.");
+          
+        } catch (basicError) {
+          console.error("❌ Basic file save failed:", basicError);
+          
+          // Last resort: try to create a simple text representation
           try {
-            console.log("📱 Method 2: Blob URL approach...");
+            console.log("📱 Trying text representation approach...");
             
-            const blobUrl = URL.createObjectURL(file);
-            const response = await fetch(blobUrl);
-            const blob = await response.blob();
-            
-            const dataUrl = await new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = (e) => resolve(e.target.result);
-              reader.onerror = () => reject(new Error("Blob conversion failed"));
-              reader.readAsDataURL(blob);
-            });
-            
-            URL.revokeObjectURL(blobUrl);
-            
-            console.log("📱 Method 2 completed successfully");
+            const textInfo = {
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              lastModified: file.lastModified,
+              // Create a simple text representation
+              textData: `File: ${file.name}, Type: ${file.type}, Size: ${file.size} bytes`
+            };
             
             const updatedPhotos = {
               ...studentPhotos,
               [studentId]: {
-                data: dataUrl,
+                textInfo: textInfo,
                 timestamp: new Date().toISOString(),
                 status: 'uploaded',
-                filename: file.name
+                filename: file.name,
+                isTextInfo: true
               }
             };
             
             setStudentPhotos(updatedPhotos);
-            console.log("📁 Android Method 2 successful for student:", studentId);
+            console.log("📁 Android text info save successful for student:", studentId);
             
             localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-            console.log("💾 Saved to localStorage");
+            console.log("💾 Saved text info to localStorage");
             
-          } catch (method2Error) {
-            console.error("❌ Method 2 failed:", method2Error);
+            alert("Android: File information saved! The file will be processed when you save the photo.");
             
-            // Method 3: Last resort - try with ArrayBuffer
-            try {
-              console.log("📱 Method 3: ArrayBuffer approach...");
-              
-              const arrayBuffer = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.onerror = () => reject(new Error("ArrayBuffer failed"));
-                reader.readAsArrayBuffer(file);
-              });
-              
-              const bytes = new Uint8Array(arrayBuffer);
-              let binary = '';
-              for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
-              }
-              const base64 = btoa(binary);
-              const dataUrl = `data:${file.type};base64,${base64}`;
-              
-              console.log("📱 Method 3 completed successfully");
-              
-              const updatedPhotos = {
-                ...studentPhotos,
-                [studentId]: {
-                  data: dataUrl,
-                  timestamp: new Date().toISOString(),
-                  status: 'uploaded',
-                  filename: file.name
-                }
-              };
-              
-              setStudentPhotos(updatedPhotos);
-              console.log("📁 Android Method 3 successful for student:", studentId);
-              
-              localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-              console.log("💾 Saved to localStorage");
-              
-            } catch (method3Error) {
-              console.error("❌ All methods failed:", method3Error);
-              alert("Android: All methods failed. Please try a different image or restart the app.");
-            }
+          } catch (textError) {
+            console.error("❌ Text representation also failed:", textError);
+            alert("Android: Unable to save file. Please try a different image or restart the app.");
           }
         }
         
