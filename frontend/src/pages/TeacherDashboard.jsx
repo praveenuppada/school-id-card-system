@@ -532,42 +532,88 @@ export default function TeacherDashboard() {
           
           console.log("📱 File info created:", fileInfo);
           
-          // Save the file info immediately
-          const updatedPhotos = {
-            ...studentPhotos,
-            [studentId]: {
-              fileInfo: fileInfo,
-              timestamp: new Date().toISOString(),
-              status: 'uploaded',
-              filename: file.name,
-              // Add a flag to indicate this is a file object
-              isFileObject: true
-            }
-          };
-          
-          setStudentPhotos(updatedPhotos);
-          console.log("📁 Android basic file save successful for student:", studentId);
-          
-          // Save to localStorage (without the file object to avoid serialization issues)
-          const storageData = {
-            ...studentPhotos,
-            [studentId]: {
-              name: file.name,
-              type: file.type,
-              size: file.size,
-              lastModified: file.lastModified,
-              timestamp: new Date().toISOString(),
-              status: 'uploaded',
-              filename: file.name,
-              isFileObject: true
-            }
-          };
-          
-          localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
-          console.log("💾 Saved file info to localStorage");
-          
-          // Show success message
-          alert("Android: File saved successfully! The file will be processed when you save the photo.");
+          // Now try to create a data URL for display (simple approach)
+          try {
+            console.log("📱 Creating data URL for display...");
+            
+            const dataUrl = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              
+              reader.onload = (e) => {
+                console.log("📱 Data URL created successfully");
+                resolve(e.target.result);
+              };
+              
+              reader.onerror = () => {
+                console.error("📱 Data URL creation failed");
+                reject(new Error("Data URL creation failed"));
+              };
+              
+              // Use a simple approach
+              reader.readAsDataURL(file);
+            });
+            
+            console.log("📱 Data URL created, length:", dataUrl.length);
+            
+            // Save with data URL for display
+            const updatedPhotos = {
+              ...studentPhotos,
+              [studentId]: {
+                data: dataUrl,
+                timestamp: new Date().toISOString(),
+                status: 'uploaded',
+                filename: file.name
+              }
+            };
+            
+            setStudentPhotos(updatedPhotos);
+            console.log("📁 Android file with data URL saved successfully for student:", studentId);
+            
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+            console.log("💾 Saved with data URL to localStorage");
+            
+            // Show success message
+            alert("Android: Photo uploaded successfully!");
+            
+          } catch (dataUrlError) {
+            console.error("❌ Data URL creation failed:", dataUrlError);
+            
+            // Fallback: save file info without data URL
+            const updatedPhotos = {
+              ...studentPhotos,
+              [studentId]: {
+                fileInfo: fileInfo,
+                timestamp: new Date().toISOString(),
+                status: 'uploaded',
+                filename: file.name,
+                isFileObject: true
+              }
+            };
+            
+            setStudentPhotos(updatedPhotos);
+            console.log("📁 Android basic file save successful for student:", studentId);
+            
+            // Save to localStorage (without the file object to avoid serialization issues)
+            const storageData = {
+              ...studentPhotos,
+              [studentId]: {
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                lastModified: file.lastModified,
+                timestamp: new Date().toISOString(),
+                status: 'uploaded',
+                filename: file.name,
+                isFileObject: true
+              }
+            };
+            
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+            console.log("💾 Saved file info to localStorage");
+            
+            // Show success message
+            alert("Android: File saved successfully! The file will be processed when you save the photo.");
+          }
           
         } catch (basicError) {
           console.error("❌ Basic file save failed:", basicError);
