@@ -242,44 +242,86 @@ export default function TeacherDashboard() {
     return Math.ceil(students.length / itemsPerPage);
   };
 
-  // Camera functions
+  // Camera functions with Android fallback
   const startCamera = async (studentId) => {
     try {
       console.log("📸 Starting camera for student:", studentId);
       
-      // Create file input for native camera app
+      // Check if we're on Android
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      console.log("📱 Device type:", isAndroid ? "Android" : "Other");
+      
+      // Create file input for native camera app with better Android support
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.capture = 'environment'; // Use back camera by default
+      
+      // Use different capture settings for Android
+      if (isAndroid) {
+        input.capture = 'environment'; // Back camera for Android
+        console.log("📸 Using back camera for Android");
+      } else {
+        input.capture = 'environment'; // Back camera for other devices
+        console.log("📸 Using back camera for other devices");
+      }
+      
+      // Add additional attributes for better Android compatibility
+      input.setAttribute('data-testid', 'camera-input');
+      input.style.display = 'none';
       
       input.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          // Validate file before processing
-          if (!file.type.startsWith('image/')) {
-            alert("Please select an image file.");
-            return;
-          }
+        try {
+          console.log("📸 Camera file selected");
+          const file = e.target.files[0];
           
-          // Use the same validation as handleFileUpload
-          if (!file.type.startsWith('image/')) {
-            alert("Please select an image file.");
-            return;
+          if (file) {
+            console.log("📸 Camera file details:", {
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              lastModified: file.lastModified
+            });
+            
+            // Use the same validation as handleFileUpload
+            if (!file.type.startsWith('image/') && !file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|webp)$/)) {
+              alert("Please select an image file (JPG, PNG, GIF, BMP, or WebP).");
+              return;
+            }
+            
+            // Accept any file size - no compression
+            handleFileUpload(studentId, file);
+          } else {
+            console.log("📸 No file selected from camera");
           }
-          
-          // Accept any file size - no compression
-          handleFileUpload(studentId, file);
+        } catch (error) {
+          console.error("❌ Error in camera file selection:", error);
+          alert("Error processing camera image. Please try again.");
         }
       };
       
+      input.onerror = (error) => {
+        console.error("❌ Camera input error:", error);
+        alert("Camera error. Please try again or use file upload instead.");
+      };
+      
+      // Add to DOM temporarily
+      document.body.appendChild(input);
+      
+      // Trigger file selection
       input.click();
+      
+      // Clean up after a delay
+      setTimeout(() => {
+        if (document.body.contains(input)) {
+          document.body.removeChild(input);
+        }
+      }, 1000);
       
     } catch (error) {
       console.error("❌ Error accessing camera:", error);
       alert("Unable to access camera. Please check permissions and try again.");
     }
-  };
+
 
   const stopCamera = () => {
     if (cameraStream) {
@@ -345,34 +387,45 @@ export default function TeacherDashboard() {
   const handleFileUpload = async (studentId, file) => {
     try {
       console.log("📁 File upload for student:", studentId, "File:", file);
+      console.log("📁 File details:", {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: file.lastModified
+      });
       
       if (!file) {
         console.error("❌ No file selected");
         return;
       }
       
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert("Please select an image file.");
+      // Validate file type - be more lenient for Android
+      if (!file.type.startsWith('image/') && !file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|webp)$/)) {
+        alert("Please select an image file (JPG, PNG, GIF, BMP, or WebP).");
         return;
       }
       
       // Accept any file size - no compression
       const processedFile = file;
       
-      // Create a new FileReader instance
+      // Create a new FileReader instance with better error handling
       const reader = new FileReader();
       
       reader.onload = (e) => {
         try {
+          console.log("📁 FileReader onload triggered");
+          
           // Validate that we got a valid data URL
           if (!e.target.result || typeof e.target.result !== 'string') {
-            throw new Error("Invalid image data");
+            throw new Error("Invalid image data received");
           }
           
-          // Check if the data URL is valid
-          if (!e.target.result.startsWith('data:image/')) {
-            throw new Error("Invalid image format");
+          console.log("📁 Data URL length:", e.target.result.length);
+          console.log("📁 Data URL starts with:", e.target.result.substring(0, 50));
+          
+          // Check if the data URL is valid - be more lenient
+          if (!e.target.result.startsWith('data:image/') && !e.target.result.startsWith('data:application/')) {
+            throw new Error("Invalid image format - not a valid data URL");
           }
           
           const updatedPhotos = {
@@ -394,13 +447,18 @@ export default function TeacherDashboard() {
           
         } catch (error) {
           console.error("❌ Error creating photo preview:", error);
-          alert("Error processing image. Please try again with a different image.");
+          console.error("❌ Error details:", error.message);
+          alert("Error processing image. Please try again with a different image or format.");
         }
       };
       
       reader.onerror = (error) => {
         console.error("❌ Error reading file:", error);
-        alert("Error reading file. Please try again with a different image.");
+        console.error("❌ FileReader error details:", {
+          error: error.target.error,
+          readyState: error.target.readyState
+        });
+        alert("Error reading file. Please try again with a different image or format.");
       };
       
       reader.onabort = () => {
@@ -408,12 +466,29 @@ export default function TeacherDashboard() {
         alert("File reading was cancelled. Please try again.");
       };
       
+      reader.onloadstart = () => {
+        console.log("📁 FileReader started reading file");
+      };
+      
+      reader.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = (event.loaded / event.total) * 100;
+          console.log(`📁 File reading progress: ${progress.toFixed(1)}%`);
+        }
+      };
+      
+      reader.onloadend = () => {
+        console.log("📁 FileReader finished reading file");
+      };
+      
       // Start reading the file with maximum quality
+      console.log("📁 Starting to read file as data URL...");
       reader.readAsDataURL(processedFile);
       
     } catch (error) {
       console.error("❌ Error handling file upload:", error);
-      alert("Error uploading file. Please try again with a different image.");
+      console.error("❌ Error stack:", error.stack);
+      alert("Error uploading file. Please try again with a different image or format.");
     }
   };
 
