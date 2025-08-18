@@ -321,7 +321,7 @@ export default function TeacherDashboard() {
       console.error("❌ Error accessing camera:", error);
       alert("Unable to access camera. Please check permissions and try again.");
     }
-
+   };
 
   const stopCamera = () => {
     if (cameraStream) {
