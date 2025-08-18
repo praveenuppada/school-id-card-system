@@ -586,7 +586,7 @@ export default function ViewSchools() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
       <Sidebar role="ADMIN" />
       
       {/* Main Content Container - Proper layout */}

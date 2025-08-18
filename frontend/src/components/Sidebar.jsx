@@ -102,21 +102,35 @@ export default function Sidebar({ role }) {
                   </svg>
                   Dashboard
                 </Link>
+                <button
+                  onClick={() => {
+                    alert("📋 INSTRUCTIONS:\n\n1. Select a class from the dropdown\n2. For each student, you can:\n   • Take photo using camera\n   • Upload photo from file\n   • Save the photo\n3. Submit all records when done\n4. Photos will be sent to admin for review");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center p-3 rounded-xl text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-200"
+                >
+                  <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                  </svg>
+                  Instructions
+                </button>
               </>
             )}
           </nav>
           
                             <div className="pt-6 space-y-3">
-                    {/* Call Us Option */}
-                    <a
-                      href="tel:+918977219777"
-                      className="w-full flex items-center justify-center p-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors duration-200"
-                    >
-                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                      </svg>
-                      Call Us Now +91 8977219777
-                    </a>
+                    {/* Call Us Option - Only for Teachers */}
+                    {role === "TEACHER" && (
+                      <a
+                        href="tel:+918977219777"
+                        className="w-full flex items-center justify-center p-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors duration-200"
+                      >
+                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                        </svg>
+                        Call Us Now +91 8977219777
+                      </a>
+                    )}
                     
                     <button
                       onClick={handleLogout}

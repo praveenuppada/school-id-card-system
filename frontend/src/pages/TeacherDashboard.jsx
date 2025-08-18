@@ -525,7 +525,7 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
       <Sidebar role="TEACHER" />
       
       {/* Main Content Container - Proper layout */}
