@@ -211,3 +211,127 @@ html, body, #root, .welcome-page, .login-page, .dashboard-page {
   width: 100% !important;
   max-width: 100vw !important;
 }
+
+/* ABSOLUTE NO HORIZONTAL SCROLL - CRITICAL FIXES */
+html, body, #root, .welcome-page, .login-page, .dashboard-page, .teacher-dashboard, .admin-dashboard {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  min-width: 320px !important;
+  /* Prevent any horizontal movement */
+  position: relative !important;
+  /* Force single column layout */
+  display: block !important;
+}
+
+/* Force all flex containers to prevent horizontal overflow */
+.flex, .flex-col, .flex-row, .grid {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+/* Force all table containers to prevent horizontal scroll */
+table, .table {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+/* Force all div containers to prevent horizontal scroll */
+div {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+/* CRITICAL: Prevent horizontal scroll on ALL elements */
+* {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  /* Prevent any horizontal movement */
+  box-sizing: border-box !important;
+}
+
+/* Force viewport to prevent horizontal scroll */
+html {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  /* Prevent any horizontal movement */
+  position: relative !important;
+}
+
+body {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  /* Prevent any horizontal movement */
+  position: relative !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#root {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  /* Prevent any horizontal movement */
+  position: relative !important;
+}
+
+/* Prevent horizontal scroll on all pages */
+.welcome-page, .login-page, .dashboard-page, .teacher-dashboard, .admin-dashboard {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  /* Prevent any horizontal movement */
+  position: relative !important;
+  /* Force single column layout */
+  display: block !important;
+}
+
+/* Force mobile viewport to prevent horizontal scroll */
+@media (max-width: 768px) {
+  html, body, #root, .welcome-page, .login-page, .dashboard-page, .teacher-dashboard, .admin-dashboard {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 320px !important;
+    /* Prevent any horizontal movement */
+    position: relative !important;
+    /* Force single column layout */
+    display: block !important;
+    /* Prevent pull-to-refresh */
+    overscroll-behavior: none;
+    /* Smooth scrolling */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Force all containers to prevent horizontal scroll */
+  .container, .max-w-4xl, .max-w-6xl, .max-w-7xl, .max-w-md, .max-w-lg, .max-w-xl {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 320px !important;
+  }
+  
+  /* Force all flex containers to prevent horizontal overflow */
+  .flex, .flex-col, .flex-row, .grid {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
+  
+  /* Force all table containers to prevent horizontal scroll */
+  table, .table {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
+  
+  /* Force all div containers to prevent horizontal scroll */
+  div {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+}
