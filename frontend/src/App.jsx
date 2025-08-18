@@ -12,6 +12,7 @@ import RegisterSchool from "./pages/RegisterTeacher";
 import UploadExcel from "./pages/UploadExcel";
 import ViewSchools from "./pages/ViewSchools";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import TeacherInstructions from "./pages/TeacherInstructions";
 import SubmitUpdates from "./pages/SubmitUpdates";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,7 @@ export default function App() {
           {/* Teacher Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={["TEACHER"]} />}>
             <Route path="/teacher" element={<TeacherDashboard />} />
+            <Route path="/teacher/instructions" element={<TeacherInstructions />} />
             <Route path="/teacher/submit-updates" element={<SubmitUpdates />} />
           </Route>
 

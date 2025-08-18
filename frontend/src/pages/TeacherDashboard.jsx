@@ -247,21 +247,20 @@ export default function TeacherDashboard() {
     try {
       console.log("📸 Starting camera for student:", studentId);
       
-      // Stop any existing camera first
-      if (cameraStream) {
-        stopCamera();
-      }
+      // Create file input for native camera app
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment'; // Use back camera by default
       
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-          facingMode: 'user'
-        } 
-      });
-      console.log("📸 Camera stream obtained:", stream);
-      setCameraStream(stream);
-      setActiveCamera(studentId);
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          handleFileUpload(studentId, file);
+        }
+      };
+      
+      input.click();
       
     } catch (error) {
       console.error("❌ Error accessing camera:", error);
@@ -329,26 +328,61 @@ export default function TeacherDashboard() {
   };
 
   const handleFileUpload = (studentId, file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const updatedPhotos = {
-        ...studentPhotos,
-        [studentId]: {
-          data: e.target.result,
-          timestamp: new Date().toISOString(),
-          status: 'uploaded',
-          filename: file.name
+    try {
+      console.log("📁 File upload for student:", studentId, "File:", file);
+      
+      if (!file) {
+        console.error("❌ No file selected");
+        return;
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert("Please select an image file.");
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size should be less than 5MB.");
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const updatedPhotos = {
+            ...studentPhotos,
+            [studentId]: {
+              data: e.target.result,
+              timestamp: new Date().toISOString(),
+              status: 'uploaded',
+              filename: file.name
+            }
+          };
+          
+          setStudentPhotos(updatedPhotos);
+          console.log("📁 File uploaded, updated studentPhotos:", updatedPhotos);
+          
+          // Force save to localStorage immediately
+          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+          console.log("💾 Immediately saved uploaded file to localStorage");
+        } catch (error) {
+          console.error("❌ Error creating photo preview:", error);
+          alert("Error processing image. Please try again.");
         }
       };
       
-      setStudentPhotos(updatedPhotos);
-      console.log("📁 File uploaded, updated studentPhotos:", updatedPhotos);
+      reader.onerror = () => {
+        console.error("❌ Error reading file");
+        alert("Error reading file. Please try again.");
+      };
       
-      // Force save to localStorage immediately
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-      console.log("💾 Immediately saved uploaded file to localStorage");
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("❌ Error handling file upload:", error);
+      alert("Error uploading file. Please try again.");
+    }
   };
 
   const savePhoto = async (studentId) => {

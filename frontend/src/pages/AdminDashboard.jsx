@@ -37,6 +37,18 @@ export default function AdminDashboard() {
     loadStats();
   }, []);
 
+  // Refresh data periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadStats();
+      if (selectedSchool && selectedClass) {
+        handleClassChange(selectedClass);
+      }
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [selectedSchool, selectedClass]);
+
   const loadSchools = async () => {
     try {
       const res = await getSchools();

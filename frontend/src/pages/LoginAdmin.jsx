@@ -24,7 +24,6 @@ export default function LoginAdmin() {
     try {
       const data = await login(username, password);
       authLogin(data.token, data.roles, data.user);
-      showSuccess("Login Successful", "Welcome back!");
       navigate("/admin");
     } catch (err) {
       showError("Login Failed", "Invalid credentials. Please try again.");
