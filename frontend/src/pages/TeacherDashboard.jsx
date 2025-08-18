@@ -242,7 +242,7 @@ export default function TeacherDashboard() {
     return Math.ceil(students.length / itemsPerPage);
   };
 
-  // Camera functions with Android fallback
+    // Camera functions with Android fallback
   const startCamera = async (studentId) => {
     try {
       console.log("📸 Starting camera for student:", studentId);
@@ -260,13 +260,16 @@ export default function TeacherDashboard() {
       if (isAndroid) {
         input.capture = 'environment'; // Back camera for Android
         console.log("📸 Using back camera for Android");
+        // Add Android-specific attributes
+        input.setAttribute('data-testid', 'camera-input-android');
+        input.setAttribute('data-capture', 'environment');
       } else {
         input.capture = 'environment'; // Back camera for other devices
         console.log("📸 Using back camera for other devices");
+        input.setAttribute('data-testid', 'camera-input');
       }
       
       // Add additional attributes for better Android compatibility
-      input.setAttribute('data-testid', 'camera-input');
       input.style.display = 'none';
       
       input.onchange = async (e) => {
@@ -295,13 +298,25 @@ export default function TeacherDashboard() {
           }
         } catch (error) {
           console.error("❌ Error in camera file selection:", error);
-          alert("Error processing camera image. Please try again.");
+          
+          // Android-specific error message
+          if (isAndroid) {
+            alert("Android: Error processing camera image. Please try again or use file upload.");
+          } else {
+            alert("Error processing camera image. Please try again.");
+          }
         }
       };
       
       input.onerror = (error) => {
         console.error("❌ Camera input error:", error);
-        alert("Camera error. Please try again or use file upload instead.");
+        
+        // Android-specific error message
+        if (isAndroid) {
+          alert("Android: Camera error. Please try again or use file upload instead.");
+        } else {
+          alert("Camera error. Please try again or use file upload instead.");
+        }
       };
       
       // Add to DOM temporarily
@@ -319,9 +334,16 @@ export default function TeacherDashboard() {
       
     } catch (error) {
       console.error("❌ Error accessing camera:", error);
-      alert("Unable to access camera. Please check permissions and try again.");
+      
+      // Android-specific error message
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      if (isAndroid) {
+        alert("Android: Unable to access camera. Please check permissions and try again.");
+      } else {
+        alert("Unable to access camera. Please check permissions and try again.");
+      }
     }
-   };
+  };
 
   const stopCamera = () => {
     if (cameraStream) {
@@ -394,6 +416,10 @@ export default function TeacherDashboard() {
         lastModified: file.lastModified
       });
       
+      // Check if we're on Android
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      console.log("📱 Device type:", isAndroid ? "Android" : "Other");
+      
       if (!file) {
         console.error("❌ No file selected");
         return;
@@ -423,9 +449,17 @@ export default function TeacherDashboard() {
           console.log("📁 Data URL length:", e.target.result.length);
           console.log("📁 Data URL starts with:", e.target.result.substring(0, 50));
           
-          // Check if the data URL is valid - be more lenient
-          if (!e.target.result.startsWith('data:image/') && !e.target.result.startsWith('data:application/')) {
+          // Check if the data URL is valid - be more lenient for Android
+          if (!e.target.result.startsWith('data:image/') && 
+              !e.target.result.startsWith('data:application/') && 
+              !e.target.result.startsWith('data:') && 
+              !isAndroid) {
             throw new Error("Invalid image format - not a valid data URL");
+          }
+          
+          // For Android, be more lenient with data URL validation
+          if (isAndroid && !e.target.result.startsWith('data:')) {
+            console.log("⚠️ Android device - accepting non-standard data URL format");
           }
           
           const updatedPhotos = {
@@ -448,7 +482,13 @@ export default function TeacherDashboard() {
         } catch (error) {
           console.error("❌ Error creating photo preview:", error);
           console.error("❌ Error details:", error.message);
-          alert("Error processing image. Please try again with a different image or format.");
+          
+          // Android-specific error message
+          if (isAndroid) {
+            alert("Android: Error processing image. Please try again or use a different image.");
+          } else {
+            alert("Error processing image. Please try again with a different image or format.");
+          }
         }
       };
       
@@ -458,7 +498,13 @@ export default function TeacherDashboard() {
           error: error.target.error,
           readyState: error.target.readyState
         });
-        alert("Error reading file. Please try again with a different image or format.");
+        
+        // Android-specific error message
+        if (isAndroid) {
+          alert("Android: Error reading file. Please try again or use a different image.");
+        } else {
+          alert("Error reading file. Please try again with a different image or format.");
+        }
       };
       
       reader.onabort = () => {
@@ -483,12 +529,36 @@ export default function TeacherDashboard() {
       
       // Start reading the file with maximum quality
       console.log("📁 Starting to read file as data URL...");
-      reader.readAsDataURL(processedFile);
+      
+      // For Android, try different reading methods if needed
+      if (isAndroid) {
+        try {
+          reader.readAsDataURL(processedFile);
+        } catch (androidError) {
+          console.error("❌ Android FileReader error:", androidError);
+          // Fallback for Android
+          try {
+            reader.readAsArrayBuffer(processedFile);
+          } catch (fallbackError) {
+            console.error("❌ Android fallback error:", fallbackError);
+            alert("Android: Unable to read image file. Please try a different image.");
+          }
+        }
+      } else {
+        reader.readAsDataURL(processedFile);
+      }
       
     } catch (error) {
       console.error("❌ Error handling file upload:", error);
       console.error("❌ Error stack:", error.stack);
-      alert("Error uploading file. Please try again with a different image or format.");
+      
+      // Android-specific error message
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      if (isAndroid) {
+        alert("Android: Error uploading file. Please try again or use a different image.");
+      } else {
+        alert("Error uploading file. Please try again with a different image or format.");
+      }
     }
   };
 
