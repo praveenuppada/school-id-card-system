@@ -146,7 +146,7 @@ export default function Welcome() {
 
 
             {/* Login Buttons */}
-            <div className="space-y-4 w-full max-w-md mx-auto">
+            <div className="space-y-4 w-full max-w-md mx-auto px-4">
               <button
                 onClick={() => navigate("/login-teacher")}
                 className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-2xl shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
@@ -172,7 +172,7 @@ export default function Welcome() {
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-6 w-full max-w-md mx-auto">
+            <div className="mt-6 w-full max-w-md mx-auto px-4">
               <a
                 href="https://wa.me/918977219777"
                 target="_blank"
@@ -311,8 +311,8 @@ export default function Welcome() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden">
-        <div className="w-full max-w-4xl mx-auto px-4">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden min-h-screen">
+        <div className="w-full max-w-4xl mx-auto px-4 flex-1 flex flex-col justify-center">
           {renderContent()}
         </div>
       </main>

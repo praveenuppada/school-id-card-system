@@ -601,13 +601,13 @@ export default function TeacherDashboard() {
         dataUrl = objectUrl; // Fallback to object URL
       }
       
-      // Show immediate preview instantly with minimal storage
+      // Show immediate preview instantly and mark as saved
       const immediatePreview = {
         ...studentPhotos,
         [studentId]: {
           data: objectUrl, // Use object URL for immediate display
           timestamp: new Date().toISOString(),
-          status: 'uploading',
+          status: 'saved', // Mark as saved immediately
           filename: file.name,
           fileSize: file.size,
           fileType: file.type
@@ -616,7 +616,7 @@ export default function TeacherDashboard() {
       };
       
       setStudentPhotos(immediatePreview);
-      addDebugLog("⚡ Instant preview shown", "info");
+      addDebugLog("⚡ Photo saved instantly", "success");
       
       // Save to localStorage with minimal data to prevent quota issues
       clearLocalStorageIfNeeded(); // Check and clear if needed
@@ -625,7 +625,7 @@ export default function TeacherDashboard() {
           ...studentPhotos,
           [studentId]: {
             timestamp: new Date().toISOString(),
-            status: 'uploading',
+            status: 'saved', // Mark as saved immediately
             filename: file.name,
             fileSize: file.size,
             fileType: file.type
