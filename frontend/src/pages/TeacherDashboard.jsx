@@ -518,41 +518,88 @@ export default function TeacherDashboard() {
       
       console.log("📱 File info created:", fileInfo);
       
-      // Save file info immediately without any processing
-      const updatedPhotos = {
-        ...studentPhotos,
-        [studentId]: {
-          fileInfo: fileInfo,
-          timestamp: new Date().toISOString(),
-          status: 'uploaded',
-          filename: file.name,
-          isFileObject: true
-        }
-      };
-      
-      setStudentPhotos(updatedPhotos);
-      console.log("📁 File info saved successfully for student:", studentId);
-      
-      // Save to localStorage (without the file object to avoid serialization issues)
-      const storageData = {
-        ...studentPhotos,
-        [studentId]: {
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          lastModified: file.lastModified,
-          timestamp: new Date().toISOString(),
-          status: 'uploaded',
-          filename: file.name,
-          isFileObject: true
-        }
-      };
-      
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
-      console.log("💾 Saved file info to localStorage");
-      
-      // Show success message
-      alert("File saved successfully! The file will be processed when you save the photo.");
+      // Try to create a simple data URL for display
+      try {
+        console.log("📱 Creating simple data URL for display...");
+        
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          
+          reader.onload = (e) => {
+            console.log("📱 Data URL created successfully");
+            resolve(e.target.result);
+          };
+          
+          reader.onerror = () => {
+            console.error("📱 Data URL creation failed");
+            reject(new Error("Data URL creation failed"));
+          };
+          
+          // Simple FileReader approach
+          reader.readAsDataURL(file);
+        });
+        
+        console.log("📱 Data URL created, length:", dataUrl.length);
+        
+        // Save with data URL for display
+        const updatedPhotos = {
+          ...studentPhotos,
+          [studentId]: {
+            data: dataUrl,
+            timestamp: new Date().toISOString(),
+            status: 'uploaded',
+            filename: file.name
+          }
+        };
+        
+        setStudentPhotos(updatedPhotos);
+        console.log("📁 File with data URL saved successfully for student:", studentId);
+        
+        localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+        console.log("💾 Saved with data URL to localStorage");
+        
+        // Show success message
+        alert("Photo uploaded successfully!");
+        
+      } catch (dataUrlError) {
+        console.error("❌ Data URL creation failed:", dataUrlError);
+        
+        // Fallback: save file info without data URL
+        const updatedPhotos = {
+          ...studentPhotos,
+          [studentId]: {
+            fileInfo: fileInfo,
+            timestamp: new Date().toISOString(),
+            status: 'uploaded',
+            filename: file.name,
+            isFileObject: true
+          }
+        };
+        
+        setStudentPhotos(updatedPhotos);
+        console.log("📁 File info saved successfully for student:", studentId);
+        
+        // Save to localStorage (without the file object to avoid serialization issues)
+        const storageData = {
+          ...studentPhotos,
+          [studentId]: {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            lastModified: file.lastModified,
+            timestamp: new Date().toISOString(),
+            status: 'uploaded',
+            filename: file.name,
+            isFileObject: true
+          }
+        };
+        
+        localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+        console.log("💾 Saved file info to localStorage");
+        
+        // Show success message
+        alert("File saved successfully! The file will be processed when you save the photo.");
+      }
       
     } catch (error) {
       console.error("❌ Error handling file upload:", error);
