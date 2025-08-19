@@ -28,6 +28,7 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     formData.append("studentId", studentId);
   }
   formData.append("file", file);
+  formData.append("photo", file); // Send with both field names
   
   // Verify FormData was created correctly
   console.log("📋 FormData created with file:", formData.has("file"));
