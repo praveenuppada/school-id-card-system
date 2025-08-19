@@ -95,12 +95,8 @@ html, body, #root {
 
   /* Welcome page specific mobile fixes */
   .welcome-page {
-    height: 100vh !important;
     min-height: 100vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
+    height: auto !important;
   }
   
   /* Prevent zoom on input focus */
@@ -333,14 +329,9 @@ body {
   max-width: 100vw !important;
   /* Preserve original layout */
   position: relative !important;
-  /* Force full viewport height */
-  height: 100vh !important;
+  /* Allow content to flow naturally */
   min-height: 100vh !important;
-  /* Ensure content fills the screen */
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
+  height: auto !important;
 }
 
 /* Login pages specific - preserve layout */
@@ -645,6 +636,8 @@ body {
     /* Allow content to flow properly */
     height: auto !important;
     min-height: 100vh !important;
+    /* Remove forced flex layout */
+    display: block !important;
   }
   
   /* Login pages - preserve layout */

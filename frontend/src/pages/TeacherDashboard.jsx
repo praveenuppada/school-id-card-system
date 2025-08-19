@@ -516,12 +516,61 @@ export default function TeacherDashboard() {
       
       // Upload to backend using the existing uploadPhoto function
       console.log("📤 Starting backend upload...");
-      const response = await uploadPhoto(student.photoId, file, studentId);
+      console.log("📤 Upload details:", {
+        photoId: student.photoId,
+        studentId: studentId,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      });
       
-      console.log("📤 Backend upload response:", response.data);
-      
-      if (!response.data.success) {
-        throw new Error(response.data.message || "Upload failed");
+      try {
+        const response = await uploadPhoto(student.photoId, file, studentId);
+        
+        console.log("📤 Backend upload response:", response.data);
+        
+        if (!response.data.success) {
+          throw new Error(response.data.message || "Upload failed");
+        }
+      } catch (uploadError) {
+        console.error("📤 Upload error details:", {
+          error: uploadError,
+          message: uploadError.message,
+          response: uploadError.response?.data,
+          status: uploadError.response?.status
+        });
+        
+        // Check if it's a network error or server error
+        if (uploadError.code === 'NETWORK_ERROR' || uploadError.message.includes('Network Error')) {
+          console.log("📱 Network error detected - using local storage fallback");
+          
+          // Fallback: Save locally and show message
+          const updatedPhotos = {
+            ...studentPhotos,
+            [studentId]: {
+              data: dataUrl,
+              timestamp: new Date().toISOString(),
+              status: 'pending_upload',
+              filename: file.name,
+              error: 'Network error - will retry when connection is restored'
+            }
+          };
+          
+          setStudentPhotos(updatedPhotos);
+          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+          
+          alert("Photo saved locally. Upload will retry when connection is restored.");
+          return;
+        }
+        
+        // Show specific error message
+        if (uploadError.response?.data?.message) {
+          throw new Error(uploadError.response.data.message);
+        } else if (uploadError.message) {
+          throw new Error(uploadError.message);
+        } else {
+          throw new Error("Upload failed. Please check your connection and try again.");
+        }
       }
       
       // Create a temporary data URL for immediate display
