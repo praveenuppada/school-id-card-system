@@ -246,38 +246,50 @@ export default function TeacherDashboard() {
     return Math.ceil(students.length / itemsPerPage);
   };
 
-    // Camera functions with Android fallback
+    // Camera functions with cross-platform compatibility
   const startCamera = async (studentId) => {
     try {
       console.log("📸 Starting camera for student:", studentId);
+      addDebugLog("📸 Starting camera capture", "info");
       
       // Clean up any existing resources before starting camera
       cleanupResources();
       
-      // Check if we're on Android
+      // Detect platform for better compatibility
       const isAndroid = /Android/i.test(navigator.userAgent);
-      console.log("📱 Device type:", isAndroid ? "Android" : "Other");
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      console.log("📱 Device type:", isAndroid ? "Android" : isIOS ? "iOS" : "Other");
+      addDebugLog(`📱 Device: ${isAndroid ? "Android" : isIOS ? "iOS" : "Other"}`, "info");
       
-      // Create file input for native camera app with better Android support
+      // Create file input for native camera app with cross-platform support
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
       
-      // Use different capture settings for Android
+      // Use platform-specific capture settings
       if (isAndroid) {
         input.capture = 'environment'; // Back camera for Android
         console.log("📸 Using back camera for Android");
+        addDebugLog("📸 Using back camera (Android)", "info");
         // Add Android-specific attributes
         input.setAttribute('data-testid', 'camera-input-android');
+        input.setAttribute('data-capture', 'environment');
+      } else if (isIOS) {
+        input.capture = 'environment'; // Back camera for iOS
+        console.log("📸 Using back camera for iOS");
+        addDebugLog("📸 Using back camera (iOS)", "info");
+        input.setAttribute('data-testid', 'camera-input-ios');
         input.setAttribute('data-capture', 'environment');
       } else {
         input.capture = 'environment'; // Back camera for other devices
         console.log("📸 Using back camera for other devices");
+        addDebugLog("📸 Using back camera (Other)", "info");
         input.setAttribute('data-testid', 'camera-input');
       }
       
-      // Add additional attributes for better Android compatibility
+      // Add cross-platform compatibility attributes
       input.style.display = 'none';
+      input.setAttribute('data-platform', isAndroid ? 'android' : isIOS ? 'ios' : 'other');
       
       input.onchange = async (e) => {
         try {
@@ -296,24 +308,29 @@ export default function TeacherDashboard() {
             
             // Use the same validation as handleFileUpload
             if (!file.type.startsWith('image/') && !file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|webp)$/)) {
-              alert("Please select an image file (JPG, PNG, GIF, BMP, or WebP).");
+              addDebugLog("❌ Invalid file type from camera", "error");
+              // Don't show alert - just log the error
               return;
             }
             
             // Accept any file size - no compression
+            addDebugLog("✅ Camera file validated, starting upload", "success");
             handleFileUpload(studentId, file);
           } else {
             console.log("📸 No file selected from camera");
           }
         } catch (error) {
           console.error("❌ Error in camera file selection:", error);
+          addDebugLog(`❌ Camera error: ${error.message}`, "error");
           cleanupResources();
           
-          // Android-specific error message
+          // Platform-specific error logging
           if (isAndroid) {
-            alert("Android: Error processing camera image. Please try again or use file upload.");
+            addDebugLog("⚠️ Android camera error - try file upload", "warning");
+          } else if (isIOS) {
+            addDebugLog("⚠️ iOS camera error - try file upload", "warning");
           } else {
-            alert("Error processing camera image. Please try again.");
+            addDebugLog("⚠️ Camera error - try file upload", "warning");
           }
         }
       };
@@ -535,19 +552,40 @@ export default function TeacherDashboard() {
       // Create immediate preview using URL.createObjectURL for instant display
       const objectUrl = URL.createObjectURL(file);
       
-      // Show immediate preview instantly
+      // Also create a data URL as backup for better cross-platform compatibility
+      let dataUrl;
+      try {
+        dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => reject(new Error("Failed to create data URL"));
+          reader.readAsDataURL(file);
+        });
+      } catch (dataUrlError) {
+        addDebugLog("⚠️ Data URL creation failed, using object URL only", "warning");
+        dataUrl = objectUrl; // Fallback to object URL
+      }
+      
+      // Show immediate preview instantly with both URLs
       const immediatePreview = {
         ...studentPhotos,
         [studentId]: {
-          data: objectUrl,
+          data: objectUrl, // Use object URL for immediate display
+          dataUrl: dataUrl, // Keep data URL as backup
           timestamp: new Date().toISOString(),
           status: 'uploading',
-          filename: file.name
+          filename: file.name,
+          fileSize: file.size,
+          fileType: file.type
         }
       };
       
       setStudentPhotos(immediatePreview);
-      addDebugLog("⚡ Instant preview shown", "info");
+      addDebugLog("⚡ Instant preview shown with backup", "info");
+      
+      // Save to localStorage immediately
+      localStorage.setItem('teacherStudentPhotos', JSON.stringify(immediatePreview));
+      addDebugLog("💾 Saved to localStorage instantly", "success");
       
       // Start backend upload in background (non-blocking)
       uploadPhoto(student.photoId, file, studentId)
@@ -560,21 +598,39 @@ export default function TeacherDashboard() {
             const updatedPhotos = {
               ...studentPhotos,
               [studentId]: {
-                data: photoUrl,
+                data: photoUrl, // Use Cloudinary URL for display
+                dataUrl: dataUrl, // Keep data URL as backup
                 timestamp: new Date().toISOString(),
                 status: 'uploaded',
                 filename: file.name,
-                cloudinaryUrl: photoUrl
+                cloudinaryUrl: photoUrl,
+                fileSize: file.size,
+                fileType: file.type
               }
             };
             
             setStudentPhotos(updatedPhotos);
             localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
             addDebugLog("✅ Photo updated with Cloudinary URL", "success");
+          } else {
+            // If no Cloudinary URL, keep using object URL
+            const updatedPhotos = {
+              ...studentPhotos,
+              [studentId]: {
+                data: objectUrl,
+                dataUrl: dataUrl,
+                timestamp: new Date().toISOString(),
+                status: 'uploaded_no_url',
+                filename: file.name,
+                fileSize: file.size,
+                fileType: file.type
+              }
+            };
+            
+            setStudentPhotos(updatedPhotos);
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+            addDebugLog("✅ Photo uploaded but no Cloudinary URL received", "success");
           }
-          
-          // Clean up object URL
-          URL.revokeObjectURL(objectUrl);
         })
         .catch(uploadError => {
           addDebugLog(`❌ Upload failed: ${uploadError.message}`, "error");
@@ -583,11 +639,14 @@ export default function TeacherDashboard() {
           const updatedPhotos = {
             ...studentPhotos,
             [studentId]: {
-              data: objectUrl,
+              data: objectUrl, // Keep object URL for display
+              dataUrl: dataUrl, // Keep data URL as backup
               timestamp: new Date().toISOString(),
               status: 'failed',
               filename: file.name,
-              error: uploadError.message
+              error: uploadError.message,
+              fileSize: file.size,
+              fileType: file.type
             }
           };
           
@@ -596,11 +655,7 @@ export default function TeacherDashboard() {
           addDebugLog("⚠️ Photo saved locally due to upload failure", "warning");
         });
       
-      // Save to localStorage immediately
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(immediatePreview));
-      addDebugLog("💾 Saved to localStorage instantly", "success");
-      
-            return; // Exit early - no need to wait for upload
+      return; // Exit early - no need to wait for upload
       
     } catch (error) {
       console.error("❌ Error uploading file:", error);
@@ -845,19 +900,45 @@ export default function TeacherDashboard() {
                 src={photo.data}
                 alt="Student photo"
                 className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border-2 border-gray-300"
+                onError={(e) => {
+                  // If main image fails, try backup data URL
+                  if (photo.dataUrl && e.target.src !== photo.dataUrl) {
+                    addDebugLog("🔄 Image failed, trying backup URL", "warning");
+                    e.target.src = photo.dataUrl;
+                  } else {
+                    addDebugLog("❌ All image URLs failed", "error");
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }
+                }}
               />
+              {/* Fallback display if image fails */}
+              <div 
+                className="w-32 h-32 sm:w-40 sm:h-40 bg-gray-100 border-2 border-gray-300 rounded-lg flex items-center justify-center"
+                style={{ display: 'none' }}
+              >
+                <div className="text-center">
+                  <div className="text-gray-400 text-xs mb-1">⚠️ Image Error</div>
+                  <div className="text-gray-500 text-xs">{photo.filename}</div>
+                  <div className="text-gray-400 text-xs mt-1">{photo.status}</div>
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => savePhoto(studentId)}
-                disabled={photo.status === 'saved'}
+                disabled={photo.status === 'saved' || photo.status === 'uploaded'}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  photo.status === 'saved'
+                  photo.status === 'saved' || photo.status === 'uploaded'
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 text-white hover:bg-blue-600'
                 }`}
               >
-                {photo.status === 'saved' ? '✅ Saved' : '💾 Save'}
+                {photo.status === 'saved' ? '✅ Saved' : 
+                 photo.status === 'uploaded' ? '✅ Uploaded' :
+                 photo.status === 'uploading' ? '⏳ Uploading...' :
+                 photo.status === 'failed' ? '❌ Failed' :
+                 '💾 Save'}
               </button>
               <button
                 onClick={() => retakePhoto(studentId)}

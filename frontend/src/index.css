@@ -186,6 +186,10 @@ html, body, #root {
     /* Hide Android scroll indicators */
     scrollbar-width: none;
     -ms-overflow-style: none;
+    /* Prevent Android Chrome issues */
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
   }
   
   /* Hide Android scroll indicators */
@@ -193,6 +197,64 @@ html, body, #root {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
+  }
+  
+  /* Android-specific Welcome page fixes */
+  .welcome-page {
+    /* Force proper layout on Android */
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    /* Prevent Android Chrome layout issues */
+    position: relative !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Android-specific container fixes */
+  .welcome-page .max-w-4xl,
+  .welcome-page .max-w-6xl,
+  .welcome-page .max-w-7xl {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 auto !important;
+    padding: 0 1rem !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Android-specific button fixes */
+  .welcome-page button {
+    /* Prevent Android button scaling issues */
+    -webkit-appearance: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    /* Force proper button sizing */
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+  
+  /* Android-specific logo fixes */
+  .welcome-page .bg-white.shadow-2xl {
+    /* Prevent Android Chrome rendering issues */
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    /* Force proper border radius */
+    border-radius: 1.5rem !important;
+    -webkit-border-radius: 1.5rem !important;
+  }
+  
+  /* Android-specific text fixes */
+  .welcome-page h1,
+  .welcome-page h2,
+  .welcome-page h3,
+  .welcome-page p {
+    /* Prevent Android text rendering issues */
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    /* Force proper text sizing */
+    line-height: 1.5 !important;
   }
 }
 
