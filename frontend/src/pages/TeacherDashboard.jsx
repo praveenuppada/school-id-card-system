@@ -525,7 +525,29 @@ export default function TeacherDashboard() {
         fullName: student.fullName 
       });
       
-      // Upload to backend using the existing uploadPhoto function
+      // Create immediate preview for instant display
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error("Failed to create preview"));
+        reader.readAsDataURL(file);
+      });
+      
+      // Show immediate preview while uploading
+      const immediatePreview = {
+        ...studentPhotos,
+        [studentId]: {
+          data: dataUrl,
+          timestamp: new Date().toISOString(),
+          status: 'uploading',
+          filename: file.name
+        }
+      };
+      
+      setStudentPhotos(immediatePreview);
+      addDebugLog("⚡ Immediate preview shown", "info");
+      
+      // Upload to backend in background
       addDebugLog("📤 Starting backend upload...", "info");
       addDebugLog(`📤 File: ${file.name} (${file.size} bytes)`, "info");
       addDebugLog(`📤 Student: ${student.fullName} (${student.photoId})`, "info");
@@ -548,8 +570,7 @@ export default function TeacherDashboard() {
       addDebugLog("✅ File validation passed", "success");
       console.log("📤 File validation passed - file exists and has content");
       
-              try {
-          addDebugLog("📤 Sending to backend API...", "info");
+      try {
           addDebugLog("📤 Sending to backend API...", "info");
           const response = await uploadPhoto(student.photoId, file, studentId);
           
@@ -566,39 +587,11 @@ export default function TeacherDashboard() {
           const photoUrl = response.data.photoUrl;
           addDebugLog(`📸 Using Cloudinary URL: ${photoUrl}`, "info");
           
-          // Fallback: If no Cloudinary URL, create a data URL for preview
-          if (!photoUrl) {
-            addDebugLog("⚠️ No Cloudinary URL received, creating data URL fallback", "warning");
-            const dataUrl = await new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = (e) => resolve(e.target.result);
-              reader.onerror = () => reject(new Error("Failed to create preview"));
-              reader.readAsDataURL(file);
-            });
-            
-            // Save with data URL as fallback
-            const updatedPhotos = {
-              ...studentPhotos,
-              [studentId]: {
-                data: dataUrl,
-                timestamp: new Date().toISOString(),
-                status: 'uploaded_no_url',
-                filename: file.name
-              }
-            };
-            
-            setStudentPhotos(updatedPhotos);
-            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-            addDebugLog("✅ Photo saved with data URL fallback", "success");
-            alert("Photo uploaded successfully! (Using local preview)");
-            return;
-          }
-          
-          // Save the photo with Cloudinary URL for display
+          // Update with Cloudinary URL for better quality
           const updatedPhotos = {
             ...studentPhotos,
             [studentId]: {
-              data: photoUrl, // Use Cloudinary URL instead of data URL
+              data: photoUrl || dataUrl, // Use Cloudinary URL if available, otherwise keep data URL
               timestamp: new Date().toISOString(),
               status: 'uploaded',
               filename: file.name,
@@ -607,13 +600,10 @@ export default function TeacherDashboard() {
           };
           
           setStudentPhotos(updatedPhotos);
-          console.log("📁 Photo uploaded successfully for student:", studentId);
-          
           localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-          console.log("💾 Saved to localStorage");
           
-          addDebugLog("✅ Photo uploaded and displayed successfully!", "success");
-          alert("Photo uploaded successfully!");
+          addDebugLog("✅ Photo uploaded successfully!", "success");
+          // No alert - user already sees the photo
           return;
           
       } catch (uploadError) {
@@ -637,13 +627,13 @@ export default function TeacherDashboard() {
           addDebugLog("📱 Network/timeout error - using local storage fallback", "warning");
           console.log("📱 Network/timeout error detected - using local storage fallback");
           
-          // Fallback: Save locally and show message
+          // Keep the preview but mark as failed
           const updatedPhotos = {
             ...studentPhotos,
             [studentId]: {
               data: dataUrl,
               timestamp: new Date().toISOString(),
-              status: 'pending_upload',
+              status: 'failed',
               filename: file.name,
               error: 'Network/timeout error - will retry when connection is restored'
             }
@@ -652,7 +642,8 @@ export default function TeacherDashboard() {
           setStudentPhotos(updatedPhotos);
           localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
           
-          alert("Photo saved locally. Upload will retry when connection is restored.");
+          addDebugLog("⚠️ Upload failed - photo saved locally", "warning");
+          // No alert - user already sees the photo
           return;
         }
         
@@ -663,7 +654,25 @@ export default function TeacherDashboard() {
           // Handle quota exceeded error
           if (errorMessage.includes('quota') || errorMessage.includes('Quota') || errorMessage.includes('exceeded')) {
             addDebugLog("⚠️ Cloudinary quota exceeded - using local storage", "warning");
-            throw new Error("Upload quota exceeded. Photo saved locally. Please try again later.");
+            
+            // Keep the preview but mark as quota exceeded
+            const updatedPhotos = {
+              ...studentPhotos,
+              [studentId]: {
+                data: dataUrl,
+                timestamp: new Date().toISOString(),
+                status: 'quota_exceeded',
+                filename: file.name,
+                error: 'Upload quota exceeded - photo saved locally'
+              }
+            };
+            
+            setStudentPhotos(updatedPhotos);
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+            
+            addDebugLog("⚠️ Quota exceeded - photo saved locally", "warning");
+            // No alert - user already sees the photo
+            return;
           }
           
           throw new Error(errorMessage);
