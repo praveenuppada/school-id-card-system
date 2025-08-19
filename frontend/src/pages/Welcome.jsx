@@ -86,9 +86,9 @@ export default function Welcome() {
         return (
           <div className="text-center max-w-4xl mx-auto">
             {/* Welcome Text - Above Logo */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-8 w-full">
               <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Welcome to Student ID Management</h2>
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto px-4">
                 Streamline your school's student identification process with our comprehensive digital platform. 
                 Manage student records, track photo uploads, and generate ID cards efficiently.
               </p>
@@ -146,7 +146,7 @@ export default function Welcome() {
 
 
             {/* Login Buttons */}
-            <div className="space-y-4 w-full max-w-md mx-auto px-4">
+            <div className="space-y-4 w-full max-w-md mx-auto">
               <button
                 onClick={() => navigate("/login-teacher")}
                 className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-2xl shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
@@ -172,7 +172,7 @@ export default function Welcome() {
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-6 w-full max-w-md mx-auto px-4">
+            <div className="mt-6 w-full max-w-md mx-auto">
               <a
                 href="https://wa.me/918977219777"
                 target="_blank"
@@ -310,12 +310,12 @@ export default function Welcome() {
         )}
       </header>
 
-      {/* Main Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden min-h-screen">
-        <div className="w-full max-w-4xl mx-auto px-4 flex-1 flex flex-col justify-center">
-          {renderContent()}
-        </div>
-      </main>
+              {/* Main Content */}
+        <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden min-h-screen">
+          <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center text-center">
+            {renderContent()}
+          </div>
+        </main>
 
       {/* Footer */}
       <footer className="relative z-20 bg-gray-800 text-white py-4">
