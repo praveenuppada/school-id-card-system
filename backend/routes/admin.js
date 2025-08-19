@@ -27,11 +27,13 @@ const upload = multer({
 // Apply authentication middleware to all admin routes
 router.use(verifyToken, requireAdmin);
 
-// Register school
+// Register school with teacher account
 router.post('/school', async (req, res) => {
   try {
     const {
       schoolName,
+      username,
+      password,
       schoolAddress,
       contactPerson,
       contactEmail,
@@ -41,10 +43,10 @@ router.post('/school', async (req, res) => {
       establishedYear
     } = req.body;
 
-    if (!schoolName) {
+    if (!schoolName || !username || !password) {
       return res.status(400).json({
         success: false,
-        message: 'School name is required'
+        message: 'School name, username, and password are required'
       });
     }
 
@@ -54,6 +56,15 @@ router.post('/school', async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'School with this name already exists'
+      });
+    }
+
+    // Check if username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username already exists'
       });
     }
 
@@ -71,11 +82,23 @@ router.post('/school', async (req, res) => {
 
     await school.save();
 
+    // Create teacher user account
+    const teacherUser = new User({
+      username: username,
+      password: password,
+      role: 'ROLE_TEACHER',
+      schoolId: school._id.toString(),
+      email: contactEmail
+    });
+
+    await teacherUser.save();
+
     res.json({
       success: true,
-      message: 'School registered successfully',
+      message: 'School and teacher account registered successfully',
       schoolId: school._id,
-      schoolName: school.name
+      schoolName: school.name,
+      username: username
     });
 
   } catch (error) {
