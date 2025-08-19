@@ -574,10 +574,17 @@ export default function TeacherDashboard() {
       }
       
       // Create a temporary data URL for immediate display
+      console.log("📱 Creating data URL for preview...");
       const dataUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => reject(new Error("Failed to create preview"));
+        reader.onload = (e) => {
+          console.log("📱 Data URL created successfully for preview");
+          resolve(e.target.result);
+        };
+        reader.onerror = (error) => {
+          console.error("📱 Data URL creation failed:", error);
+          reject(new Error("Failed to create preview"));
+        };
         reader.readAsDataURL(file);
       });
       
@@ -602,7 +609,25 @@ export default function TeacherDashboard() {
       
     } catch (error) {
       console.error("❌ Error uploading file:", error);
-      alert("Error uploading file. Please try again.");
+      
+      // Show specific error message based on error type
+      let errorMessage = "Error uploading file. Please try again.";
+      
+      if (error.message.includes("Network Error")) {
+        errorMessage = "Network error. Please check your internet connection and try again.";
+      } else if (error.message.includes("timeout")) {
+        errorMessage = "Upload timeout. Please try again with a smaller image.";
+      } else if (error.message.includes("413")) {
+        errorMessage = "File too large. Please select a smaller image.";
+      } else if (error.message.includes("401")) {
+        errorMessage = "Authentication error. Please log in again.";
+      } else if (error.message.includes("500")) {
+        errorMessage = "Server error. Please try again later.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
     }
   };
 

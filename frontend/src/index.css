@@ -332,6 +332,30 @@ body {
   /* Allow content to flow naturally */
   min-height: 100vh !important;
   height: auto !important;
+  /* Smooth scrolling */
+  scroll-behavior: smooth !important;
+}
+
+/* Welcome page container constraints */
+.welcome-page .max-w-4xl {
+  max-width: 56rem !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 1rem !important;
+}
+
+.welcome-page .max-w-6xl {
+  max-width: 72rem !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 1rem !important;
+}
+
+.welcome-page .max-w-7xl {
+  max-width: 80rem !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 1rem !important;
 }
 
 /* Login pages specific - preserve layout */
