@@ -443,6 +443,41 @@ export default function TeacherDashboard() {
     console.log(`[${timestamp}] ${message}`);
   };
 
+  // Function to clear localStorage when quota is exceeded
+  const clearLocalStorageIfNeeded = () => {
+    try {
+      // Try to store a small test item
+      localStorage.setItem('test', '1');
+      localStorage.removeItem('test');
+    } catch (error) {
+      // If quota is exceeded, clear old data
+      addDebugLog("⚠️ localStorage quota exceeded, clearing old data", "warning");
+      try {
+        // Keep only the most recent 5 photos
+        const currentData = localStorage.getItem('teacherStudentPhotos');
+        if (currentData) {
+          const photos = JSON.parse(currentData);
+          const photoEntries = Object.entries(photos);
+          if (photoEntries.length > 5) {
+            // Sort by timestamp and keep only the 5 most recent
+            const sortedEntries = photoEntries.sort((a, b) => {
+              const timeA = new Date(a[1].timestamp || 0);
+              const timeB = new Date(b[1].timestamp || 0);
+              return timeB - timeA;
+            });
+            const recentPhotos = Object.fromEntries(sortedEntries.slice(0, 5));
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(recentPhotos));
+            addDebugLog("✅ Cleared old photos, kept 5 most recent", "success");
+          }
+        }
+      } catch (clearError) {
+        // If clearing fails, remove all data
+        localStorage.removeItem('teacherStudentPhotos');
+        addDebugLog("✅ Cleared all localStorage data", "success");
+      }
+    }
+  };
+
   // Global cleanup function to prevent memory leaks
   const cleanupResources = () => {
     console.log("🧹 Starting cleanup...");
@@ -566,26 +601,43 @@ export default function TeacherDashboard() {
         dataUrl = objectUrl; // Fallback to object URL
       }
       
-      // Show immediate preview instantly with both URLs
+      // Show immediate preview instantly with minimal storage
       const immediatePreview = {
         ...studentPhotos,
         [studentId]: {
           data: objectUrl, // Use object URL for immediate display
-          dataUrl: dataUrl, // Keep data URL as backup
           timestamp: new Date().toISOString(),
           status: 'uploading',
           filename: file.name,
           fileSize: file.size,
           fileType: file.type
+          // Don't store dataUrl in localStorage to prevent quota issues
         }
       };
       
       setStudentPhotos(immediatePreview);
-      addDebugLog("⚡ Instant preview shown with backup", "info");
+      addDebugLog("⚡ Instant preview shown", "info");
       
-      // Save to localStorage immediately
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(immediatePreview));
-      addDebugLog("💾 Saved to localStorage instantly", "success");
+      // Save to localStorage with minimal data to prevent quota issues
+      clearLocalStorageIfNeeded(); // Check and clear if needed
+      try {
+        const storageData = {
+          ...studentPhotos,
+          [studentId]: {
+            timestamp: new Date().toISOString(),
+            status: 'uploading',
+            filename: file.name,
+            fileSize: file.size,
+            fileType: file.type
+            // Only store metadata, not the actual image data
+          }
+        };
+        localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+        addDebugLog("💾 Saved metadata to localStorage", "success");
+      } catch (storageError) {
+        addDebugLog("⚠️ localStorage quota exceeded, continuing without storage", "warning");
+        // Continue without localStorage if quota is exceeded
+      }
       
       // Start backend upload in background (non-blocking)
       uploadPhoto(student.photoId, file, studentId)
@@ -599,7 +651,6 @@ export default function TeacherDashboard() {
               ...studentPhotos,
               [studentId]: {
                 data: photoUrl, // Use Cloudinary URL for display
-                dataUrl: dataUrl, // Keep data URL as backup
                 timestamp: new Date().toISOString(),
                 status: 'uploaded',
                 filename: file.name,
@@ -610,15 +661,30 @@ export default function TeacherDashboard() {
             };
             
             setStudentPhotos(updatedPhotos);
-            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-            addDebugLog("✅ Photo updated with Cloudinary URL", "success");
+            
+            // Save minimal data to localStorage
+            try {
+              const storageData = {
+                ...studentPhotos,
+                [studentId]: {
+                  data: photoUrl, // Store Cloudinary URL (small)
+                  timestamp: new Date().toISOString(),
+                  status: 'uploaded',
+                  filename: file.name,
+                  cloudinaryUrl: photoUrl
+                }
+              };
+              localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+              addDebugLog("✅ Photo updated with Cloudinary URL", "success");
+            } catch (storageError) {
+              addDebugLog("⚠️ localStorage quota exceeded, but photo uploaded successfully", "warning");
+            }
           } else {
             // If no Cloudinary URL, keep using object URL
             const updatedPhotos = {
               ...studentPhotos,
               [studentId]: {
                 data: objectUrl,
-                dataUrl: dataUrl,
                 timestamp: new Date().toISOString(),
                 status: 'uploaded_no_url',
                 filename: file.name,
@@ -628,8 +694,22 @@ export default function TeacherDashboard() {
             };
             
             setStudentPhotos(updatedPhotos);
-            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-            addDebugLog("✅ Photo uploaded but no Cloudinary URL received", "success");
+            
+            // Save minimal data to localStorage
+            try {
+              const storageData = {
+                ...studentPhotos,
+                [studentId]: {
+                  timestamp: new Date().toISOString(),
+                  status: 'uploaded_no_url',
+                  filename: file.name
+                }
+              };
+              localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+              addDebugLog("✅ Photo uploaded but no Cloudinary URL received", "success");
+            } catch (storageError) {
+              addDebugLog("⚠️ localStorage quota exceeded, but photo uploaded successfully", "warning");
+            }
           }
         })
         .catch(uploadError => {
@@ -640,7 +720,6 @@ export default function TeacherDashboard() {
             ...studentPhotos,
             [studentId]: {
               data: objectUrl, // Keep object URL for display
-              dataUrl: dataUrl, // Keep data URL as backup
               timestamp: new Date().toISOString(),
               status: 'failed',
               filename: file.name,
@@ -651,8 +730,23 @@ export default function TeacherDashboard() {
           };
           
           setStudentPhotos(updatedPhotos);
-          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-          addDebugLog("⚠️ Photo saved locally due to upload failure", "warning");
+          
+          // Save minimal data to localStorage
+          try {
+            const storageData = {
+              ...studentPhotos,
+              [studentId]: {
+                timestamp: new Date().toISOString(),
+                status: 'failed',
+                filename: file.name,
+                error: uploadError.message
+              }
+            };
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+            addDebugLog("⚠️ Photo saved locally due to upload failure", "warning");
+          } catch (storageError) {
+            addDebugLog("⚠️ localStorage quota exceeded, but photo saved locally", "warning");
+          }
         });
       
       return; // Exit early - no need to wait for upload
@@ -697,8 +791,21 @@ export default function TeacherDashboard() {
     };
     
     setStudentPhotos(immediateUpdate);
-    localStorage.setItem('teacherStudentPhotos', JSON.stringify(immediateUpdate));
-    addDebugLog("💾 Photo marked as saved instantly", "success");
+    
+    // Save minimal data to localStorage
+    try {
+      const storageData = {
+        ...studentPhotos,
+        [studentId]: {
+          ...studentPhotos[studentId],
+          status: 'saved'
+        }
+      };
+      localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+      addDebugLog("💾 Photo marked as saved instantly", "success");
+    } catch (storageError) {
+      addDebugLog("⚠️ localStorage quota exceeded, but photo marked as saved", "warning");
+    }
     
     // Start backend upload in background (non-blocking)
     try {
