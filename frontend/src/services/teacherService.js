@@ -43,6 +43,24 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     }
   }
   
+  // Try different field names to see which one works
+  console.log("📋 Testing different field names...");
+  const testFormData = new FormData();
+  testFormData.append("photoId", photoId);
+  if (studentId) {
+    testFormData.append("studentId", studentId);
+  }
+  testFormData.append("photo", file); // Try 'photo' instead of 'file'
+  
+  console.log("📋 Test FormData with 'photo' field:");
+  for (let [key, value] of testFormData.entries()) {
+    if (value instanceof File) {
+      console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+    } else {
+      console.log(`  ${key}: ${value}`);
+    }
+  }
+  
   // Log FormData contents
   console.log("📋 FormData contents:");
   for (let [key, value] of formData.entries()) {
@@ -74,6 +92,8 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
   
   console.log("📤 Sending request to:", "/teacher/upload-photo");
   
+  // Try with 'file' field first
+  console.log("📤 Attempting upload with 'file' field...");
   return api.post("/teacher/upload-photo", formData, {
     headers: { 
       // Don't set Content-Type for FormData - let browser set it with boundary
@@ -94,6 +114,31 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     if (error.response?.status === 400 && error.response?.data?.success) {
       console.log("✅ Treating 400 as success due to success flag in response");
       return { data: error.response.data };
+    }
+    
+    // If 'file' field fails, try with 'photo' field
+    if (error.response?.status === 400 && error.response?.data?.message?.includes('No file uploaded')) {
+      console.log("📤 'file' field failed, trying with 'photo' field...");
+      
+      const photoFormData = new FormData();
+      photoFormData.append("photoId", photoId);
+      if (studentId) {
+        photoFormData.append("studentId", studentId);
+      }
+      photoFormData.append("photo", file);
+      
+      return api.post("/teacher/upload-photo", photoFormData, {
+        headers: { 
+          // Don't set Content-Type for FormData - let browser set it with boundary
+        },
+        timeout: 30000, // 30 second timeout
+      }).then(response => {
+        console.log("✅ uploadPhoto success with 'photo' field:", response.data);
+        return response;
+      }).catch(photoError => {
+        console.error("❌ uploadPhoto failed with 'photo' field too:", photoError);
+        throw error; // Throw original error
+      });
     }
     
     throw error;
