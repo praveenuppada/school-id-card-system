@@ -290,6 +290,68 @@ html, body, #root {
     align-items: center !important;
   }
   
+  /* Ensure all content is visible and properly spaced */
+  .welcome-page .space-y-4 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .welcome-page .mt-6 {
+    margin-top: 1.5rem !important;
+  }
+  
+  /* Debug: Make sure all buttons are visible */
+  .welcome-page button,
+  .welcome-page a[href] {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 10 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Force all buttons to be visible */
+  .welcome-page .space-y-4 > button,
+  .welcome-page .mt-6 > a {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Ensure proper spacing */
+  .welcome-page .space-y-4 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .welcome-page .mt-6 {
+    margin-top: 1.5rem !important;
+    display: block !important;
+  }
+  
+  /* Force button visibility with important overrides */
+  .welcome-page button[onClick] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .welcome-page a[href*="wa.me"] {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-top: 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
   /* Mobile-specific Welcome page fixes */
   @media (max-width: 768px) {
     .welcome-page .text-center {
@@ -313,6 +375,35 @@ html, body, #root {
     .welcome-page p {
       padding-left: 0 !important;
       padding-right: 0 !important;
+    }
+    
+    /* Ensure all buttons are visible */
+    .welcome-page button,
+    .welcome-page a {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      margin-bottom: 1.5rem !important;
+      width: 100% !important;
+    }
+    
+    /* Ensure proper spacing between buttons */
+    .welcome-page .space-y-4 > * + * {
+      margin-top: 1.5rem !important;
+    }
+    
+    /* Ensure main content is fully visible */
+    .welcome-page main {
+      min-height: 100vh !important;
+      padding-bottom: 3rem !important;
+    }
+    
+    /* Force button containers to be visible */
+    .welcome-page .space-y-4,
+    .welcome-page .mt-6 {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
   }
   

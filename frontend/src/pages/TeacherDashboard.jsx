@@ -640,6 +640,7 @@ export default function TeacherDashboard() {
       }
       
       // Start backend upload in background (non-blocking)
+      addDebugLog("📤 Starting backend upload to Railway...", "info");
       uploadPhoto(student.photoId, file, studentId)
         .then(response => {
           addDebugLog("✅ Backend upload successful", "success");
@@ -713,7 +714,11 @@ export default function TeacherDashboard() {
           }
         })
         .catch(uploadError => {
-          addDebugLog(`❌ Upload failed: ${uploadError.message}`, "error");
+          if (uploadError.message.includes('timeout') || uploadError.code === 'ECONNABORTED') {
+            addDebugLog("⏰ Upload timeout - Railway backend is slow, but photo is saved locally", "warning");
+          } else {
+            addDebugLog(`❌ Upload failed: ${uploadError.message}`, "error");
+          }
           
           // Keep the preview but mark as failed
           const updatedPhotos = {

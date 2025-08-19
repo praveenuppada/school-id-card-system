@@ -146,10 +146,12 @@ export default function Welcome() {
 
 
             {/* Login Buttons */}
-            <div className="space-y-4 w-full max-w-md mx-auto">
+            <div className="space-y-4 w-full max-w-md mx-auto" style={{ border: '1px solid red', padding: '1rem' }}>
+              <div style={{ color: 'red', fontSize: '12px', marginBottom: '1rem' }}>DEBUG: Buttons Container</div>
               <button
                 onClick={() => navigate("/login-teacher")}
                 className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-2xl shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
+                style={{ display: 'block', visibility: 'visible', opacity: 1 }}
               >
                 <div className="flex items-center justify-center space-x-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,6 +163,7 @@ export default function Welcome() {
               <button
                 onClick={() => navigate("/login-admin")}
                 className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-2xl shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
+                style={{ display: 'block', visibility: 'visible', opacity: 1 }}
               >
                 <div className="flex items-center justify-center space-x-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,12 +175,14 @@ export default function Welcome() {
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-6 w-full max-w-md mx-auto">
+            <div className="mt-6 w-full max-w-md mx-auto" style={{ display: 'block', visibility: 'visible', opacity: 1, border: '1px solid blue', padding: '1rem' }}>
+              <div style={{ color: 'blue', fontSize: '12px', marginBottom: '1rem' }}>DEBUG: WhatsApp Container</div>
               <a
                 href="https://wa.me/918977219777"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-2xl shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
+                style={{ display: 'inline-flex', visibility: 'visible', opacity: 1 }}
               >
                 <span className="text-lg mr-3">📱</span>
                 <span>WhatsApp: +91 8977219777</span>
@@ -312,7 +317,7 @@ export default function Welcome() {
 
               {/* Main Content */}
         <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden min-h-screen">
-          <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center text-center">
+          <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center text-center pb-8" style={{ minHeight: 'calc(100vh - 200px)' }}>
             {renderContent()}
           </div>
         </main>

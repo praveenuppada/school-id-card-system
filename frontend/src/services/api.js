@@ -19,9 +19,9 @@ const getApiUrl = () => {
     return 'https://web-production-6c52b.up.railway.app/api';
   }
   
-  // Default to localhost for development
+  // Default to localhost for development (updated to match your backend port)
   console.log('Using localhost for development');
-  return 'http://localhost:8081/api';
+  return 'http://localhost:8080/api';
 };
 
 const API_BASE_URL = getApiUrl();
@@ -29,6 +29,7 @@ console.log('🔗 Final API_BASE_URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 120000, // Increase timeout to 2 minutes
   headers: {
     'Content-Type': 'application/json',
   },

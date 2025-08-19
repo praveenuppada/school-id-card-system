@@ -118,7 +118,7 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     headers: { 
       // Don't set Content-Type for FormData - let browser set it with boundary
     },
-    timeout: 60000, // 60 second timeout for larger files
+    timeout: 180000, // 3 minute timeout for Railway backend
   }).then(response => {
     console.log("✅ uploadPhoto success:", response.data);
     return response;
@@ -151,7 +151,7 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
         headers: { 
           // Don't set Content-Type for FormData - let browser set it with boundary
         },
-        timeout: 60000, // 60 second timeout for larger files
+        timeout: 180000, // 3 minute timeout for Railway backend
       }).then(response => {
         console.log("✅ uploadPhoto success with 'photo' field:", response.data);
         return response;
@@ -159,6 +159,12 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
         console.error("❌ uploadPhoto failed with 'photo' field too:", photoError);
         throw error; // Throw original error
       });
+    }
+    
+    // Handle timeout errors specifically
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      console.error("⏰ Upload timeout - Railway backend might be slow");
+      throw new Error("Upload timeout. Please try again. Railway backend is responding slowly.");
     }
     
     throw error;
@@ -184,7 +190,7 @@ export const testPhotoUpload = () => {
         headers: { 
           // Don't set Content-Type for FormData - let browser set it with boundary
         },
-        timeout: 60000, // 60 second timeout for larger files
+        timeout: 180000, // 3 minute timeout for Railway backend
       });
     })
     .then(response => {
