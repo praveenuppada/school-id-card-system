@@ -499,28 +499,35 @@ export default function TeacherDashboard() {
         return;
       }
       
-      // PERFECT SOLUTION - Simple and reliable
-      console.log("📱 Using PERFECT solution for all devices");
+      // PERFECT SOLUTION - Send file directly to backend API
+      console.log("📱 Using PERFECT solution - sending to backend API");
       
-      // Create data URL using the most reliable method
+      // Find the student to get photoId
+      const student = students.find(s => (s._id || s.id) === studentId);
+      if (!student) {
+        throw new Error("Student not found");
+      }
+      
+      console.log("🎯 Student found:", { 
+        studentId, 
+        photoId: student.photoId, 
+        fullName: student.fullName 
+      });
+      
+      // Upload to backend using the existing uploadPhoto function
+      const response = await uploadPhoto(student.photoId, file, studentId);
+      
+      console.log("📤 Backend upload response:", response.data);
+      
+      // Create a temporary data URL for immediate display
       const dataUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
-        
-        reader.onload = (e) => {
-          console.log("📱 Data URL created successfully");
-          resolve(e.target.result);
-        };
-        
-        reader.onerror = (error) => {
-          console.error("📱 FileReader error:", error);
-          reject(new Error("Failed to read file"));
-        };
-        
-        // Use the most reliable method
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error("Failed to create preview"));
         reader.readAsDataURL(file);
       });
       
-      // Save the photo with data URL
+      // Save the photo with data URL for display
       const updatedPhotos = {
         ...studentPhotos,
         [studentId]: {
