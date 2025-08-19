@@ -29,6 +29,9 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
   }
   formData.append("file", file);
   
+  // Try both field names to see which one works
+  formData.append("photo", file); // Alternative field name
+  
   // Verify FormData was created correctly
   console.log("📋 FormData created with file:", formData.has("file"));
   console.log("📋 FormData file size:", file.size);
@@ -41,6 +44,20 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     } else {
       console.log(`  ${key}: ${value}`);
     }
+  }
+  
+  // Additional validation
+  if (!formData.has('file')) {
+    throw new Error("File not found in FormData");
+  }
+  
+  const formDataFile = formData.get('file');
+  if (!(formDataFile instanceof File)) {
+    throw new Error("FormData file is not a File object");
+  }
+  
+  if (formDataFile.size === 0) {
+    throw new Error("File size is 0 bytes");
   }
   
   // Check if we have authentication token

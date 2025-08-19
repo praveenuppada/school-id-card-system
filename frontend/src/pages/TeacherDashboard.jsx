@@ -281,10 +281,12 @@ export default function TeacherDashboard() {
       
       input.onchange = async (e) => {
         try {
+          addDebugLog("📸 Camera file selected", "info");
           console.log("📸 Camera file selected");
           const file = e.target.files[0];
           
           if (file) {
+            addDebugLog(`📸 File: ${file.name} (${file.size} bytes)`, "info");
             console.log("📸 Camera file details:", {
               name: file.name,
               type: file.type,
@@ -888,14 +890,20 @@ export default function TeacherDashboard() {
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
+                      addDebugLog(`📁 File selected: ${file.name} (${file.size} bytes)`, "info");
+                      
                       // Validate file before processing
                       if (!file.type.startsWith('image/')) {
+                        addDebugLog("❌ Invalid file type selected", "error");
                         alert("Please select an image file.");
                         return;
                       }
                       
+                      addDebugLog("✅ File validation passed, starting upload", "success");
                       // Accept any file size - no compression
                       handleFileUpload(studentId, file);
+                    } else {
+                      addDebugLog("❌ No file selected", "error");
                     }
                   }}
                   className="hidden"
