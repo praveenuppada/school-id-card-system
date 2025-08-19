@@ -574,10 +574,13 @@ export default function TeacherDashboard() {
           status: uploadError.response?.status
         });
         
-        // Check if it's a network error or server error
-        if (uploadError.code === 'NETWORK_ERROR' || uploadError.message.includes('Network Error')) {
-          addDebugLog("📱 Network error - using local storage fallback", "warning");
-          console.log("📱 Network error detected - using local storage fallback");
+        // Check if it's a network error, timeout, or server error
+        if (uploadError.code === 'NETWORK_ERROR' || 
+            uploadError.message.includes('Network Error') ||
+            uploadError.message.includes('timeout') ||
+            uploadError.code === 'ECONNABORTED') {
+          addDebugLog("📱 Network/timeout error - using local storage fallback", "warning");
+          console.log("📱 Network/timeout error detected - using local storage fallback");
           
           // Fallback: Save locally and show message
           const updatedPhotos = {
@@ -587,7 +590,7 @@ export default function TeacherDashboard() {
               timestamp: new Date().toISOString(),
               status: 'pending_upload',
               filename: file.name,
-              error: 'Network error - will retry when connection is restored'
+              error: 'Network/timeout error - will retry when connection is restored'
             }
           };
           

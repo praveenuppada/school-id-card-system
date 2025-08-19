@@ -118,7 +118,7 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     headers: { 
       // Don't set Content-Type for FormData - let browser set it with boundary
     },
-    timeout: 30000, // 30 second timeout
+    timeout: 60000, // 60 second timeout for larger files
   }).then(response => {
     console.log("✅ uploadPhoto success:", response.data);
     return response;
@@ -151,7 +151,7 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
         headers: { 
           // Don't set Content-Type for FormData - let browser set it with boundary
         },
-        timeout: 30000, // 30 second timeout
+        timeout: 60000, // 60 second timeout for larger files
       }).then(response => {
         console.log("✅ uploadPhoto success with 'photo' field:", response.data);
         return response;
@@ -184,7 +184,7 @@ export const testPhotoUpload = () => {
         headers: { 
           // Don't set Content-Type for FormData - let browser set it with boundary
         },
-        timeout: 30000, // 30 second timeout
+        timeout: 60000, // 60 second timeout for larger files
       });
     })
     .then(response => {
