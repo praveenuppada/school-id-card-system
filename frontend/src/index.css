@@ -78,6 +78,9 @@ html, body, #root {
     overflow-x: hidden !important;
     /* Prevent zoom on input focus */
     font-size: 16px !important;
+    /* Smooth scrolling */
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
   }
   
   /* Force fixed UI - prevent shrinking */
@@ -97,6 +100,20 @@ html, body, #root {
   .welcome-page {
     min-height: 100vh !important;
     height: auto !important;
+    /* Remove extra bottom space */
+    padding-bottom: 0 !important;
+  }
+  
+  /* Fix footer spacing on mobile */
+  .welcome-page footer {
+    margin-top: auto !important;
+    padding: 1rem 0 !important;
+  }
+  
+  /* Fix main content spacing on mobile */
+  .welcome-page main {
+    flex: 1 !important;
+    padding: 1rem 0 !important;
   }
   
   /* Prevent zoom on input focus */
@@ -660,8 +677,25 @@ body {
     /* Allow content to flow properly */
     height: auto !important;
     min-height: 100vh !important;
-    /* Remove forced flex layout */
-    display: block !important;
+    /* Use flex layout for proper spacing */
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Welcome page main content */
+  .welcome-page main {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 1rem 0 !important;
+  }
+  
+  /* Welcome page footer */
+  .welcome-page footer {
+    margin-top: auto !important;
+    padding: 1rem 0 !important;
   }
   
   /* Login pages - preserve layout */

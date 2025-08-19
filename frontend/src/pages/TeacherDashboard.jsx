@@ -17,6 +17,7 @@ export default function TeacherDashboard() {
   const [activeCamera, setActiveCamera] = useState(null);
   const [showConfirmationCard, setShowConfirmationCard] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [debugLogs, setDebugLogs] = useState([]);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -415,6 +416,14 @@ export default function TeacherDashboard() {
 
 
 
+  // Debug logging function for mobile
+  const addDebugLog = (message, type = 'info') => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = { timestamp, message, type };
+    setDebugLogs(prev => [...prev.slice(-9), logEntry]); // Keep last 10 logs
+    console.log(`[${timestamp}] ${message}`);
+  };
+
   // Global cleanup function to prevent memory leaks
   const cleanupResources = () => {
     console.log("🧹 Starting cleanup...");
@@ -515,6 +524,10 @@ export default function TeacherDashboard() {
       });
       
       // Upload to backend using the existing uploadPhoto function
+      addDebugLog("📤 Starting backend upload...", "info");
+      addDebugLog(`📤 File: ${file.name} (${file.size} bytes)`, "info");
+      addDebugLog(`📤 Student: ${student.fullName} (${student.photoId})`, "info");
+      
       console.log("📤 Starting backend upload...");
       console.log("📤 Upload details:", {
         photoId: student.photoId,
@@ -524,15 +537,31 @@ export default function TeacherDashboard() {
         fileType: file.type
       });
       
-      try {
-        const response = await uploadPhoto(student.photoId, file, studentId);
-        
-        console.log("📤 Backend upload response:", response.data);
-        
-        if (!response.data.success) {
-          throw new Error(response.data.message || "Upload failed");
-        }
+      // Verify file exists and has content
+      if (!file || file.size === 0) {
+        addDebugLog("❌ File is empty or invalid", "error");
+        throw new Error("File is empty or invalid");
+      }
+      
+      addDebugLog("✅ File validation passed", "success");
+      console.log("📤 File validation passed - file exists and has content");
+      
+              try {
+          addDebugLog("📤 Sending to backend API...", "info");
+          const response = await uploadPhoto(student.photoId, file, studentId);
+          
+          addDebugLog("✅ Backend response received", "success");
+          console.log("📤 Backend upload response:", response.data);
+          
+          if (!response.data.success) {
+            addDebugLog(`❌ Backend error: ${response.data.message}`, "error");
+            throw new Error(response.data.message || "Upload failed");
+          }
       } catch (uploadError) {
+        addDebugLog(`❌ Upload error: ${uploadError.message}`, "error");
+        addDebugLog(`❌ Status: ${uploadError.response?.status}`, "error");
+        addDebugLog(`❌ Response: ${JSON.stringify(uploadError.response?.data)}`, "error");
+        
         console.error("📤 Upload error details:", {
           error: uploadError,
           message: uploadError.message,
@@ -542,6 +571,7 @@ export default function TeacherDashboard() {
         
         // Check if it's a network error or server error
         if (uploadError.code === 'NETWORK_ERROR' || uploadError.message.includes('Network Error')) {
+          addDebugLog("📱 Network error - using local storage fallback", "warning");
           console.log("📱 Network error detected - using local storage fallback");
           
           // Fallback: Save locally and show message
@@ -574,14 +604,17 @@ export default function TeacherDashboard() {
       }
       
       // Create a temporary data URL for immediate display
+      addDebugLog("📱 Creating data URL for preview...", "info");
       console.log("📱 Creating data URL for preview...");
       const dataUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
+          addDebugLog("✅ Data URL created successfully", "success");
           console.log("📱 Data URL created successfully for preview");
           resolve(e.target.result);
         };
         reader.onerror = (error) => {
+          addDebugLog("❌ Data URL creation failed", "error");
           console.error("📱 Data URL creation failed:", error);
           reject(new Error("Failed to create preview"));
         };
@@ -882,6 +915,31 @@ export default function TeacherDashboard() {
       {/* Main Content Container - Proper layout */}
       <div className="flex-1 w-full" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
+          
+          {/* Debug Panel - Visible on mobile */}
+          {debugLogs.length > 0 && (
+            <div className="mb-6 bg-gray-900 text-white p-4 rounded-lg font-mono text-xs max-h-40 overflow-y-auto">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-bold">🔍 Debug Logs (Last 10)</h3>
+                <button 
+                  onClick={() => setDebugLogs([])} 
+                  className="text-gray-400 hover:text-white"
+                >
+                  Clear
+                </button>
+              </div>
+              {debugLogs.map((log, index) => (
+                <div key={index} className={`mb-1 ${
+                  log.type === 'error' ? 'text-red-400' : 
+                  log.type === 'success' ? 'text-green-400' : 
+                  log.type === 'warning' ? 'text-yellow-400' : 
+                  'text-gray-300'
+                }`}>
+                  <span className="text-gray-500">[{log.timestamp}]</span> {log.message}
+                </div>
+              ))}
+            </div>
+          )}
           
           {/* Header Section - Compact and professional */}
           <div className="mb-6">

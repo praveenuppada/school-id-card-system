@@ -17,12 +17,21 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     fileType: file.type 
   });
   
+  // Validate file before creating FormData
+  if (!file || file.size === 0) {
+    throw new Error("File is empty or invalid");
+  }
+  
   const formData = new FormData();
   formData.append("photoId", photoId);
   if (studentId) {
     formData.append("studentId", studentId);
   }
   formData.append("file", file);
+  
+  // Verify FormData was created correctly
+  console.log("📋 FormData created with file:", formData.has("file"));
+  console.log("📋 FormData file size:", file.size);
   
   // Log FormData contents
   console.log("📋 FormData contents:");

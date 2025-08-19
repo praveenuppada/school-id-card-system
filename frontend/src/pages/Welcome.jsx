@@ -311,19 +311,19 @@ export default function Welcome() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden">
         <div className="w-full max-w-4xl mx-auto px-4">
           {renderContent()}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="relative z-20 bg-gray-800 text-white py-8">
+      <footer className="relative z-20 bg-gray-800 text-white py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm text-gray-300">
             © Harsha ID Solutions. A COMPLETE ID WORLD.....
           </p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs text-gray-400 mt-1">
             GSTIN: 37CWUPM2873D1Z0 | Service Areas: Srikakulam, Vizianagaram, Visakhapatnam
           </p>
         </div>
