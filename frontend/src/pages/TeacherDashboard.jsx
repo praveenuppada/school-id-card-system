@@ -632,6 +632,20 @@ export default function TeacherDashboard() {
     const photo = studentPhotos[studentId];
     if (!photo) return;
 
+    // Mark as saved immediately for instant feedback
+    const immediateUpdate = {
+      ...studentPhotos,
+      [studentId]: {
+        ...studentPhotos[studentId],
+        status: 'saved'
+      }
+    };
+    
+    setStudentPhotos(immediateUpdate);
+    localStorage.setItem('teacherStudentPhotos', JSON.stringify(immediateUpdate));
+    addDebugLog("💾 Photo marked as saved instantly", "success");
+    
+    // Start backend upload in background (non-blocking)
     try {
       // Convert base64 to blob
       const response = await fetch(photo.data);
@@ -643,46 +657,69 @@ export default function TeacherDashboard() {
       // Find the student object to get photoId
       const student = students.find(s => (s._id || s.id) === studentId);
       if (!student) {
-        throw new Error("Student not found");
+        addDebugLog("❌ Student not found", "error");
+        return;
       }
       
-      console.log("🎯 Student found:", { 
-        studentId, 
-        photoId: student.photoId, 
-        fullName: student.fullName 
-      });
+      addDebugLog("📤 Starting backend save...", "info");
       
-      // Upload to backend using the existing uploadPhoto function
-      await uploadPhoto(student.photoId, file, studentId);
+      // Upload to backend in background
+      uploadPhoto(student.photoId, file, studentId)
+        .then(response => {
+          addDebugLog("✅ Backend save successful", "success");
+          
+          // Update with Cloudinary URL if available
+          const photoUrl = response.data.photoUrl;
+          if (photoUrl) {
+            const finalUpdate = {
+              ...studentPhotos,
+              [studentId]: {
+                ...studentPhotos[studentId],
+                data: photoUrl,
+                cloudinaryUrl: photoUrl,
+                status: 'saved'
+              }
+            };
+            
+            setStudentPhotos(finalUpdate);
+            localStorage.setItem('teacherStudentPhotos', JSON.stringify(finalUpdate));
+            addDebugLog("✅ Photo updated with Cloudinary URL", "success");
+          }
+        })
+        .catch(error => {
+          addDebugLog(`❌ Backend save failed: ${error.message}`, "error");
+          
+          // Keep the saved status but mark as failed
+          const failedUpdate = {
+            ...studentPhotos,
+            [studentId]: {
+              ...studentPhotos[studentId],
+              status: 'saved_failed',
+              error: error.message
+            }
+          };
+          
+          setStudentPhotos(failedUpdate);
+          localStorage.setItem('teacherStudentPhotos', JSON.stringify(failedUpdate));
+          addDebugLog("⚠️ Photo saved locally but backend failed", "warning");
+        });
+        
+    } catch (error) {
+      addDebugLog(`❌ Save error: ${error.message}`, "error");
       
-      const updatedPhotos = {
+      // Keep the saved status but mark as failed
+      const failedUpdate = {
         ...studentPhotos,
         [studentId]: {
           ...studentPhotos[studentId],
-          status: 'saved'
+          status: 'saved_failed',
+          error: error.message
         }
       };
       
-      setStudentPhotos(updatedPhotos);
-      console.log("💾 Photo saved, updated studentPhotos:", updatedPhotos);
-      
-      // Force save to localStorage immediately
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-      console.log("💾 Immediately saved to localStorage");
-    } catch (error) {
-      console.error("Error saving photo:", error);
-      console.error("Error details:", {
-        status: error.response?.status,
-        data: JSON.stringify(error.response?.data, null, 2),
-        message: error.message,
-        fullError: JSON.stringify(error, null, 2)
-      });
-      
-      // Check if the photo was actually saved despite the error
-      if (error.response?.data?.success) {
-        console.log("✅ Photo was actually saved successfully!");
-        return;
-      }
+      setStudentPhotos(failedUpdate);
+      localStorage.setItem('teacherStudentPhotos', JSON.stringify(failedUpdate));
+      addDebugLog("⚠️ Photo saved locally but processing failed", "warning");
     }
   };
 
