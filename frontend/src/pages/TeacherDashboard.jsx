@@ -532,26 +532,14 @@ export default function TeacherDashboard() {
         fullName: student.fullName 
       });
       
-      // Create immediate preview for instant display
-      let dataUrl;
-      try {
-        dataUrl = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = () => reject(new Error("Failed to create preview"));
-          reader.readAsDataURL(file);
-        });
-      } catch (previewError) {
-        console.error("❌ Failed to create preview:", previewError);
-        addDebugLog("❌ Failed to create preview", "error");
-        throw new Error("Failed to create image preview");
-      }
+      // Create immediate preview using URL.createObjectURL for instant display
+      const objectUrl = URL.createObjectURL(file);
       
-      // Show immediate preview while uploading
+      // Show immediate preview instantly
       const immediatePreview = {
         ...studentPhotos,
         [studentId]: {
-          data: dataUrl,
+          data: objectUrl,
           timestamp: new Date().toISOString(),
           status: 'uploading',
           filename: file.name
@@ -559,143 +547,60 @@ export default function TeacherDashboard() {
       };
       
       setStudentPhotos(immediatePreview);
-      addDebugLog("⚡ Immediate preview shown", "info");
+      addDebugLog("⚡ Instant preview shown", "info");
       
-      // Upload to backend in background
-      addDebugLog("📤 Starting backend upload...", "info");
-      addDebugLog(`📤 File: ${file.name} (${file.size} bytes)`, "info");
-      addDebugLog(`📤 Student: ${student.fullName} (${student.photoId})`, "info");
-      
-      console.log("📤 Starting backend upload...");
-      console.log("📤 Upload details:", {
-        photoId: student.photoId,
-        studentId: studentId,
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type
-      });
-      
-      // Verify file exists and has content
-      if (!file || file.size === 0) {
-        addDebugLog("❌ File is empty or invalid", "error");
-        throw new Error("File is empty or invalid");
-      }
-      
-      addDebugLog("✅ File validation passed", "success");
-      console.log("📤 File validation passed - file exists and has content");
-      
-      try {
-          addDebugLog("📤 Sending to backend API...", "info");
-          const response = await uploadPhoto(student.photoId, file, studentId);
+      // Start backend upload in background (non-blocking)
+      uploadPhoto(student.photoId, file, studentId)
+        .then(response => {
+          addDebugLog("✅ Backend upload successful", "success");
           
-          addDebugLog("✅ Backend response received", "success");
-          addDebugLog(`📤 Response: ${JSON.stringify(response.data)}`, "info");
-          console.log("📤 Backend upload response:", response.data);
-          
-          if (!response.data.success) {
-            addDebugLog(`❌ Backend error: ${response.data.message}`, "error");
-            throw new Error(response.data.message || "Upload failed");
-          }
-          
-          // Use the Cloudinary URL from backend response for display
+          // Update with Cloudinary URL if available
           const photoUrl = response.data.photoUrl;
-          addDebugLog(`📸 Using Cloudinary URL: ${photoUrl}`, "info");
-          
-          // Update with Cloudinary URL for better quality
-          const updatedPhotos = {
-            ...studentPhotos,
-            [studentId]: {
-              data: photoUrl || dataUrl, // Use Cloudinary URL if available, otherwise keep data URL
-              timestamp: new Date().toISOString(),
-              status: 'uploaded',
-              filename: file.name,
-              cloudinaryUrl: photoUrl // Store the Cloudinary URL separately
-            }
-          };
-          
-          setStudentPhotos(updatedPhotos);
-          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-          
-          addDebugLog("✅ Photo uploaded successfully!", "success");
-          // No alert - user already sees the photo
-          return;
-          
-      } catch (uploadError) {
-        addDebugLog(`❌ Upload error: ${uploadError.message}`, "error");
-        addDebugLog(`❌ Status: ${uploadError.response?.status}`, "error");
-        addDebugLog(`❌ Response: ${JSON.stringify(uploadError.response?.data)}`, "error");
-        addDebugLog(`❌ Full error: ${JSON.stringify(uploadError)}`, "error");
-        
-        console.error("📤 Upload error details:", {
-          error: uploadError,
-          message: uploadError.message,
-          response: uploadError.response?.data,
-          status: uploadError.response?.status
-        });
-        
-        // Check if it's a network error, timeout, or server error
-        if (uploadError.code === 'NETWORK_ERROR' || 
-            uploadError.message.includes('Network Error') ||
-            uploadError.message.includes('timeout') ||
-            uploadError.code === 'ECONNABORTED') {
-          addDebugLog("📱 Network/timeout error - using local storage fallback", "warning");
-          console.log("📱 Network/timeout error detected - using local storage fallback");
-          
-          // Keep the preview but mark as failed
-          const updatedPhotos = {
-            ...studentPhotos,
-            [studentId]: {
-              data: dataUrl,
-              timestamp: new Date().toISOString(),
-              status: 'failed',
-              filename: file.name,
-              error: 'Network/timeout error - will retry when connection is restored'
-            }
-          };
-          
-          setStudentPhotos(updatedPhotos);
-          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-          
-          addDebugLog("⚠️ Upload failed - photo saved locally", "warning");
-          // No alert - user already sees the photo
-          return;
-        }
-        
-        // Show specific error message
-        if (uploadError.response?.data?.message) {
-          const errorMessage = uploadError.response.data.message;
-          
-          // Handle quota exceeded error
-          if (errorMessage.includes('quota') || errorMessage.includes('Quota') || errorMessage.includes('exceeded')) {
-            addDebugLog("⚠️ Cloudinary quota exceeded - using local storage", "warning");
-            
-            // Keep the preview but mark as quota exceeded
+          if (photoUrl) {
             const updatedPhotos = {
               ...studentPhotos,
               [studentId]: {
-                data: dataUrl,
+                data: photoUrl,
                 timestamp: new Date().toISOString(),
-                status: 'quota_exceeded',
+                status: 'uploaded',
                 filename: file.name,
-                error: 'Upload quota exceeded - photo saved locally'
+                cloudinaryUrl: photoUrl
               }
             };
             
             setStudentPhotos(updatedPhotos);
             localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-            
-            addDebugLog("⚠️ Quota exceeded - photo saved locally", "warning");
-            // No alert - user already sees the photo
-            return;
+            addDebugLog("✅ Photo updated with Cloudinary URL", "success");
           }
           
-          throw new Error(errorMessage);
-        } else if (uploadError.message) {
-          throw new Error(uploadError.message);
-        } else {
-          throw new Error("Upload failed. Please check your connection and try again.");
-        }
-      }
+          // Clean up object URL
+          URL.revokeObjectURL(objectUrl);
+        })
+        .catch(uploadError => {
+          addDebugLog(`❌ Upload failed: ${uploadError.message}`, "error");
+          
+          // Keep the preview but mark as failed
+          const updatedPhotos = {
+            ...studentPhotos,
+            [studentId]: {
+              data: objectUrl,
+              timestamp: new Date().toISOString(),
+              status: 'failed',
+              filename: file.name,
+              error: uploadError.message
+            }
+          };
+          
+          setStudentPhotos(updatedPhotos);
+          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+          addDebugLog("⚠️ Photo saved locally due to upload failure", "warning");
+        });
+      
+      // Save to localStorage immediately
+      localStorage.setItem('teacherStudentPhotos', JSON.stringify(immediatePreview));
+      addDebugLog("💾 Saved to localStorage instantly", "success");
+      
+            return; // Exit early - no need to wait for upload
       
     } catch (error) {
       console.error("❌ Error uploading file:", error);
@@ -718,13 +623,8 @@ export default function TeacherDashboard() {
         errorMessage = error.message;
       }
       
-      // Don't show alert if we have a preview - just log the error
-      if (dataUrl) {
-        addDebugLog(`⚠️ Upload failed but preview is available`, "warning");
-        console.log("⚠️ Upload failed but preview is available - not showing alert");
-      } else {
-        alert(errorMessage);
-      }
+      // Show error message
+      alert(errorMessage);
     }
   };
 
