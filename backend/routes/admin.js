@@ -16,11 +16,11 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Configure multer for file uploads
+// Configure multer for file uploads with larger size limit for high quality images
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: parseInt(process.env.MAX_FILE_SIZE) || 10 * 1024 * 1024 // 10MB
+    fileSize: parseInt(process.env.MAX_FILE_SIZE) || 50 * 1024 * 1024 // 50MB for high quality images
   }
 });
 
@@ -677,13 +677,20 @@ router.post('/crop-photo', upload.single('file'), async (req, res) => {
 
     console.log(`🎯 FINAL: Updating student: ${student.fullName} (ID: ${student._id}, PhotoID: ${student.photoId})`);
 
-    // Upload to Cloudinary with a unique identifier using student ID
+    // Upload to Cloudinary with maximum quality preservation
     const uniquePhotoId = `${student._id}_${Date.now()}`;
     const uploadResult = await cloudinary.uploader.upload(
       `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
       {
         public_id: `student_photos/${uniquePhotoId}`,
-        overwrite: true
+        overwrite: true,
+        quality: 'auto:best', // Maximum quality
+        fetch_format: 'auto', // Preserve original format
+        flags: 'preserve_transparency', // Preserve transparency if any
+        transformation: [
+          { quality: 'auto:best' }, // Ensure best quality
+          { fetch_format: 'auto' }  // Preserve original format
+        ]
       }
     );
 
