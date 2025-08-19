@@ -603,7 +603,15 @@ export default function TeacherDashboard() {
         
         // Show specific error message
         if (uploadError.response?.data?.message) {
-          throw new Error(uploadError.response.data.message);
+          const errorMessage = uploadError.response.data.message;
+          
+          // Handle quota exceeded error
+          if (errorMessage.includes('quota') || errorMessage.includes('Quota') || errorMessage.includes('exceeded')) {
+            addDebugLog("⚠️ Cloudinary quota exceeded - using local storage", "warning");
+            throw new Error("Upload quota exceeded. Photo saved locally. Please try again later.");
+          }
+          
+          throw new Error(errorMessage);
         } else if (uploadError.message) {
           throw new Error(uploadError.message);
         } else {
@@ -611,32 +619,47 @@ export default function TeacherDashboard() {
         }
       }
       
-      // Create a temporary data URL for immediate display
-      addDebugLog("📱 Creating data URL for preview...", "info");
-      console.log("📱 Creating data URL for preview...");
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          addDebugLog("✅ Data URL created successfully", "success");
-          console.log("📱 Data URL created successfully for preview");
-          resolve(e.target.result);
-        };
-        reader.onerror = (error) => {
-          addDebugLog("❌ Data URL creation failed", "error");
-          console.error("📱 Data URL creation failed:", error);
-          reject(new Error("Failed to create preview"));
-        };
-        reader.readAsDataURL(file);
-      });
+      // Use the Cloudinary URL from backend response for display
+      const photoUrl = response.data.photoUrl;
+      addDebugLog(`📸 Using Cloudinary URL: ${photoUrl}`, "info");
       
-      // Save the photo with data URL for display
+      // Fallback: If no Cloudinary URL, create a data URL for preview
+      if (!photoUrl) {
+        addDebugLog("⚠️ No Cloudinary URL received, creating data URL fallback", "warning");
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => reject(new Error("Failed to create preview"));
+          reader.readAsDataURL(file);
+        });
+        
+        // Save with data URL as fallback
+        const updatedPhotos = {
+          ...studentPhotos,
+          [studentId]: {
+            data: dataUrl,
+            timestamp: new Date().toISOString(),
+            status: 'uploaded_no_url',
+            filename: file.name
+          }
+        };
+        
+        setStudentPhotos(updatedPhotos);
+        localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
+        addDebugLog("✅ Photo saved with data URL fallback", "success");
+        alert("Photo uploaded successfully! (Using local preview)");
+        return;
+      }
+      
+      // Save the photo with Cloudinary URL for display
       const updatedPhotos = {
         ...studentPhotos,
         [studentId]: {
-          data: dataUrl,
+          data: photoUrl, // Use Cloudinary URL instead of data URL
           timestamp: new Date().toISOString(),
           status: 'uploaded',
-          filename: file.name
+          filename: file.name,
+          cloudinaryUrl: photoUrl // Store the Cloudinary URL separately
         }
       };
       
