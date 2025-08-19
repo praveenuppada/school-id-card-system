@@ -518,30 +518,77 @@ export default function TeacherDashboard() {
       
       console.log("📱 File info created:", fileInfo);
       
-      // Try to create a simple data URL for display
+      // Try multiple approaches to create data URL for display
+      let dataUrl = null;
+      let success = false;
+      
+      // Method 1: Simple FileReader
       try {
-        console.log("📱 Creating simple data URL for display...");
-        
-        const dataUrl = await new Promise((resolve, reject) => {
+        console.log("📱 Method 1: Simple FileReader for data URL...");
+        dataUrl = await new Promise((resolve, reject) => {
           const reader = new FileReader();
-          
-          reader.onload = (e) => {
-            console.log("📱 Data URL created successfully");
-            resolve(e.target.result);
-          };
-          
-          reader.onerror = () => {
-            console.error("📱 Data URL creation failed");
-            reject(new Error("Data URL creation failed"));
-          };
-          
-          // Simple FileReader approach
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => reject(new Error("Method 1 failed"));
           reader.readAsDataURL(file);
         });
+        success = true;
+        console.log("📱 Method 1 successful, data URL length:", dataUrl.length);
+      } catch (error) {
+        console.error("❌ Method 1 failed:", error);
+      }
+      
+      // Method 2: Blob URL + fetch if Method 1 failed
+      if (!success) {
+        try {
+          console.log("📱 Method 2: Blob URL + fetch for data URL...");
+          const blobUrl = URL.createObjectURL(file);
+          const response = await fetch(blobUrl);
+          const blob = await response.blob();
+          
+          dataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject(new Error("Method 2 failed"));
+            reader.readAsDataURL(blob);
+          });
+          
+          URL.revokeObjectURL(blobUrl);
+          success = true;
+          console.log("📱 Method 2 successful, data URL length:", dataUrl.length);
+        } catch (error) {
+          console.error("❌ Method 2 failed:", error);
+        }
+      }
+      
+      // Method 3: ArrayBuffer if Method 2 failed
+      if (!success) {
+        try {
+          console.log("📱 Method 3: ArrayBuffer for data URL...");
+          const arrayBuffer = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject(new Error("Method 3 failed"));
+            reader.readAsArrayBuffer(file);
+          });
+          
+          const bytes = new Uint8Array(arrayBuffer);
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          const base64 = btoa(binary);
+          dataUrl = `data:${file.type};base64,${base64}`;
+          success = true;
+          console.log("📱 Method 3 successful, data URL length:", dataUrl.length);
+        } catch (error) {
+          console.error("❌ Method 3 failed:", error);
+        }
+      }
+      
+      // If any method succeeded, save with data URL
+      if (success && dataUrl) {
+        console.log("📱 Data URL creation successful!");
         
-        console.log("📱 Data URL created, length:", dataUrl.length);
-        
-        // Save with data URL for display
         const updatedPhotos = {
           ...studentPhotos,
           [studentId]: {
@@ -558,11 +605,9 @@ export default function TeacherDashboard() {
         localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
         console.log("💾 Saved with data URL to localStorage");
         
-        // Show success message
         alert("Photo uploaded successfully!");
-        
-      } catch (dataUrlError) {
-        console.error("❌ Data URL creation failed:", dataUrlError);
+      } else {
+        console.error("❌ All data URL methods failed");
         
         // Fallback: save file info without data URL
         const updatedPhotos = {
@@ -597,7 +642,6 @@ export default function TeacherDashboard() {
         localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
         console.log("💾 Saved file info to localStorage");
         
-        // Show success message
         alert("File saved successfully! The file will be processed when you save the photo.");
       }
       
