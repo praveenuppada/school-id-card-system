@@ -497,6 +497,13 @@ export default function TeacherDashboard() {
 
   const handleFileUpload = async (studentId, file) => {
     try {
+      // Safety check
+      if (!studentId || !file) {
+        console.error("❌ Invalid parameters:", { studentId, file });
+        addDebugLog("❌ Invalid parameters for file upload", "error");
+        return;
+      }
+      
       console.log("📁 File upload for student:", studentId, "File:", file);
       
       if (!file) {
@@ -526,12 +533,19 @@ export default function TeacherDashboard() {
       });
       
       // Create immediate preview for instant display
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => reject(new Error("Failed to create preview"));
-        reader.readAsDataURL(file);
-      });
+      let dataUrl;
+      try {
+        dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => reject(new Error("Failed to create preview"));
+          reader.readAsDataURL(file);
+        });
+      } catch (previewError) {
+        console.error("❌ Failed to create preview:", previewError);
+        addDebugLog("❌ Failed to create preview", "error");
+        throw new Error("Failed to create image preview");
+      }
       
       // Show immediate preview while uploading
       const immediatePreview = {
@@ -685,6 +699,7 @@ export default function TeacherDashboard() {
       
     } catch (error) {
       console.error("❌ Error uploading file:", error);
+      addDebugLog(`❌ Upload error: ${error.message}`, "error");
       
       // Show specific error message based on error type
       let errorMessage = "Error uploading file. Please try again.";
@@ -703,7 +718,13 @@ export default function TeacherDashboard() {
         errorMessage = error.message;
       }
       
-      alert(errorMessage);
+      // Don't show alert if we have a preview - just log the error
+      if (dataUrl) {
+        addDebugLog(`⚠️ Upload failed but preview is available`, "warning");
+        console.log("⚠️ Upload failed but preview is available - not showing alert");
+      } else {
+        alert(errorMessage);
+      }
     }
   };
 
