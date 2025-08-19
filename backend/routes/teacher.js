@@ -103,11 +103,23 @@ router.get('/students', async (req, res) => {
   }
 });
 
-// Upload student photo
-router.post('/upload-photo', upload.single('file'), async (req, res) => {
+// Upload student photo - Handle both 'file' and 'photo' field names
+router.post('/upload-photo', upload.fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'photo', maxCount: 1 }
+]), async (req, res) => {
   try {
     const { photoId, studentId } = req.body;
-    const file = req.file;
+    
+    // Try to get file from either field
+    let file = null;
+    if (req.files && req.files.file && req.files.file[0]) {
+      file = req.files.file[0];
+      console.log('📸 File found in "file" field');
+    } else if (req.files && req.files.photo && req.files.photo[0]) {
+      file = req.files.photo[0];
+      console.log('📸 File found in "photo" field');
+    }
 
     console.log('📸 Teacher photo upload request received:');
     console.log('  - photoId:', photoId);
