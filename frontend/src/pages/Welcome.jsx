@@ -146,7 +146,9 @@ export default function Welcome() {
 
 
             {/* Login Buttons */}
-            <div className="space-y-5 w-full max-w-md mx-auto">
+            <div className="space-y-5 w-full max-w-md mx-auto" style={{ display: 'block', visibility: 'visible', opacity: 1, border: '2px solid red', padding: '20px', margin: '20px 0' }}>
+              <div style={{ color: 'red', fontSize: '14px', marginBottom: '10px', fontWeight: 'bold' }}>DEBUG: LOGIN BUTTONS CONTAINER</div>
+              <div style={{ color: 'red', fontSize: '12px', marginBottom: '10px' }}>This container should show 2 login buttons below:</div>
               <button
                 onClick={() => navigate("/login-teacher")}
                 className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-xl shadow-md hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-[1.02] text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2"
@@ -172,7 +174,9 @@ export default function Welcome() {
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-8 w-full max-w-md mx-auto">
+            <div className="mt-8 w-full max-w-md mx-auto" style={{ display: 'block', visibility: 'visible', opacity: 1, border: '2px solid blue', padding: '20px', margin: '20px 0' }}>
+              <div style={{ color: 'blue', fontSize: '14px', marginBottom: '10px', fontWeight: 'bold' }}>DEBUG: WHATSAPP CONTAINER</div>
+              <div style={{ color: 'blue', fontSize: '12px', marginBottom: '10px' }}>This container should show WhatsApp button below:</div>
               <a
                 href="https://wa.me/918977219777"
                 target="_blank"
@@ -312,7 +316,7 @@ export default function Welcome() {
 
               {/* Main Content */}
         <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden min-h-screen">
-          <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center text-center pb-8">
+          <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center text-center pb-8" style={{ minHeight: '100vh', paddingBottom: '100px' }}>
             {renderContent()}
           </div>
         </main>

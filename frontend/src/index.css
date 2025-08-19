@@ -301,10 +301,22 @@ html, body, #root {
     margin-top: 1.5rem !important;
   }
   
-  /* Professional button styling */
+  /* Force all buttons to be visible */
   .welcome-page button,
   .welcome-page a[href] {
     display: inline-flex !important;
+    position: relative !important;
+    z-index: 10 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Force button containers to be visible */
+  .welcome-page .space-y-5,
+  .welcome-page .mt-8 {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     position: relative !important;
     z-index: 10 !important;
   }
