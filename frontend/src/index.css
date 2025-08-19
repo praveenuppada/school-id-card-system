@@ -301,24 +301,12 @@ html, body, #root {
     margin-top: 1.5rem !important;
   }
   
-  /* Debug: Make sure all buttons are visible */
+  /* Professional button styling */
   .welcome-page button,
   .welcome-page a[href] {
     display: inline-flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
     position: relative !important;
     z-index: 10 !important;
-    margin-bottom: 1rem !important;
-  }
-  
-  /* Force all buttons to be visible */
-  .welcome-page .space-y-4 > button,
-  .welcome-page .mt-6 > a {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    margin-bottom: 1rem !important;
   }
   
   /* Ensure proper spacing */
@@ -333,23 +321,19 @@ html, body, #root {
     display: block !important;
   }
   
-  /* Force button visibility with important overrides */
+  /* Professional button styling */
   .welcome-page button[onClick] {
     display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    margin-bottom: 1rem !important;
     width: 100% !important;
     max-width: 100% !important;
+    margin-bottom: 1rem !important;
   }
   
   .welcome-page a[href*="wa.me"] {
     display: inline-flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    margin-top: 1rem !important;
     width: 100% !important;
     max-width: 100% !important;
+    margin-top: 1rem !important;
   }
   
   /* Mobile-specific Welcome page fixes */

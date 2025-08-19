@@ -86,16 +86,16 @@ export default function Welcome() {
         return (
           <div className="text-center max-w-4xl mx-auto">
             {/* Welcome Text - Above Logo */}
-            <div className="text-center mb-8 w-full">
-              <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-4">Welcome to Student ID Management</h2>
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto px-4">
+            <div className="text-center mb-10 w-full">
+              <h2 className="text-3xl sm:text-4xl font-bold text-blue-600 mb-6">Welcome to Student ID Management</h2>
+              <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto px-4">
                 Streamline your school's student identification process with our comprehensive digital platform. 
                 Manage student records, track photo uploads, and generate ID cards efficiently.
               </p>
             </div>
             
-            {/* HARSHA ID SOLUTIONS Logo in Card - Exact as per image */}
-            <div className="bg-white shadow-2xl rounded-3xl p-6 sm:p-8 mb-8 border border-gray-100 transform hover:scale-105 transition-all duration-300 overflow-hidden">
+            {/* HARSHA ID SOLUTIONS Logo in Card - Professional styling */}
+            <div className="bg-white shadow-xl rounded-2xl p-8 sm:p-10 mb-10 border border-gray-200 transform hover:scale-[1.02] transition-all duration-300 overflow-hidden">
               <div className="flex flex-col items-center justify-center space-y-4">
                 {/* HARSHA letters - Exact as per image */}
                 <div className="flex justify-center space-x-2">
@@ -146,12 +146,10 @@ export default function Welcome() {
 
 
             {/* Login Buttons */}
-            <div className="space-y-4 w-full max-w-md mx-auto" style={{ border: '1px solid red', padding: '1rem' }}>
-              <div style={{ color: 'red', fontSize: '12px', marginBottom: '1rem' }}>DEBUG: Buttons Container</div>
+            <div className="space-y-5 w-full max-w-md mx-auto">
               <button
                 onClick={() => navigate("/login-teacher")}
-                className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-2xl shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
-                style={{ display: 'block', visibility: 'visible', opacity: 1 }}
+                className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-xl shadow-md hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-[1.02] text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2"
               >
                 <div className="flex items-center justify-center space-x-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,8 +160,7 @@ export default function Welcome() {
               </button>
               <button
                 onClick={() => navigate("/login-admin")}
-                className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-2xl shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
-                style={{ display: 'block', visibility: 'visible', opacity: 1 }}
+                className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-xl shadow-md hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 transform hover:scale-[1.02] text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2"
               >
                 <div className="flex items-center justify-center space-x-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,14 +172,12 @@ export default function Welcome() {
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-6 w-full max-w-md mx-auto" style={{ display: 'block', visibility: 'visible', opacity: 1, border: '1px solid blue', padding: '1rem' }}>
-              <div style={{ color: 'blue', fontSize: '12px', marginBottom: '1rem' }}>DEBUG: WhatsApp Container</div>
+            <div className="mt-8 w-full max-w-md mx-auto">
               <a
                 href="https://wa.me/918977219777"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-2xl shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 text-base sm:text-lg"
-                style={{ display: 'inline-flex', visibility: 'visible', opacity: 1 }}
+                className="w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-md hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-[1.02] text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
               >
                 <span className="text-lg mr-3">📱</span>
                 <span>WhatsApp: +91 8977219777</span>
@@ -317,7 +312,7 @@ export default function Welcome() {
 
               {/* Main Content */}
         <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 overflow-x-hidden min-h-screen">
-          <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center text-center pb-8" style={{ minHeight: 'calc(100vh - 200px)' }}>
+          <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center text-center pb-8">
             {renderContent()}
           </div>
         </main>
