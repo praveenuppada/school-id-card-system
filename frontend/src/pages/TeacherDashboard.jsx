@@ -515,9 +515,14 @@ export default function TeacherDashboard() {
       });
       
       // Upload to backend using the existing uploadPhoto function
+      console.log("📤 Starting backend upload...");
       const response = await uploadPhoto(student.photoId, file, studentId);
       
       console.log("📤 Backend upload response:", response.data);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Upload failed");
+      }
       
       // Create a temporary data URL for immediate display
       const dataUrl = await new Promise((resolve, reject) => {

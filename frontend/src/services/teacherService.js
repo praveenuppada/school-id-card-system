@@ -42,7 +42,9 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
   console.log("📤 Sending request to:", "/teacher/upload-photo");
   
   return api.post("/teacher/upload-photo", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: { 
+      // Don't set Content-Type for FormData - let browser set it with boundary
+    },
   }).then(response => {
     console.log("✅ uploadPhoto success:", response.data);
     return response;
@@ -80,7 +82,9 @@ export const testPhotoUpload = () => {
       formData.append("file", testFile);
       
       return api.post("/teacher/upload-photo", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          // Don't set Content-Type for FormData - let browser set it with boundary
+        },
       });
     })
     .then(response => {
