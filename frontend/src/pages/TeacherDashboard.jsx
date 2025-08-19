@@ -924,11 +924,47 @@ export default function TeacherDashboard() {
       <div className="flex-1 w-full" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
           
-          {/* Debug Panel - Visible on mobile */}
-          {debugLogs.length > 0 && (
-            <div className="mb-6 bg-gray-900 text-white p-4 rounded-lg font-mono text-xs max-h-40 overflow-y-auto">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-bold">🔍 Debug Logs (Last 10)</h3>
+          {/* Debug Panel - Always visible for testing */}
+          <div className="mb-6 bg-gray-900 text-white p-4 rounded-lg font-mono text-xs max-h-40 overflow-y-auto">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-bold">🔍 Debug Logs (Last 10)</h3>
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => {
+                    addDebugLog("🧪 Test log message", "info");
+                  }} 
+                  className="text-blue-400 hover:text-white text-xs"
+                >
+                  Test
+                </button>
+                <button 
+                  onClick={async () => {
+                    addDebugLog("🧪 Testing file upload...", "info");
+                    try {
+                      // Create a test file
+                      const testData = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=";
+                      const response = await fetch(testData);
+                      const blob = await response.blob();
+                      const testFile = new File([blob], "test.jpg", { type: "image/jpeg" });
+                      
+                      addDebugLog(`🧪 Test file created: ${testFile.name} (${testFile.size} bytes)`, "info");
+                      
+                      // Test upload with first student
+                      if (students.length > 0) {
+                        const firstStudent = students[0];
+                        addDebugLog(`🧪 Testing with student: ${firstStudent.fullName}`, "info");
+                        await handleFileUpload(firstStudent._id || firstStudent.id, testFile);
+                      } else {
+                        addDebugLog("❌ No students available for test", "error");
+                      }
+                    } catch (error) {
+                      addDebugLog(`❌ Test failed: ${error.message}`, "error");
+                    }
+                  }} 
+                  className="text-green-400 hover:text-white text-xs"
+                >
+                  Test Upload
+                </button>
                 <button 
                   onClick={() => setDebugLogs([])} 
                   className="text-gray-400 hover:text-white"
@@ -936,7 +972,11 @@ export default function TeacherDashboard() {
                   Clear
                 </button>
               </div>
-              {debugLogs.map((log, index) => (
+            </div>
+            {debugLogs.length === 0 ? (
+              <div className="text-gray-500">No logs yet. Try uploading a photo or click "Test"</div>
+            ) : (
+              debugLogs.map((log, index) => (
                 <div key={index} className={`mb-1 ${
                   log.type === 'error' ? 'text-red-400' : 
                   log.type === 'success' ? 'text-green-400' : 
@@ -945,9 +985,9 @@ export default function TeacherDashboard() {
                 }`}>
                   <span className="text-gray-500">[{log.timestamp}]</span> {log.message}
                 </div>
-              ))}
-            </div>
-          )}
+              ))
+            )}
+          </div>
           
           {/* Header Section - Compact and professional */}
           <div className="mb-6">

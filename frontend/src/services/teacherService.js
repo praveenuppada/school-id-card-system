@@ -29,12 +29,19 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
   }
   formData.append("file", file);
   
-  // Try both field names to see which one works
-  formData.append("photo", file); // Alternative field name
-  
   // Verify FormData was created correctly
   console.log("📋 FormData created with file:", formData.has("file"));
   console.log("📋 FormData file size:", file.size);
+  
+  // Test: Log all FormData entries
+  console.log("📋 All FormData entries:");
+  for (let [key, value] of formData.entries()) {
+    if (value instanceof File) {
+      console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+    } else {
+      console.log(`  ${key}: ${value}`);
+    }
+  }
   
   // Log FormData contents
   console.log("📋 FormData contents:");
@@ -73,6 +80,24 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     },
     timeout: 30000, // 30 second timeout
   }).then(response => {
+    console.log("✅ uploadPhoto success:", response.data);
+    return response;
+  }).catch(error => {
+    console.error("❌ uploadPhoto API error:", {
+      status: error.response?.status,
+      data: JSON.stringify(error.response?.data, null, 2),
+      message: error.message,
+      fullError: JSON.stringify(error, null, 2)
+    });
+    
+    // If we get a 400 but the response contains success data, treat it as success
+    if (error.response?.status === 400 && error.response?.data?.success) {
+      console.log("✅ Treating 400 as success due to success flag in response");
+      return { data: error.response.data };
+    }
+    
+    throw error;
+  });
     console.log("✅ uploadPhoto success:", response.data);
     return response;
   }).catch(error => {
