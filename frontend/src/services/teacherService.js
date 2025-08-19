@@ -61,6 +61,25 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     }
   }
   
+  // Test: Try sending with both field names
+  console.log("📋 Sending with both 'file' and 'photo' fields...");
+  const dualFormData = new FormData();
+  dualFormData.append("photoId", photoId);
+  if (studentId) {
+    dualFormData.append("studentId", studentId);
+  }
+  dualFormData.append("file", file);
+  dualFormData.append("photo", file);
+  
+  console.log("📋 Dual FormData entries:");
+  for (let [key, value] of dualFormData.entries()) {
+    if (value instanceof File) {
+      console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+    } else {
+      console.log(`  ${key}: ${value}`);
+    }
+  }
+  
   // Log FormData contents
   console.log("📋 FormData contents:");
   for (let [key, value] of formData.entries()) {
