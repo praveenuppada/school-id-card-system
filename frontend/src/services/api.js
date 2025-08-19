@@ -34,7 +34,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add JWT token
+// Request interceptor to add JWT token and handle FormData
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('REACT_APP_JWT_STORAGE_KEY');
@@ -43,6 +43,12 @@ api.interceptors.request.use(
     console.log("Method:", config.method);
     console.log("Token exists:", !!token);
     console.log("Authorization header:", token ? `Bearer ${token.substring(0, 20)}...` : "No token");
+    
+    // Handle FormData properly - don't set Content-Type for FormData
+    if (config.data instanceof FormData) {
+      console.log("📋 FormData detected - removing Content-Type header");
+      delete config.headers['Content-Type']; // Let browser set it with boundary
+    }
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
