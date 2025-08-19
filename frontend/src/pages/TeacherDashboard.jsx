@@ -550,9 +550,11 @@ export default function TeacherDashboard() {
       
               try {
           addDebugLog("📤 Sending to backend API...", "info");
+          addDebugLog("📤 Sending to backend API...", "info");
           const response = await uploadPhoto(student.photoId, file, studentId);
           
           addDebugLog("✅ Backend response received", "success");
+          addDebugLog(`📤 Response: ${JSON.stringify(response.data)}`, "info");
           console.log("📤 Backend upload response:", response.data);
           
           if (!response.data.success) {
@@ -563,6 +565,7 @@ export default function TeacherDashboard() {
         addDebugLog(`❌ Upload error: ${uploadError.message}`, "error");
         addDebugLog(`❌ Status: ${uploadError.response?.status}`, "error");
         addDebugLog(`❌ Response: ${JSON.stringify(uploadError.response?.data)}`, "error");
+        addDebugLog(`❌ Full error: ${JSON.stringify(uploadError)}`, "error");
         
         console.error("📤 Upload error details:", {
           error: uploadError,
