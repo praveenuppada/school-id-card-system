@@ -505,150 +505,59 @@ export default function TeacherDashboard() {
         return;
       }
       
-      // Universal approach for all devices
-      console.log("📱 Using universal file handling for all devices");
+      // SIMPLEST POSSIBLE APPROACH - Skip all complex processing
+      console.log("📱 Using SIMPLEST approach - no FileReader");
       
-      // Method 1: Simple FileReader (works on most devices)
-      try {
-        console.log("📱 Method 1: Simple FileReader...");
-        
-        const dataUrl = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          
-          reader.onload = (e) => {
-            console.log("📱 FileReader success, length:", e.target.result.length);
-            resolve(e.target.result);
-          };
-          
-          reader.onerror = (error) => {
-            console.error("📱 FileReader error:", error);
-            reject(new Error("FileReader failed"));
-          };
-          
-          reader.onabort = () => {
-            console.error("📱 FileReader aborted");
-            reject(new Error("FileReader aborted"));
-          };
-          
-          // Start reading
-          reader.readAsDataURL(file);
-        });
-        
-        console.log("📱 Method 1 successful!");
-        
-        // Save with data URL
-        const updatedPhotos = {
-          ...studentPhotos,
-          [studentId]: {
-            data: dataUrl,
-            timestamp: new Date().toISOString(),
-            status: 'uploaded',
-            filename: file.name
-          }
-        };
-        
-        setStudentPhotos(updatedPhotos);
-        console.log("📁 File uploaded successfully for student:", studentId);
-        
-        localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-        console.log("💾 Saved to localStorage");
-        
-        // Show success message
-        alert("Photo uploaded successfully!");
-        
-      } catch (method1Error) {
-        console.error("❌ Method 1 failed:", method1Error);
-        
-        // Method 2: Blob URL approach
-        try {
-          console.log("📱 Method 2: Blob URL approach...");
-          
-          const blobUrl = URL.createObjectURL(file);
-          const response = await fetch(blobUrl);
-          const blob = await response.blob();
-          
-          const dataUrl = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = () => reject(new Error("Blob conversion failed"));
-            reader.readAsDataURL(blob);
-          });
-          
-          URL.revokeObjectURL(blobUrl);
-          
-          console.log("📱 Method 2 successful!");
-          
-          const updatedPhotos = {
-            ...studentPhotos,
-            [studentId]: {
-              data: dataUrl,
-              timestamp: new Date().toISOString(),
-              status: 'uploaded',
-              filename: file.name
-            }
-          };
-          
-          setStudentPhotos(updatedPhotos);
-          console.log("📁 File uploaded successfully for student:", studentId);
-          
-          localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-          console.log("💾 Saved to localStorage");
-          
-          alert("Photo uploaded successfully!");
-          
-        } catch (method2Error) {
-          console.error("❌ Method 2 failed:", method2Error);
-          
-          // Method 3: ArrayBuffer approach
-          try {
-            console.log("📱 Method 3: ArrayBuffer approach...");
-            
-            const arrayBuffer = await new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = (e) => resolve(e.target.result);
-              reader.onerror = () => reject(new Error("ArrayBuffer failed"));
-              reader.readAsArrayBuffer(file);
-            });
-            
-            const bytes = new Uint8Array(arrayBuffer);
-            let binary = '';
-            for (let i = 0; i < bytes.byteLength; i++) {
-              binary += String.fromCharCode(bytes[i]);
-            }
-            const base64 = btoa(binary);
-            const dataUrl = `data:${file.type};base64,${base64}`;
-            
-            console.log("📱 Method 3 successful!");
-            
-            const updatedPhotos = {
-              ...studentPhotos,
-              [studentId]: {
-                data: dataUrl,
-                timestamp: new Date().toISOString(),
-                status: 'uploaded',
-                filename: file.name
-              }
-            };
-            
-            setStudentPhotos(updatedPhotos);
-            console.log("📁 File uploaded successfully for student:", studentId);
-            
-            localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-            console.log("💾 Saved to localStorage");
-            
-            alert("Photo uploaded successfully!");
-            
-          } catch (method3Error) {
-            console.error("❌ All methods failed:", method3Error);
-            alert("Unable to process image. Please try a different image or restart the app.");
-          }
+      // Create a simple file info object
+      const fileInfo = {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: file.lastModified
+      };
+      
+      console.log("📱 File info created:", fileInfo);
+      
+      // Save file info immediately without any processing
+      const updatedPhotos = {
+        ...studentPhotos,
+        [studentId]: {
+          fileInfo: fileInfo,
+          timestamp: new Date().toISOString(),
+          status: 'uploaded',
+          filename: file.name,
+          isFileObject: true
         }
-      }
+      };
+      
+      setStudentPhotos(updatedPhotos);
+      console.log("📁 File info saved successfully for student:", studentId);
+      
+      // Save to localStorage (without the file object to avoid serialization issues)
+      const storageData = {
+        ...studentPhotos,
+        [studentId]: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          lastModified: file.lastModified,
+          timestamp: new Date().toISOString(),
+          status: 'uploaded',
+          filename: file.name,
+          isFileObject: true
+        }
+      };
+      
+      localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
+      console.log("💾 Saved file info to localStorage");
+      
+      // Show success message
+      alert("File saved successfully! The file will be processed when you save the photo.");
       
     } catch (error) {
       console.error("❌ Error handling file upload:", error);
       console.error("❌ Error stack:", error.stack);
-      alert("Error uploading file. Please try again with a different image.");
+      alert("Error saving file. Please try again with a different image.");
     }
   };
 
