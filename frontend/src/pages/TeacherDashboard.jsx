@@ -891,16 +891,19 @@ export default function TeacherDashboard() {
                     if (file) {
                       addDebugLog(`📁 File selected: ${file.name} (${file.size} bytes)`, "info");
                       
-                      // Validate file before processing
+                      // Quick validation without blocking
                       if (!file.type.startsWith('image/')) {
                         addDebugLog("❌ Invalid file type selected", "error");
-                        alert("Please select an image file.");
+                        // Don't show alert - just log the error
                         return;
                       }
                       
-                      addDebugLog("✅ File validation passed, starting upload", "success");
-                      // Accept any file size - no compression
+                      addDebugLog("✅ File validation passed, starting instant upload", "success");
+                      // Start upload immediately
                       handleFileUpload(studentId, file);
+                      
+                      // Clear the input to allow selecting the same file again
+                      e.target.value = '';
                     } else {
                       addDebugLog("❌ No file selected", "error");
                     }
