@@ -98,24 +98,6 @@ export const uploadPhoto = (photoId, file, studentId = null) => {
     
     throw error;
   });
-    console.log("✅ uploadPhoto success:", response.data);
-    return response;
-  }).catch(error => {
-    console.error("❌ uploadPhoto API error:", {
-      status: error.response?.status,
-      data: JSON.stringify(error.response?.data, null, 2),
-      message: error.message,
-      fullError: JSON.stringify(error, null, 2)
-    });
-    
-    // If we get a 400 but the response contains success data, treat it as success
-    if (error.response?.status === 400 && error.response?.data?.success) {
-      console.log("✅ Treating 400 as success due to success flag in response");
-      return { data: error.response.data };
-    }
-    
-    throw error;
-  });
 };
 
 // Test function to check if endpoint exists
