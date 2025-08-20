@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 8081;
 
 // CORS configuration - must come before other middleware
 app.use(cors({
-  origin: ['https://school-id-card-system.vercel.app', 'https://school-id-card-s-git-4c6b03-praveenuppada1812gmailcoms-projects.vercel.app', 'http://localhost:5175'],
+  origin: ['https://school-id-card-system.vercel.app', 'https://school-id-card-s-git-4c6b03-praveenuppada1812gmailcoms-projects.vercel.app', 'http://localhost:5175', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
