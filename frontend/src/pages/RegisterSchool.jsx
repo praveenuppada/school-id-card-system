@@ -34,7 +34,7 @@ const RegisterSchool = () => {
         navigate("/admin")
       }, 2000)
     } catch (error) {
-      console.error("Error registering school:", error)
+
       setMessage(error.response?.data?.message || "Failed to register school")
     } finally {
       setLoading(false)

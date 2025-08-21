@@ -36,7 +36,7 @@ const ViewSchools = () => {
         setSelectedSchool(schoolsData[0]._id)
       }
     } catch (error) {
-      console.error("Error fetching schools:", error)
+
       setSchools([])
     } finally {
       setLoading(false)
@@ -51,7 +51,7 @@ const ViewSchools = () => {
       const response = await getSchoolData(selectedSchool)
       setSchoolData(response.data?.data || null)
     } catch (error) {
-      console.error("Error fetching school data:", error)
+
       setSchoolData(null)
     } finally {
       setDataLoading(false)
@@ -81,7 +81,7 @@ const ViewSchools = () => {
         
         alert('Excel file downloaded successfully!')
       } catch (error) {
-        console.error('Error downloading Excel:', error)
+  
         alert('Failed to download Excel file. Please try again.')
       }
     }
@@ -104,7 +104,7 @@ const ViewSchools = () => {
         
         alert('Photos ZIP file downloaded successfully!')
       } catch (error) {
-        console.error('Error downloading photos:', error)
+  
         alert('Failed to download photos. Please try again.')
       }
     }
@@ -125,7 +125,7 @@ const ViewSchools = () => {
           setSchoolData(null)
           await fetchSchools() // Refresh the list
         } catch (error) {
-          console.error('Error deleting school:', error)
+    
           alert('Failed to delete school. Please try again.')
         }
       }
@@ -186,7 +186,7 @@ const ViewSchools = () => {
       
       alert('Photo downloaded successfully!')
     } catch (error) {
-      console.error('Error downloading photo:', error)
+
       alert('Failed to download photo. Please try again.')
     }
   }

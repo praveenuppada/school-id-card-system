@@ -16,14 +16,14 @@ const ProtectedRoute = ({ children, role }) => {
   }
 
   if (!user) {
-    console.log("🔒 No user found, redirecting to login")
+
     return <Navigate to="/login" replace />
   }
 
   if (role) {
     const expectedRole = role === "admin" ? "ROLE_ADMIN" : "ROLE_TEACHER"
     if (user.role !== expectedRole) {
-      console.log("🚫 Role mismatch:", { userRole: user.role, expectedRole, role })
+
       return <Navigate to="/" replace />
     }
   }

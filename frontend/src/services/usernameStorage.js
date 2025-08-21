@@ -20,9 +20,9 @@ class UsernameStorageService {
       }
 
       localStorage.setItem(this.storageKey, JSON.stringify(stored))
-      console.log('✅ Username saved for autocomplete:', username)
+
     } catch (error) {
-      console.error('❌ Error saving username:', error)
+
     }
   }
 
@@ -32,7 +32,7 @@ class UsernameStorageService {
       const stored = localStorage.getItem(this.storageKey)
       return stored ? JSON.parse(stored) : {}
     } catch (error) {
-      console.error('❌ Error reading saved usernames:', error)
+
       return {}
     }
   }
@@ -81,9 +81,9 @@ class UsernameStorageService {
       const key = `${role}_${username}`
       delete stored[key]
       localStorage.setItem(this.storageKey, JSON.stringify(stored))
-      console.log('✅ Username removed:', username)
+
     } catch (error) {
-      console.error('❌ Error removing username:', error)
+
     }
   }
 
@@ -91,9 +91,9 @@ class UsernameStorageService {
   clearAllUsernames() {
     try {
       localStorage.removeItem(this.storageKey)
-      console.log('✅ All saved usernames cleared')
+
     } catch (error) {
-      console.error('❌ Error clearing usernames:', error)
+
     }
   }
 

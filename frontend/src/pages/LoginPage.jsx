@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import { Shield, User, Lock, ArrowLeft, Eye, EyeOff, TestTube, ChevronDown } from "lucide-react"
+import { Shield, User, Lock, ArrowLeft, Eye, EyeOff, ChevronDown } from "lucide-react"
 import usernameStorage from "../services/usernameStorage"
-import apiTest from "../services/apiTest"
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState("")
@@ -12,8 +12,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [showApiTest, setShowApiTest] = useState(false)
-  const [testResults, setTestResults] = useState(null)
+
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [suggestions, setSuggestions] = useState([])
 
@@ -36,13 +35,13 @@ const LoginPage = () => {
     const result = await login(email, password, role)
 
     if (result.success) {
-      console.log("🚀 Login successful, preparing navigation...")
+
       
       // Save username for future autocomplete
       usernameStorage.saveUsername(email, role)
       
       const targetPath = role === "admin" ? "/admin" : "/teacher"
-      console.log("🎯 Target path:", targetPath)
+
       
       // Use React Router navigate
       navigate(targetPath, { replace: true })
@@ -84,19 +83,7 @@ const LoginPage = () => {
     setShowSuggestions(false)
   }
 
-  const handleApiTest = async () => {
-    setLoading(true)
-    setTestResults("Running tests...")
-    
-    try {
-      const results = await apiTest.runAllTests()
-      setTestResults(results)
-    } catch (error) {
-      setTestResults({ error: error.message })
-    }
-    
-    setLoading(false)
-  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
@@ -249,40 +236,7 @@ const LoginPage = () => {
             )}
             </form>
 
-            {/* API Test Section */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-medium text-gray-700">Connection Test</h4>
-                <button
-                  onClick={() => setShowApiTest(!showApiTest)}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
-                  {showApiTest ? "Hide" : "Show"}
-                </button>
-              </div>
-              
-              {showApiTest && (
-                <div className="space-y-4">
-                  <button
-                    onClick={handleApiTest}
-                    disabled={loading}
-                    className="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
-                  >
-                    <TestTube className="h-4 w-4" />
-                    <span>{loading ? "Testing..." : "Test API Connection"}</span>
-                  </button>
-                  
-                  {testResults && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
-                      <h5 className="text-sm font-medium text-gray-900 mb-2">Test Results:</h5>
-                      <pre className="text-xs text-gray-700 whitespace-pre-wrap">
-                        {typeof testResults === 'string' ? testResults : JSON.stringify(testResults, null, 2)}
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+
 
         </div>
       </div>

@@ -28,10 +28,43 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
     const file = e.target.files[0]
     
     if (file && file.type.startsWith("image/")) {
-      // Auto-save immediately without any preview or delay
-      onSave(file, currentStudent || student)
-      // Close modal after a short delay to ensure state updates
-      setTimeout(() => onClose(), 200)
+      // Resize image for faster upload
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+      
+      img.onload = () => {
+        // Resize to max 600x600 for faster upload
+        const maxSize = 600
+        let { width, height } = img
+        
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width
+            width = maxSize
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height
+            height = maxSize
+          }
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        
+        ctx.drawImage(img, 0, 0, width, height)
+        
+        canvas.toBlob((blob) => {
+          const resizedFile = new File([blob], file.name, { type: 'image/jpeg' })
+          // Auto-save immediately without any preview or delay
+          onSave(resizedFile, currentStudent || student)
+          // Close modal after a short delay to ensure state updates
+          setTimeout(() => onClose(), 200)
+        }, 'image/jpeg', 0.5)
+      }
+      
+      img.src = URL.createObjectURL(file)
     } else {
       alert("Please select a valid image file.")
     }
@@ -70,7 +103,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
           setShowCamera(true)
         }
       } catch (error) {
-        console.error("Error accessing camera:", error)
+
         alert("Unable to access camera. Please use file upload instead.")
       }
     }
@@ -82,9 +115,25 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
       
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      context.drawImage(video, 0, 0)
+      // Resize to max 600x600 for faster upload
+      const maxSize = 600
+      let { videoWidth, videoHeight } = video
+      
+      if (videoWidth > videoHeight) {
+        if (videoWidth > maxSize) {
+          videoHeight = (videoHeight * maxSize) / videoWidth
+          videoWidth = maxSize
+        }
+      } else {
+        if (videoHeight > maxSize) {
+          videoWidth = (videoWidth * maxSize) / videoHeight
+          videoHeight = maxSize
+        }
+      }
+      
+      canvas.width = videoWidth
+      canvas.height = videoHeight
+      context.drawImage(video, 0, 0, videoWidth, videoHeight)
       
       // Create file immediately without waiting for blob
       canvas.toBlob((blob) => {
@@ -94,7 +143,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
         onSave(file, currentStudent || student)
         // Close modal after a short delay to ensure state updates
         setTimeout(() => onClose(), 200)
-      }, "image/jpeg", 0.6) // Lower quality for faster processing
+      }, "image/jpeg", 0.5) // Lower quality for faster processing and smaller files
       
       // Stop camera immediately
       const stream = video.srcObject

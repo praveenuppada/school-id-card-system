@@ -29,7 +29,7 @@ const UploadExcel = () => {
         setSelectedSchool(schoolsData[0]._id)
       }
     } catch (error) {
-      console.error("Error fetching schools:", error)
+
       setError("Failed to fetch schools")
     }
   }
@@ -74,7 +74,7 @@ const UploadExcel = () => {
         
         setExcelData(allData)
       } catch (error) {
-        console.error("Error reading Excel file:", error)
+  
         setError("Failed to read Excel file. Please check the file format.")
       }
     }
@@ -107,7 +107,7 @@ const UploadExcel = () => {
       if (fileInput) fileInput.value = ''
       
     } catch (error) {
-      console.error("Upload error:", error)
+
       setError(error.response?.data?.message || "Failed to upload Excel file")
     } finally {
       setUploading(false)

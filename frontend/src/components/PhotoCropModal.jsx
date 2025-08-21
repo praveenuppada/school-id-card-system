@@ -217,8 +217,8 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
     const croppedCanvas = document.createElement('canvas')
     const croppedCtx = croppedCanvas.getContext('2d')
     
-    // Optimize canvas size for faster processing (max 800x800)
-    const maxSize = 800
+    // Optimize canvas size for faster processing (max 600x600)
+    const maxSize = 600
     let finalWidth = cropArea.width
     let finalHeight = cropArea.height
     
@@ -250,7 +250,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
       finalHeight
     )
     
-    return croppedCanvas.toDataURL('image/jpeg', 0.8) // Good quality but faster processing
+    return croppedCanvas.toDataURL('image/jpeg', 0.7) // Faster processing with good quality
   }
 
   const handleSave = async () => {
@@ -297,7 +297,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
         }, 300)
       }
     } catch (error) {
-      console.error('Error saving cropped photo:', error)
+
       if (error.message === 'Upload timeout') {
         alert('Upload took too long. Please try again.')
       } else {
@@ -330,7 +330,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
       
       alert('Photo downloaded successfully!')
     } catch (error) {
-      console.error('Error downloading photo:', error)
+
       alert('Failed to download photo. Please try again.')
     }
   }

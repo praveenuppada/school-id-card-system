@@ -6,10 +6,10 @@ export const isMobile = () => {
 // Mobile-specific navigation
 export const mobileNavigate = (path) => {
   if (isMobile()) {
-    console.log("📱 Mobile navigation to:", path)
+  
     window.location.href = path
   } else {
-    console.log("💻 Desktop navigation to:", path)
+  
     // For desktop, we'll use React Router
     return path
   }
@@ -17,6 +17,6 @@ export const mobileNavigate = (path) => {
 
 // Mobile-specific redirect
 export const mobileRedirect = (path) => {
-  console.log("🔄 Mobile redirect to:", path)
+
   window.location.href = path
 }

@@ -2,10 +2,10 @@ import { useEffect } from 'react'
 
 const MobileRedirect = ({ to, children }) => {
   useEffect(() => {
-    console.log("🔄 MobileRedirect: Redirecting to", to)
+  
     
     // Always use window.location for mobile redirects
-    console.log("📱 Using window.location for redirect")
+  
     window.location.href = to
   }, [to])
 

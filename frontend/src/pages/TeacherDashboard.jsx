@@ -56,7 +56,7 @@ const TeacherDashboard = () => {
       }
       
     } catch (error) {
-      console.error("Error fetching students:", error)
+
       setStudents([])
     }
   }
@@ -79,7 +79,7 @@ const TeacherDashboard = () => {
         setStudents([])
       }
     } catch (error) {
-      console.error("Error fetching students for class:", className, error)
+
       setStudents([])
     }
   }
@@ -94,7 +94,7 @@ const TeacherDashboard = () => {
         localStorage.setItem('teacherSchoolName', response.data.schoolName)
       }
     } catch (error) {
-      console.error("Error fetching teacher profile:", error)
+
     }
   }
 
@@ -184,7 +184,7 @@ const TeacherDashboard = () => {
     }
     
     if (!student || !photoFile) {
-      console.error("No student or photo file provided")
+
       return
     }
 
@@ -264,7 +264,7 @@ const TeacherDashboard = () => {
         setSelectedStudent(null)
       }, 100)
     } catch (error) {
-      console.error("Upload error:", error)
+
       
       let errorMessage = "Error uploading photo"
       if (error.response?.data?.message) {
