@@ -255,10 +255,10 @@ const TeacherDashboard = () => {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1">
+      <div className="flex-1 md:ml-0 ml-0">
         {/* Header */}
         <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:pl-6 pl-16">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">

@@ -1,9 +1,6 @@
 import axios from "axios"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://web-production-6c52b.up.railway.app"
-
-// Configure axios defaults
-axios.defaults.baseURL = API_BASE_URL
+// Use the baseURL already configured in AuthContext
 
 // Add request interceptor to include auth token
 axios.interceptors.request.use(
@@ -22,19 +19,19 @@ axios.interceptors.request.use(
 // Students
 export const getStudents = (className = null) => {
   if (className) {
-    return axios.get(`/api/teacher/students?className=${encodeURIComponent(className)}`)
+    return axios.get(`/teacher/students?className=${encodeURIComponent(className)}`)
   } else {
-    return axios.get("/api/teacher/students")
+    return axios.get("/teacher/students")
   }
 }
-export const getStudentsByClass = (className) => axios.get(`/api/teacher/students/class/${className}`)
-export const getAllStudents = () => axios.get("/api/teacher/students")
-export const getStudentsBySchool = (schoolId) => axios.get(`/api/admin/students/school/${schoolId}`)
-export const getClasses = () => axios.get("/api/teacher/classes")
+export const getStudentsByClass = (className) => axios.get(`/teacher/students/class/${className}`)
+export const getAllStudents = () => axios.get("/teacher/students")
+export const getStudentsBySchool = (schoolId) => axios.get(`/admin/students/school/${schoolId}`)
+export const getClasses = () => axios.get("/teacher/classes")
 
 // Photo Upload
 export const uploadPhoto = (formData) => {
-  return axios.post("/api/teacher/upload-photo", formData, {
+  return axios.post("/teacher/upload-photo", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -43,11 +40,11 @@ export const uploadPhoto = (formData) => {
 }
 
 // Photo Management
-export const deletePhoto = (studentId) => axios.delete(`/api/teacher/photos/${studentId}`)
-export const updatePhoto = (studentId, photoData) => axios.put(`/api/teacher/photos/${studentId}`, photoData)
+export const deletePhoto = (studentId) => axios.delete(`/teacher/photos/${studentId}`)
+export const updatePhoto = (studentId, photoData) => axios.put(`/teacher/photos/${studentId}`, photoData)
 
 // School Info
-export const getSchoolInfo = () => axios.get("/api/teacher/school-info")
+export const getSchoolInfo = () => axios.get("/teacher/school-info")
 
 // Stats
-export const getTeacherStats = () => axios.get("/api/teacher/stats")
+export const getTeacherStats = () => axios.get("/teacher/stats")
