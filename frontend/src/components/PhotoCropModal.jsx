@@ -74,12 +74,21 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
     ctx.strokeRect(cropArea.x, cropArea.y, cropArea.width, cropArea.height)
     
     // Draw resize handles
-    const handleSize = 8
+    const handleSize = 16  // Larger handles for better touch interaction
     ctx.fillStyle = '#fff'
-    ctx.fillRect(cropArea.x - handleSize/2, cropArea.y - handleSize/2, handleSize, handleSize)
-    ctx.fillRect(cropArea.x + cropArea.width - handleSize/2, cropArea.y - handleSize/2, handleSize, handleSize)
-    ctx.fillRect(cropArea.x - handleSize/2, cropArea.y + cropArea.height - handleSize/2, handleSize, handleSize)
-    ctx.fillRect(cropArea.x + cropArea.width - handleSize/2, cropArea.y + cropArea.height - handleSize/2, handleSize, handleSize)
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 1
+    
+    // Draw handles with border for better visibility
+    const drawHandle = (x, y) => {
+      ctx.fillRect(x - handleSize/2, y - handleSize/2, handleSize, handleSize)
+      ctx.strokeRect(x - handleSize/2, y - handleSize/2, handleSize, handleSize)
+    }
+    
+    drawHandle(cropArea.x, cropArea.y)  // top-left
+    drawHandle(cropArea.x + cropArea.width, cropArea.y)  // top-right
+    drawHandle(cropArea.x, cropArea.y + cropArea.height)  // bottom-left
+    drawHandle(cropArea.x + cropArea.width, cropArea.y + cropArea.height)  // bottom-right
   }
 
   useEffect(() => {
@@ -88,13 +97,22 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
     }
   }, [image, cropArea])
 
-  const handleMouseDown = (e) => {
+  const getCanvasCoordinates = (clientX, clientY) => {
     const rect = canvasRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const scaleX = 400 / rect.width  // Canvas actual width / display width
+    const scaleY = 400 / rect.height // Canvas actual height / display height
     
-    // Check if clicking on resize handles
-    const handleSize = 8
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    }
+  }
+
+  const handleMouseDown = (e) => {
+    const { x, y } = getCanvasCoordinates(e.clientX, e.clientY)
+    
+    // Check if clicking on resize handles - make them larger for touch
+    const handleSize = 16  // Increased from 8 for better touch interaction
     const handles = [
       { x: cropArea.x - handleSize/2, y: cropArea.y - handleSize/2, corner: 'top-left' },
       { x: cropArea.x + cropArea.width - handleSize/2, y: cropArea.y - handleSize/2, corner: 'top-right' },
@@ -120,15 +138,13 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
   const handleMouseMove = (e) => {
     if (!isDragging && !isResizing) return
     
-    const rect = canvasRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const { x, y } = getCanvasCoordinates(e.clientX, e.clientY)
     
     if (isDragging) {
       setCropArea(prev => ({
         ...prev,
-        x: Math.max(0, Math.min(rect.width - prev.width, x - dragStart.x)),
-        y: Math.max(0, Math.min(rect.height - prev.height, y - dragStart.y))
+        x: Math.max(0, Math.min(400 - prev.width, x - dragStart.x)),
+        y: Math.max(0, Math.min(400 - prev.height, y - dragStart.y))
       }))
     } else if (isResizing) {
       setCropArea(prev => {
@@ -138,22 +154,22 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
           case 'top-left':
             newArea.width = Math.max(50, prev.x + prev.width - x)
             newArea.height = Math.max(50, prev.y + prev.height - y)
-            newArea.x = x
-            newArea.y = y
+            newArea.x = Math.max(0, x)
+            newArea.y = Math.max(0, y)
             break
           case 'top-right':
-            newArea.width = Math.max(50, x - prev.x)
+            newArea.width = Math.max(50, Math.min(400 - prev.x, x - prev.x))
             newArea.height = Math.max(50, prev.y + prev.height - y)
-            newArea.y = y
+            newArea.y = Math.max(0, y)
             break
           case 'bottom-left':
             newArea.width = Math.max(50, prev.x + prev.width - x)
-            newArea.height = Math.max(50, y - prev.y)
-            newArea.x = x
+            newArea.height = Math.max(50, Math.min(400 - prev.y, y - prev.y))
+            newArea.x = Math.max(0, x)
             break
           case 'bottom-right':
-            newArea.width = Math.max(50, x - prev.x)
-            newArea.height = Math.max(50, y - prev.y)
+            newArea.width = Math.max(50, Math.min(400 - prev.x, x - prev.x))
+            newArea.height = Math.max(50, Math.min(400 - prev.y, y - prev.y))
             break
         }
         
@@ -172,22 +188,16 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
     e.preventDefault()
     e.stopPropagation()
     const touch = e.touches[0]
-    const mouseEvent = new MouseEvent('mousedown', {
-      clientX: touch.clientX,
-      clientY: touch.clientY
-    })
-    handleMouseDown(mouseEvent)
+    handleMouseDown({ clientX: touch.clientX, clientY: touch.clientY })
   }
 
   const handleTouchMove = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    const touch = e.touches[0]
-    const mouseEvent = new MouseEvent('mousemove', {
-      clientX: touch.clientX,
-      clientY: touch.clientY
-    })
-    handleMouseMove(mouseEvent)
+    if (e.touches.length > 0) {
+      const touch = e.touches[0]
+      handleMouseMove({ clientX: touch.clientX, clientY: touch.clientY })
+    }
   }
 
   const handleTouchEnd = (e) => {
@@ -392,11 +402,11 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
         <div className="mt-4 text-sm text-gray-600">
           <p><strong>Instructions:</strong></p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Drag the white border to move the crop area</li>
-            <li>Drag the white corners to resize the crop area</li>
-            <li>Touch and drag on mobile devices</li>
-            <li>Click "Save Crop" to apply changes</li>
-            <li>Click "Download" to download the original photo</li>
+            <li><strong>Move crop area:</strong> Touch/drag inside the white border</li>
+            <li><strong>Resize crop area:</strong> Touch/drag the white corner squares</li>
+            <li><strong>On mobile:</strong> Use your finger to touch and drag</li>
+            <li><strong>Save:</strong> Click "Save Crop" to apply changes</li>
+            <li><strong>Download:</strong> Click "Download" to get the original photo</li>
           </ul>
         </div>
       </div>
