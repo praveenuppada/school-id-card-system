@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import { Shield, User, Lock, ArrowLeft, Eye, EyeOff, Fingerprint, Smartphone } from "lucide-react"
+import { Shield, User, Lock, ArrowLeft, Eye, EyeOff, Fingerprint, Smartphone, TestTube } from "lucide-react"
 import biometricAuth from "../services/biometricAuth"
+import apiTest from "../services/apiTest"
 
 const LoginPage = () => {
   const [email, setEmail] = useState("")
@@ -14,6 +15,8 @@ const LoginPage = () => {
   const [biometricAvailable, setBiometricAvailable] = useState(false)
   const [hasStoredCredentials, setHasStoredCredentials] = useState(false)
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false)
+  const [showApiTest, setShowApiTest] = useState(false)
+  const [testResults, setTestResults] = useState(null)
 
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -93,6 +96,20 @@ const LoginPage = () => {
 
   const handleSkipBiometric = () => {
     setShowBiometricPrompt(false)
+  }
+
+  const handleApiTest = async () => {
+    setLoading(true)
+    setTestResults("Running tests...")
+    
+    try {
+      const results = await apiTest.runAllTests()
+      setTestResults(results)
+    } catch (error) {
+      setTestResults({ error: error.message })
+    }
+    
+    setLoading(false)
   }
 
   return (
@@ -244,9 +261,43 @@ const LoginPage = () => {
                   </span>
                 </div>
               </div>
-            )}
-          </form>
+                        )}
+            </form>
 
+            {/* API Test Section */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-sm font-medium text-gray-700">Connection Test</h4>
+                <button
+                  onClick={() => setShowApiTest(!showApiTest)}
+                  className="text-sm text-blue-600 hover:text-blue-700"
+                >
+                  {showApiTest ? "Hide" : "Show"}
+                </button>
+              </div>
+              
+              {showApiTest && (
+                <div className="space-y-4">
+                  <button
+                    onClick={handleApiTest}
+                    disabled={loading}
+                    className="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
+                  >
+                    <TestTube className="h-4 w-4" />
+                    <span>{loading ? "Testing..." : "Test API Connection"}</span>
+                  </button>
+                  
+                  {testResults && (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
+                      <h5 className="text-sm font-medium text-gray-900 mb-2">Test Results:</h5>
+                      <pre className="text-xs text-gray-700 whitespace-pre-wrap">
+                        {typeof testResults === 'string' ? testResults : JSON.stringify(testResults, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
         </div>
       </div>
