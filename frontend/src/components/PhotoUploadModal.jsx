@@ -15,9 +15,9 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       setCapturedImage(null)
       setShowCamera(false)
       
-      // Auto-start camera if mode is "retake"
+      // Auto-start camera if mode is "retake" - no delay
       if (mode === "retake") {
-        setTimeout(() => startCamera(), 100)
+        startCamera()
       }
     }
   }, [student, mode])
