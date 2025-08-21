@@ -123,7 +123,7 @@ const WelcomePage = () => {
               />
             </div>
             <div className="text-center md:text-right">
-              <p className="text-gray-400">© 2024 Harsha ID Solutions. All rights reserved.</p>
+              <p className="text-gray-400">© Harsha ID Solutions. All rights reserved.</p>
               <p className="text-gray-400">Serving Srikakulam, Vizianagaram & Visakhapatnam</p>
             </div>
           </div>

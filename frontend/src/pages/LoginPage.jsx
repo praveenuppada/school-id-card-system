@@ -22,6 +22,7 @@ const LoginPage = () => {
     const result = await login(email, password, role)
 
     if (result.success) {
+      console.log("🚀 Navigating to:", role === "admin" ? "/admin" : "/teacher")
       navigate(role === "admin" ? "/admin" : "/teacher")
     } else {
       setError(result.error)

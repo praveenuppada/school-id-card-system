@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { HashRouter as Router, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./contexts/AuthContext.jsx"
 import WelcomePage from "./pages/WelcomePage.jsx"
 import LoginPage from "./pages/LoginPage.jsx"
@@ -10,6 +10,19 @@ import ViewSchools from "./pages/ViewSchools.jsx"
 import TeacherInstructions from "./pages/TeacherInstructions.jsx"
 import TeacherContact from "./pages/TeacherContact.jsx"
 import ProtectedRoute from "./components/ProtectedRoute.jsx"
+
+// 404 Page component
+const NotFound = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+      <p className="text-gray-600 mb-8">Page not found</p>
+      <a href="/" className="text-blue-600 hover:text-blue-700">
+        Go back home
+      </a>
+    </div>
+  </div>
+)
 
 function App() {
   return (
@@ -77,6 +90,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            {/* Catch-all route for 404 */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </Router>
