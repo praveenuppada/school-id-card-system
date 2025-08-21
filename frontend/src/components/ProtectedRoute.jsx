@@ -4,9 +4,6 @@ import { useAuth } from "../contexts/AuthContext"
 const ProtectedRoute = ({ children, role }) => {
   const { user, loading } = useAuth()
 
-  // Detect mobile browser
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -20,11 +17,6 @@ const ProtectedRoute = ({ children, role }) => {
 
   if (!user) {
     console.log("🔒 No user found, redirecting to login")
-    if (isMobile) {
-      // For mobile, use window.location
-      window.location.href = "/login"
-      return <div>Redirecting to login...</div>
-    }
     return <Navigate to="/login" replace />
   }
 
@@ -32,11 +24,6 @@ const ProtectedRoute = ({ children, role }) => {
     const expectedRole = role === "admin" ? "ROLE_ADMIN" : "ROLE_TEACHER"
     if (user.role !== expectedRole) {
       console.log("🚫 Role mismatch:", { userRole: user.role, expectedRole, role })
-      if (isMobile) {
-        // For mobile, use window.location
-        window.location.href = "/"
-        return <div>Redirecting to home...</div>
-      }
       return <Navigate to="/" replace />
     }
   }

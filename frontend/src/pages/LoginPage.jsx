@@ -2,7 +2,6 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { Shield, User, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react"
-import { isMobile, mobileRedirect } from "../utils/mobileDetection"
 
 const LoginPage = () => {
   const [email, setEmail] = useState("")
@@ -28,15 +27,8 @@ const LoginPage = () => {
       const targetPath = role === "admin" ? "/admin" : "/teacher"
       console.log("🎯 Target path:", targetPath)
       
-      if (isMobile()) {
-        // For mobile browsers, use direct window.location immediately
-        console.log("📱 Using mobile redirect")
-        mobileRedirect(targetPath)
-      } else {
-        // For desktop, use React Router
-        console.log("💻 Using React Router for desktop")
-        navigate(targetPath, { replace: true })
-      }
+      // Use React Router navigate
+      navigate(targetPath, { replace: true })
     } else {
       setError(result.error)
     }
