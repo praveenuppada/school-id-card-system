@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const validateToken = async () => {
     try {
-      const response = await axios.get("/api/auth/me")
+      const response = await axios.get("/auth/me")
       if (response.data.success) {
         setUser(response.data.user)
       } else {
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log("🔐 Attempting login with:", { username, role, baseURL: axios.defaults.baseURL })
       
-      const response = await axios.post("/api/auth/login", {
+      const response = await axios.post("/auth/login", {
         username,
         password,
         role: role === "admin" ? "ROLE_ADMIN" : "ROLE_TEACHER",
