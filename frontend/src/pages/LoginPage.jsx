@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { Shield, User, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { isMobile, mobileRedirect } from "../utils/mobileDetection"
 
 const LoginPage = () => {
   const [email, setEmail] = useState("")
@@ -22,27 +23,19 @@ const LoginPage = () => {
     const result = await login(email, password, role)
 
     if (result.success) {
-      console.log("🚀 Navigating to:", role === "admin" ? "/admin" : "/teacher")
+      console.log("🚀 Login successful, preparing navigation...")
       
-      // Use a more robust navigation approach for mobile compatibility
       const targetPath = role === "admin" ? "/admin" : "/teacher"
+      console.log("🎯 Target path:", targetPath)
       
-      // Try multiple navigation methods for better mobile compatibility
-      try {
-        // Method 1: Standard React Router navigation
+      if (isMobile()) {
+        // For mobile browsers, use direct window.location immediately
+        console.log("📱 Using mobile redirect")
+        mobileRedirect(targetPath)
+      } else {
+        // For desktop, use React Router
+        console.log("💻 Using React Router for desktop")
         navigate(targetPath, { replace: true })
-        
-        // Method 2: Fallback using window.location for mobile browsers
-        setTimeout(() => {
-          if (window.location.pathname !== targetPath) {
-            console.log("🔄 Fallback navigation using window.location")
-            window.location.href = targetPath
-          }
-        }, 1000)
-      } catch (error) {
-        console.error("Navigation error:", error)
-        // Method 3: Direct window.location as last resort
-        window.location.href = targetPath
       }
     } else {
       setError(result.error)

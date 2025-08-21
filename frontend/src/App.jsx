@@ -1,3 +1,4 @@
+import React from "react"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./contexts/AuthContext.jsx"
 import WelcomePage from "./pages/WelcomePage.jsx"
@@ -11,6 +12,7 @@ import TeacherInstructions from "./pages/TeacherInstructions.jsx"
 import TeacherContact from "./pages/TeacherContact.jsx"
 import ProtectedRoute from "./components/ProtectedRoute.jsx"
 import ErrorBoundary from "./components/ErrorBoundary.jsx"
+import { isMobile } from "./utils/mobileDetection"
 
 // 404 Page component
 const NotFound = () => (
@@ -26,6 +28,73 @@ const NotFound = () => (
 )
 
 function App() {
+  // Mobile-specific route handling
+  React.useEffect(() => {
+    console.log("🔍 App component mounted")
+    console.log("📱 Mobile detection result:", isMobile())
+    console.log("🌐 Current pathname:", window.location.pathname)
+    console.log("🌐 Current href:", window.location.href)
+    
+    if (isMobile()) {
+      console.log("📱 Mobile device detected")
+      console.log("🌐 Current pathname:", window.location.pathname)
+      
+      // Handle mobile routing for protected routes
+      const path = window.location.pathname
+      if (path === "/admin" || path.startsWith("/admin/")) {
+        console.log("📱 Mobile admin route detected")
+        // Check if user is authenticated
+        const token = localStorage.getItem("token")
+        const user = localStorage.getItem("user")
+        
+        if (!token || !user) {
+          console.log("📱 No auth found, redirecting to login")
+          window.location.href = "/login"
+          return
+        }
+        
+        try {
+          const userData = JSON.parse(user)
+          if (userData.role !== "ROLE_ADMIN") {
+            console.log("📱 Not admin, redirecting to home")
+            window.location.href = "/"
+            return
+          }
+        } catch (error) {
+          console.log("📱 Error parsing user data, redirecting to login")
+          window.location.href = "/login"
+          return
+        }
+      }
+      
+      if (path === "/teacher" || path.startsWith("/teacher/")) {
+        console.log("📱 Mobile teacher route detected")
+        // Check if user is authenticated
+        const token = localStorage.getItem("token")
+        const user = localStorage.getItem("user")
+        
+        if (!token || !user) {
+          console.log("📱 No auth found, redirecting to login")
+          window.location.href = "/login"
+          return
+        }
+        
+        try {
+          const userData = JSON.parse(user)
+          if (userData.role !== "ROLE_TEACHER") {
+            console.log("📱 Not teacher, redirecting to home")
+            window.location.href = "/"
+            return
+          }
+        } catch (error) {
+          console.log("📱 Error parsing user data, redirecting to login")
+          window.location.href = "/login"
+          return
+        }
+      }
+    }
+  }, [])
+
   return (
     <ErrorBoundary>
       <AuthProvider>
