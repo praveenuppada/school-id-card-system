@@ -39,12 +39,8 @@ const WelcomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:pl-6 pl-16">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              {/* H Logo */}
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">H</span>
-              </div>
               <div>
-                <h1 className="text-sm sm:text-lg font-bold text-blue-600">Harsha ID Solutions</h1>
+                <h1 className="text-sm sm:text-lg font-bold text-blue-600">HARSHA ID SOLUTIONS</h1>
                 <p className="text-xs text-gray-500">A Complete ID World...</p>
               </div>
             </div>
@@ -192,11 +188,8 @@ const WelcomePage = () => {
           <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 md:hidden">
             <div className="p-6 pt-16">
               <div className="flex items-center space-x-3 mb-8">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold">H</span>
-                </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">Harsha ID Solutions</h2>
+                  <h2 className="text-lg font-bold text-gray-900">HARSHA ID SOLUTIONS</h2>
                   <p className="text-xs text-gray-500">A Complete ID World...</p>
                 </div>
               </div>

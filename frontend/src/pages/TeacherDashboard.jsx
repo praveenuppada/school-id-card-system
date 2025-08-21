@@ -190,6 +190,23 @@ const TeacherDashboard = () => {
     setUploading(true)
     setMessage("Uploading photo...")
 
+    // Immediately update the student to show loading state
+    setStudents(prevStudents => 
+      prevStudents.map(s => 
+        s._id === student._id 
+          ? { ...s, photoUploading: true }
+          : s
+      )
+    )
+    
+    setFilteredStudents(prevFiltered => 
+      prevFiltered.map(s => 
+        s._id === student._id 
+          ? { ...s, photoUploading: true }
+          : s
+      )
+    )
+
     const formData = new FormData()
     formData.append("photo", photoFile)
     formData.append("studentId", student._id)
@@ -206,7 +223,7 @@ const TeacherDashboard = () => {
         setStudents(prevStudents => 
           prevStudents.map(s => 
             s._id === student._id 
-              ? { ...s, photoUrl: photoUrl, photoUploaded: true, updatedAt: new Date() }
+              ? { ...s, photoUrl: photoUrl, photoUploaded: true, photoUploading: false, updatedAt: new Date() }
               : s
           )
         )
@@ -215,7 +232,7 @@ const TeacherDashboard = () => {
         setFilteredStudents(prevFiltered => 
           prevFiltered.map(s => 
             s._id === student._id 
-              ? { ...s, photoUrl: photoUrl, photoUploaded: true, updatedAt: new Date() }
+              ? { ...s, photoUrl: photoUrl, photoUploaded: true, photoUploading: false, updatedAt: new Date() }
               : s
           )
         )
@@ -227,6 +244,23 @@ const TeacherDashboard = () => {
     } catch (error) {
       console.error("Upload error:", error)
       setMessage(error.response?.data?.message || "Error uploading photo")
+      
+      // Remove loading state on error
+      setStudents(prevStudents => 
+        prevStudents.map(s => 
+          s._id === student._id 
+            ? { ...s, photoUploading: false }
+            : s
+        )
+      )
+      
+      setFilteredStudents(prevFiltered => 
+        prevFiltered.map(s => 
+          s._id === student._id 
+            ? { ...s, photoUploading: false }
+            : s
+        )
+      )
     } finally {
       setUploading(false)
     }
@@ -384,7 +418,16 @@ const TeacherDashboard = () => {
 
                         
                         {/* Photo display */}
-                        {student.photoUrl ? (
+                        {student.photoUploading ? (
+                          <div className="relative">
+                            <div className="w-8 h-8 sm:w-16 sm:h-16 rounded border-2 border-blue-500 bg-gray-100 flex items-center justify-center">
+                              <div className="animate-spin rounded-full h-4 w-4 sm:h-6 sm:w-6 border-b-2 border-blue-600"></div>
+                            </div>
+                            <div className="text-xs text-blue-600 mt-1 hidden sm:block">
+                              Uploading...
+                            </div>
+                          </div>
+                        ) : student.photoUrl ? (
                           <div className="relative">
                             <div 
                               className="w-8 h-8 sm:w-16 sm:h-16 rounded border-2 border-green-500 bg-cover bg-center"
@@ -403,12 +446,19 @@ const TeacherDashboard = () => {
                           </div>
                         )}
                         <div className="flex flex-col sm:flex-row gap-1">
-                          {!student.photoUrl ? (
+                          {!student.photoUrl && !student.photoUploading ? (
                             <button 
                               onClick={() => handleAddPhoto(student)}
                               className="bg-green-500 text-white px-1 sm:px-3 py-1 rounded text-xs hover:bg-green-600"
                             >
                               Add
+                            </button>
+                          ) : student.photoUploading ? (
+                            <button 
+                              disabled
+                              className="bg-gray-400 text-white px-1 sm:px-3 py-1 rounded text-xs cursor-not-allowed"
+                            >
+                              Uploading...
                             </button>
                           ) : (
                             <button 

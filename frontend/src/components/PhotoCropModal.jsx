@@ -290,11 +290,11 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
         setSaved(true)
         onPhotoUpdated && onPhotoUpdated(result.data.photoUrl)
         
-        // Show success message and close after 1 second (faster)
+        // Show success message and close after 500ms (faster)
         setTimeout(() => {
           onClose()
           setSaved(false)
-        }, 1000)
+        }, 500)
       }
     } catch (error) {
       console.error('Error saving cropped photo:', error)

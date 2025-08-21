@@ -35,7 +35,7 @@ export const uploadPhoto = (formData) => {
     headers: {
       "Content-Type": "multipart/form-data",
     },
-    timeout: 180000, // 3 minutes
+    timeout: 10000, // 10 seconds for faster uploads
   })
 }
 

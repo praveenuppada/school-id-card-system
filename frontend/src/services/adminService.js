@@ -39,7 +39,7 @@ export const cropPhoto = (formData, onProgress) => {
     headers: {
       'Content-Type': 'multipart/form-data'
     },
-    timeout: 30000, // 30 second timeout
+    timeout: 10000, // 10 second timeout for faster processing
     onUploadProgress: (progressEvent) => {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
       console.log('Upload progress:', percentCompleted + '%')
