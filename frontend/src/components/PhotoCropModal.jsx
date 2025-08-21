@@ -250,7 +250,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
       finalHeight
     )
     
-    return croppedCanvas.toDataURL('image/jpeg', 0.95) // High quality but slightly compressed for speed
+    return croppedCanvas.toDataURL('image/jpeg', 0.8) // Good quality but faster processing
   }
 
   const handleSave = async () => {
@@ -290,11 +290,11 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
         setSaved(true)
         onPhotoUpdated && onPhotoUpdated(result.data.photoUrl)
         
-        // Show success message and close after 500ms (faster)
+        // Show success message and close after 300ms (instant feedback)
         setTimeout(() => {
           onClose()
           setSaved(false)
-        }, 500)
+        }, 300)
       }
     } catch (error) {
       console.error('Error saving cropped photo:', error)

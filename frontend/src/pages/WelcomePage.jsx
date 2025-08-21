@@ -189,7 +189,7 @@ const WelcomePage = () => {
             <div className="p-6 pt-16">
               <div className="flex items-center space-x-3 mb-8">
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">HARSHA ID SOLUTIONS</h2>
+                  <h2 className="text-sm font-bold text-gray-900">HARSHA ID SOLUTIONS</h2>
                   <p className="text-xs text-gray-500">A Complete ID World...</p>
                 </div>
               </div>

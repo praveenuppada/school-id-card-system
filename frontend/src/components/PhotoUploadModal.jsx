@@ -31,7 +31,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       // Auto-save immediately without any preview or delay
       onSave(file, currentStudent || student)
       // Close modal immediately after saving
-      setTimeout(() => onClose(), 100)
+      setTimeout(() => onClose(), 50)
     } else {
       alert("Please select a valid image file.")
     }
@@ -93,8 +93,8 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
         // Auto-save immediately without any preview or delay
         onSave(file, currentStudent || student)
         // Close modal immediately after saving
-        setTimeout(() => onClose(), 100)
-      }, "image/jpeg", 0.8) // Slightly lower quality for faster processing
+        setTimeout(() => onClose(), 50)
+      }, "image/jpeg", 0.6) // Lower quality for faster processing
       
       // Stop camera immediately
       const stream = video.srcObject
