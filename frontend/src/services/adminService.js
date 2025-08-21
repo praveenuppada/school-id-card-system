@@ -58,7 +58,19 @@ export const deleteExcelData = (schoolId) => axios.delete(`/admin/delete-excel/$
 export const deletePhotos = (schoolId) => axios.delete(`/admin/delete-photos/${schoolId}`)
 
 // Delete single photo for a student
-export const deleteSinglePhoto = (studentId, photoId) => axios.delete(`/admin/delete-photo/${studentId}/${photoId}`)
+export const deleteSinglePhoto = async (studentId, photoId) => {
+  try {
+    // Try the primary endpoint first
+    return await axios.delete(`/admin/delete-photo/${studentId}/${photoId}`)
+  } catch (error) {
+    // If the primary endpoint fails, try the alternative endpoint
+    if (error.response?.status === 404) {
+      console.log('Primary endpoint failed, trying alternative endpoint')
+      return await axios.delete(`/admin/delete-photo-by-id/${photoId}`)
+    }
+    throw error
+  }
+}
 
 // Upload Excel file
 export const uploadExcel = (formData) => {

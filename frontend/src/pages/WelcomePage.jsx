@@ -234,21 +234,21 @@ const WelcomePage = () => {
             
             <div className="text-gray-700 space-y-4 text-sm leading-relaxed">
               <p>
-                Our services begins in 2015, We have been leading ID manufacturers in the three Uttharandhra Districts .i.e., Srikakulam, vizianagaram and Visakhapatnam. We have successfully completed so many projects related to state government and central government including private sectors. We started our bussiness with STUDENT ID CARDS, TIES and BELTS. Within short time, Harsha ID Solutions developed the bussiness to small scale industry.
+                Our services begins in 2015, We have been leading ID manufacturers in the three Uttarandhra Districts i.e.,Srikakulam, Vizianagaram and Visakhapatnam. We have successfully completed so many projects related to state government and central government including private sectors. We started our bussiness with STUDENT ID CARDS, TIES and BELTS. Within short period of time, Harsha ID Solutions developed the bussiness to small scale industry.
               </p>
               
               <p>
-                We have been in the bussiness of ID CARDS, TIES, MULTI COLOUR BELTS, REPORT CARDS, DAIRIES, T-SHIRT PRINTING, MUG PRINTING, KEY CHAINS, LOGO BADGES and SCREEN PRINTING for the past 10+ Years catering various sectors i.e., Corporate, Industrial, Banks, Educational Institutions etc. taking on the challenges and fulfilling the customer expectations. The company has been providing solutions on technology, machinery, Raw materials to ID sellers across the state.
+                We have been in the bussiness of ID CARDS, TIES, MULTI COLOUR BELTS, REPORT CARDS, DAIRIES, T-SHIRT PRINTING, LOGO BADGES and SCREEN PRINTING for the past 10+ Years catering various sectors i.e., Corporate, Industrial, Banks, Educational Institutions etc. Taking on the challenges and fulfilling the customer expectations. The company has been providing solutions on technology, machinery, Raw materials to ID sellers across the state.
               </p>
               
               <div>
-                <p className="font-semibold mb-2">Our Strength:</p>
+                <p className="font-semibold mb-2">OUR STRENGTH:</p>
                 <p>Maintaining good quality, providing latest models with in-time delivery, Committed and skilled manpower, fully automated advanced machinery, assured raw material support, resulting in excelling customer expectations.</p>
               </div>
               
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="font-semibold text-blue-800">SINGLE LINE ABOUT HARSHA ID SOLUTIONS:</p>
-                <p className="text-blue-700">I STARTED HARSHA ID SOLUTIONS WITH ZERO INVESTMENT. NOW, OUR TURNOVER IS ABOUT 50LAKHS PER ANNUM.</p>
+                <p className="font-semibold text-blue-800">SINGLE LINE ABOUT HARSHA ID SOLUTIONS :</p>
+                <p className="text-blue-700">HARSHA ID SOLUTIONS MOTO IS PROVIDING TRUSTED SERVICES TO OUR CUSTOMERS.</p>
               </div>
               
               <div className="text-center font-bold text-lg text-green-600">

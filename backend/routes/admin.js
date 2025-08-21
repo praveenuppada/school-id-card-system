@@ -809,6 +809,202 @@ router.post('/notifications/:notificationId/read', async (req, res) => {
   }
 });
 
+// Delete single photo for a student
+router.delete('/delete-photo/:studentId/:photoId', async (req, res) => {
+  try {
+    const { studentId, photoId } = req.params;
+    
+    console.log('Delete photo request:', { studentId, photoId });
+    
+    // Find the student
+    const student = await Student.findById(studentId);
+    if (!student) {
+      console.log('Student not found:', studentId);
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found'
+      });
+    }
+
+
+
+    console.log('Student found:', { 
+      id: student._id, 
+      photoId: student.photoId, 
+      photoUrl: student.photoUrl,
+      photoUploaded: student.photoUploaded 
+    });
+
+    // Check if student has a photo
+    if (!student.photoUrl) {
+      console.log('No photo URL found for student');
+      return res.status(404).json({
+        success: false,
+        message: 'No photo found for this student'
+      });
+    }
+
+    // Delete from Cloudinary
+    try {
+      // Extract public ID from Cloudinary URL
+      let publicId = '';
+      
+      if (student.photoUrl.includes('cloudinary.com')) {
+        // Extract public ID from Cloudinary URL
+        const urlParts = student.photoUrl.split('/');
+        const filename = urlParts[urlParts.length - 1];
+        publicId = filename.split('.')[0];
+        
+        // If the URL contains a folder structure, include it
+        if (urlParts.length > 7) {
+          const folderIndex = urlParts.indexOf('upload') + 1;
+          const folder = urlParts[folderIndex];
+          if (folder && !folder.includes('.')) {
+            publicId = `${folder}/${publicId}`;
+          }
+        }
+      } else {
+        // For non-Cloudinary URLs, use photoId as fallback
+        publicId = student.photoId;
+      }
+      
+      console.log('Attempting to delete from Cloudinary:', { 
+        publicId, 
+        photoUrl: student.photoUrl,
+        photoId: student.photoId 
+      });
+      
+      if (publicId) {
+        const cloudinaryResult = await cloudinary.uploader.destroy(publicId);
+        console.log('Cloudinary delete result:', cloudinaryResult);
+      } else {
+        console.log('No public ID found, skipping Cloudinary deletion');
+      }
+    } catch (cloudinaryError) {
+      console.error('Cloudinary delete error:', cloudinaryError);
+      // Continue even if Cloudinary deletion fails
+    }
+
+    // Clear photo URL in database
+    student.photoUrl = null;
+    student.photoUploaded = false;
+    await student.save();
+
+    console.log('Photo deleted successfully from database');
+
+    res.json({
+      success: true,
+      message: 'Photo deleted successfully',
+      studentId,
+      photoId
+    });
+
+  } catch (error) {
+    console.error('Delete single photo error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete photo: ' + error.message
+    });
+  }
+});
+
+// Delete single photo by photoId (alternative endpoint)
+router.delete('/delete-photo-by-id/:photoId', async (req, res) => {
+  try {
+    const { photoId } = req.params;
+    
+    console.log('Delete photo by photoId request:', { photoId });
+    
+    // Find the student by photoId
+    const student = await Student.findOne({ photoId: photoId });
+    if (!student) {
+      console.log('Student not found by photoId:', photoId);
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found'
+      });
+    }
+
+    console.log('Student found by photoId:', { 
+      id: student._id, 
+      photoId: student.photoId, 
+      photoUrl: student.photoUrl,
+      photoUploaded: student.photoUploaded 
+    });
+
+    // Check if student has a photo
+    if (!student.photoUrl) {
+      console.log('No photo URL found for student');
+      return res.status(404).json({
+        success: false,
+        message: 'No photo found for this student'
+      });
+    }
+
+    // Delete from Cloudinary
+    try {
+      // Extract public ID from Cloudinary URL
+      let publicId = '';
+      
+      if (student.photoUrl.includes('cloudinary.com')) {
+        // Extract public ID from Cloudinary URL
+        const urlParts = student.photoUrl.split('/');
+        const filename = urlParts[urlParts.length - 1];
+        publicId = filename.split('.')[0];
+        
+        // If the URL contains a folder structure, include it
+        if (urlParts.length > 7) {
+          const folderIndex = urlParts.indexOf('upload') + 1;
+          const folder = urlParts[folderIndex];
+          if (folder && !folder.includes('.')) {
+            publicId = `${folder}/${publicId}`;
+          }
+        }
+      } else {
+        // For non-Cloudinary URLs, use photoId as fallback
+        publicId = student.photoId;
+      }
+      
+      console.log('Attempting to delete from Cloudinary:', { 
+        publicId, 
+        photoUrl: student.photoUrl,
+        photoId: student.photoId 
+      });
+      
+      if (publicId) {
+        const cloudinaryResult = await cloudinary.uploader.destroy(publicId);
+        console.log('Cloudinary delete result:', cloudinaryResult);
+      } else {
+        console.log('No public ID found, skipping Cloudinary deletion');
+      }
+    } catch (cloudinaryError) {
+      console.error('Cloudinary delete error:', cloudinaryError);
+      // Continue even if Cloudinary deletion fails
+    }
+
+    // Clear photo URL in database
+    student.photoUrl = null;
+    student.photoUploaded = false;
+    await student.save();
+
+    console.log('Photo deleted successfully from database');
+
+    res.json({
+      success: true,
+      message: 'Photo deleted successfully',
+      studentId: student._id,
+      photoId
+    });
+
+  } catch (error) {
+    console.error('Delete single photo by photoId error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete photo: ' + error.message
+    });
+  }
+});
+
 // Delete all photos for a school
 router.delete('/delete-photos/:schoolId', async (req, res) => {
   try {

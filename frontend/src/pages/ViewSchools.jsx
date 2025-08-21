@@ -234,7 +234,16 @@ const ViewSchools = () => {
       
       alert('Photo deleted successfully!')
     } catch (error) {
-      alert('Failed to delete photo. Please try again.')
+      let errorMessage = 'Failed to delete photo. Please try again.'
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Photo not found or already deleted.'
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to delete this photo.'
+      }
+      
+      alert(errorMessage)
     }
   }
 
