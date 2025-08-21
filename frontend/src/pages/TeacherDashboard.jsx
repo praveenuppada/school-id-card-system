@@ -222,10 +222,17 @@ const TeacherDashboard = () => {
       // Get the photo URL from the response
       const photoUrl = response.data.photoUrl
       
+      // Debug: Log the response to see what we're getting
+      console.log("Upload response:", response.data)
+      console.log("Photo URL received:", photoUrl)
+      
       // Immediately update ONLY the specific student to show the photo
       if (photoUrl) {
-        setStudents(prevStudents => 
-          prevStudents.map(s => 
+        console.log("Updating student with photo URL:", photoUrl)
+        console.log("Student identifier:", studentIdentifier)
+        
+        setStudents(prevStudents => {
+          const updatedStudents = prevStudents.map(s => 
             (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
               ? { 
                   ...s, 
@@ -236,11 +243,13 @@ const TeacherDashboard = () => {
                 }
               : s
           )
-        )
+          console.log("Updated students:", updatedStudents)
+          return updatedStudents
+        })
         
         // Also update filteredStudents immediately for instant UI update
-        setFilteredStudents(prevFiltered => 
-          prevFiltered.map(s => 
+        setFilteredStudents(prevFiltered => {
+          const updatedFiltered = prevFiltered.map(s => 
             (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
               ? { 
                   ...s, 
@@ -251,7 +260,9 @@ const TeacherDashboard = () => {
                 }
               : s
           )
-        )
+          console.log("Updated filtered students:", updatedFiltered)
+          return updatedFiltered
+        })
       } else {
         throw new Error("No photo URL received from server")
       }
@@ -448,6 +459,16 @@ const TeacherDashboard = () => {
 
                         
                         {/* Photo display */}
+                        {(() => {
+                          console.log("Rendering photo for student:", {
+                            id: student._id,
+                            photoId: student.photoId,
+                            photoUrl: student.photoUrl,
+                            photoUploading: student.photoUploading,
+                            photoUploaded: student.photoUploaded
+                          })
+                          return null
+                        })()}
                         {student.photoUploading ? (
                           <div className="relative">
                             <div className="w-8 h-8 sm:w-16 sm:h-16 rounded border-2 border-blue-500 bg-gray-100 flex items-center justify-center">
