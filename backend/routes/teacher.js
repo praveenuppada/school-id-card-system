@@ -90,6 +90,13 @@ router.get('/students', async (req, res) => {
       className: className
     }).sort({ fullName: 1 });
 
+    console.log(`📊 Returning ${students.length} students for class: ${className}`);
+    if (students.length > 0) {
+      console.log(`📊 First student fields:`, Object.keys(students[0].toObject()));
+      console.log(`📊 First student photoUrl:`, students[0].photoUrl);
+      console.log(`📊 First student photoUploaded:`, students[0].photoUploaded);
+    }
+
     res.json({
       success: true,
       students
@@ -240,6 +247,15 @@ router.post('/upload-photo', upload.fields([
 
     console.log(`✅ Successfully updated photo for student: ${updateResult.fullName}`);
     console.log(`📸 Photo URL: ${uploadResult.secure_url}`);
+    console.log(`📸 Updated student data:`, {
+      _id: updateResult._id,
+      fullName: updateResult.fullName,
+      photoId: updateResult.photoId,
+      photoUrl: updateResult.photoUrl,
+      photoUploaded: updateResult.photoUploaded,
+      updatedBy: updateResult.updatedBy,
+      updatedAt: updateResult.updatedAt
+    });
 
     res.json({
       success: true,
