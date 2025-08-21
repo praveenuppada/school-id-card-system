@@ -13,6 +13,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
   const [resizeHandle, setResizeHandle] = useState(null)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   
   const canvasRef = useRef(null)
   const imageRef = useRef(null)
@@ -212,18 +213,31 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
     
     if (!canvas || !image) return null
     
-    // Create a new canvas for the cropped image
+    // Create a new canvas for the cropped image with optimized size
     const croppedCanvas = document.createElement('canvas')
     const croppedCtx = croppedCanvas.getContext('2d')
     
-    croppedCanvas.width = cropArea.width
-    croppedCanvas.height = cropArea.height
+    // Optimize canvas size for faster processing (max 800x800)
+    const maxSize = 800
+    let finalWidth = cropArea.width
+    let finalHeight = cropArea.height
+    
+    if (finalWidth > maxSize || finalHeight > maxSize) {
+      const ratio = Math.min(maxSize / finalWidth, maxSize / finalHeight)
+      finalWidth = Math.round(finalWidth * ratio)
+      finalHeight = Math.round(finalHeight * ratio)
+    }
+    
+    croppedCanvas.width = finalWidth
+    croppedCanvas.height = finalHeight
     
     // Calculate the scale factors
     const scaleX = image.width / canvas.width
     const scaleY = image.height / canvas.height
     
-    // Draw the cropped portion
+    // Draw the cropped portion with optimized quality
+    croppedCtx.imageSmoothingEnabled = true
+    croppedCtx.imageSmoothingQuality = 'high'
     croppedCtx.drawImage(
       image,
       cropArea.x * scaleX,
@@ -232,50 +246,66 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
       cropArea.height * scaleY,
       0,
       0,
-      cropArea.width,
-      cropArea.height
+      finalWidth,
+      finalHeight
     )
     
-    return croppedCanvas.toDataURL('image/jpeg', 1.0) // Maximum quality
+    return croppedCanvas.toDataURL('image/jpeg', 0.95) // High quality but slightly compressed for speed
   }
 
   const handleSave = async () => {
     if (!student) return
     
     setLoading(true)
+    setUploadProgress(0)
     try {
       const croppedDataUrl = cropImage()
       if (!croppedDataUrl) return
       
-      // Convert data URL to blob
-      const response = await fetch(croppedDataUrl)
-      const blob = await response.blob()
+      // Optimize blob creation for faster processing
+      const base64Data = croppedDataUrl.split(',')[1]
+      const byteCharacters = atob(base64Data)
+      const byteNumbers = new Array(byteCharacters.length)
       
-      // Create form data
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
+      }
+      
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: 'image/jpeg' })
+      
+      // Create form data with optimized file
       const formData = new FormData()
       formData.append('file', blob, `${student.photoId}.jpg`)
       formData.append('photoId', student.photoId)
       formData.append('studentId', student._id)
       
-      // Upload cropped photo
-      const result = await cropPhoto(formData)
+      // Upload cropped photo with progress tracking
+      const result = await cropPhoto(formData, (progress) => {
+        setUploadProgress(progress)
+      })
       
-             if (result.data.success) {
-         setCroppedImage(croppedDataUrl)
-         setSaved(true)
-         onPhotoUpdated && onPhotoUpdated(result.data.photoUrl)
-         
-         // Show success message and close after 2 seconds
-         setTimeout(() => {
-           onClose()
-           setSaved(false)
-         }, 2000)
-       }
+      if (result.data.success) {
+        setCroppedImage(croppedDataUrl)
+        setSaved(true)
+        onPhotoUpdated && onPhotoUpdated(result.data.photoUrl)
+        
+        // Show success message and close after 1 second (faster)
+        setTimeout(() => {
+          onClose()
+          setSaved(false)
+        }, 1000)
+      }
     } catch (error) {
       console.error('Error saving cropped photo:', error)
-      alert('Failed to save cropped photo. Please try again.')
+      if (error.message === 'Upload timeout') {
+        alert('Upload took too long. Please try again.')
+      } else {
+        alert('Failed to save cropped photo. Please try again.')
+      }
     } finally {
       setLoading(false)
+      setUploadProgress(0)
     }
   }
 
@@ -353,12 +383,28 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
           />
         </div>
 
-                 {saved && (
-           <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center space-x-2">
-             <CheckCircle className="h-5 w-5" />
-             <span>Photo cropped and saved successfully! Modal will close automatically...</span>
-           </div>
-         )}
+                                   {saved && (
+            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center space-x-2">
+              <CheckCircle className="h-5 w-5" />
+              <span>Photo cropped and saved successfully! Modal will close automatically...</span>
+            </div>
+          )}
+
+          {loading && (
+            <div className="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <span>Saving cropped photo...</span>
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <div className="text-xs mt-1">{uploadProgress}% complete</div>
+            </div>
+          )}
 
          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
            <div className="flex flex-wrap gap-2">

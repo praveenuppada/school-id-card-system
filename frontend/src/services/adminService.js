@@ -33,11 +33,17 @@ export const downloadSinglePhoto = (photoUrl, fileName) => {
   })
 }
 
-// Crop and upload photo (high quality)
-export const cropPhoto = (formData) => {
-  return axios.post('/admin/crop-photo?quality=high', formData, {
+// Crop and upload photo (high quality, optimized)
+export const cropPhoto = (formData, onProgress) => {
+  return axios.post('/admin/crop-photo?quality=high&optimize=true', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
+    },
+    timeout: 30000, // 30 second timeout
+    onUploadProgress: (progressEvent) => {
+      const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+      console.log('Upload progress:', percentCompleted + '%')
+      onProgress && onProgress(percentCompleted)
     }
   })
 }
