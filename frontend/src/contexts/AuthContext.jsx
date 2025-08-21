@@ -24,15 +24,30 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    console.log("🔍 AuthContext initializing...")
+    console.log("📱 User agent:", navigator.userAgent)
+    console.log("🌐 Current location:", window.location.href)
+    
     const token = localStorage.getItem("token")
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-      // For now, just set loading to false without validating token
-      // validateToken()
-      setLoading(false)
-    } else {
-      setLoading(false)
+    const storedUser = localStorage.getItem("user")
+    
+    console.log("💾 Stored token exists:", !!token)
+    console.log("👤 Stored user exists:", !!storedUser)
+    
+    if (token && storedUser) {
+      try {
+        const userData = JSON.parse(storedUser)
+        setUser(userData)
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+        console.log("✅ User restored from storage:", userData)
+      } catch (error) {
+        console.error("❌ Error parsing stored user:", error)
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+      }
     }
+    
+    setLoading(false)
   }, [])
 
   const validateToken = async () => {

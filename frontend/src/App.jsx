@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route } from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./contexts/AuthContext.jsx"
 import WelcomePage from "./pages/WelcomePage.jsx"
 import LoginPage from "./pages/LoginPage.jsx"
@@ -10,6 +10,7 @@ import ViewSchools from "./pages/ViewSchools.jsx"
 import TeacherInstructions from "./pages/TeacherInstructions.jsx"
 import TeacherContact from "./pages/TeacherContact.jsx"
 import ProtectedRoute from "./components/ProtectedRoute.jsx"
+import ErrorBoundary from "./components/ErrorBoundary.jsx"
 
 // 404 Page component
 const NotFound = () => (
@@ -26,10 +27,11 @@ const NotFound = () => (
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            <Routes>
             <Route path="/" element={<WelcomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/login-teacher" element={<LoginPage role="teacher" />} />
@@ -96,6 +98,7 @@ function App() {
         </div>
       </Router>
     </AuthProvider>
+    </ErrorBoundary>
   )
 }
 

@@ -23,7 +23,27 @@ const LoginPage = () => {
 
     if (result.success) {
       console.log("🚀 Navigating to:", role === "admin" ? "/admin" : "/teacher")
-      navigate(role === "admin" ? "/admin" : "/teacher")
+      
+      // Use a more robust navigation approach for mobile compatibility
+      const targetPath = role === "admin" ? "/admin" : "/teacher"
+      
+      // Try multiple navigation methods for better mobile compatibility
+      try {
+        // Method 1: Standard React Router navigation
+        navigate(targetPath, { replace: true })
+        
+        // Method 2: Fallback using window.location for mobile browsers
+        setTimeout(() => {
+          if (window.location.pathname !== targetPath) {
+            console.log("🔄 Fallback navigation using window.location")
+            window.location.href = targetPath
+          }
+        }, 1000)
+      } catch (error) {
+        console.error("Navigation error:", error)
+        // Method 3: Direct window.location as last resort
+        window.location.href = targetPath
+      }
     } else {
       setError(result.error)
     }
