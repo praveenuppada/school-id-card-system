@@ -1,5 +1,5 @@
 import React from "react"
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { HashRouter as Router, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./contexts/AuthContext.jsx"
 import WelcomePage from "./pages/WelcomePage.jsx"
 import LoginPage from "./pages/LoginPage.jsx"
