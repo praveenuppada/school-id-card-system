@@ -30,8 +30,8 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
     if (file && file.type.startsWith("image/")) {
       // Auto-save immediately without any preview or delay
       onSave(file, currentStudent || student)
-      // Close modal immediately after saving
-      setTimeout(() => onClose(), 50)
+      // Close modal after a short delay to ensure state updates
+      setTimeout(() => onClose(), 200)
     } else {
       alert("Please select a valid image file.")
     }
@@ -92,8 +92,8 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
         
         // Auto-save immediately without any preview or delay
         onSave(file, currentStudent || student)
-        // Close modal immediately after saving
-        setTimeout(() => onClose(), 50)
+        // Close modal after a short delay to ensure state updates
+        setTimeout(() => onClose(), 200)
       }, "image/jpeg", 0.6) // Lower quality for faster processing
       
       // Stop camera immediately

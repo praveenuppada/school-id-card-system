@@ -184,8 +184,11 @@ const TeacherDashboard = () => {
     }
     
     if (!student || !photoFile) {
+      console.error("No student or photo file provided")
       return
     }
+
+    console.log("Starting photo upload for student:", student._id, student.photoId)
 
     setUploading(true)
     setMessage("Uploading photo...")
@@ -193,7 +196,7 @@ const TeacherDashboard = () => {
     // Immediately update the student to show loading state
     setStudents(prevStudents => 
       prevStudents.map(s => 
-        s._id === student._id 
+        (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
           ? { ...s, photoUploading: true }
           : s
       )
@@ -201,7 +204,7 @@ const TeacherDashboard = () => {
     
     setFilteredStudents(prevFiltered => 
       prevFiltered.map(s => 
-        s._id === student._id 
+        (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
           ? { ...s, photoUploading: true }
           : s
       )
@@ -218,12 +221,20 @@ const TeacherDashboard = () => {
       // Get the photo URL from the response
       const photoUrl = response.data.photoUrl
       
+      console.log("Photo upload successful, URL:", photoUrl)
+      
       // Immediately update the local state to show the photo
       if (photoUrl) {
         setStudents(prevStudents => 
           prevStudents.map(s => 
-            s._id === student._id 
-              ? { ...s, photoUrl: photoUrl, photoUploaded: true, photoUploading: false, updatedAt: new Date() }
+            (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
+              ? { 
+                  ...s, 
+                  photoUrl: photoUrl, 
+                  photoUploaded: true, 
+                  photoUploading: false, 
+                  updatedAt: new Date() 
+                }
               : s
           )
         )
@@ -231,16 +242,26 @@ const TeacherDashboard = () => {
         // Also update filteredStudents immediately for instant UI update
         setFilteredStudents(prevFiltered => 
           prevFiltered.map(s => 
-            s._id === student._id 
-              ? { ...s, photoUrl: photoUrl, photoUploaded: true, photoUploading: false, updatedAt: new Date() }
+            (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
+              ? { 
+                  ...s, 
+                  photoUrl: photoUrl, 
+                  photoUploaded: true, 
+                  photoUploading: false, 
+                  updatedAt: new Date() 
+                }
               : s
           )
         )
       }
       
       setMessage("✅ Photo uploaded successfully!")
-      setShowPhotoModal(false)
-      setSelectedStudent(null)
+      
+      // Add a small delay to ensure state updates are reflected
+      setTimeout(() => {
+        setShowPhotoModal(false)
+        setSelectedStudent(null)
+      }, 100)
     } catch (error) {
       console.error("Upload error:", error)
       setMessage(error.response?.data?.message || "Error uploading photo")
@@ -248,7 +269,7 @@ const TeacherDashboard = () => {
       // Remove loading state on error
       setStudents(prevStudents => 
         prevStudents.map(s => 
-          s._id === student._id 
+          (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
             ? { ...s, photoUploading: false }
             : s
         )
@@ -256,7 +277,7 @@ const TeacherDashboard = () => {
       
       setFilteredStudents(prevFiltered => 
         prevFiltered.map(s => 
-          s._id === student._id 
+          (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
             ? { ...s, photoUploading: false }
             : s
         )
