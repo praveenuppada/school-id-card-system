@@ -188,15 +188,16 @@ const TeacherDashboard = () => {
       return
     }
 
-    console.log("Starting photo upload for student:", student._id, student.photoId)
-
     setUploading(true)
     setMessage("Uploading photo...")
 
-    // Immediately update the student to show loading state
+    // Create a unique identifier for this specific student
+    const studentIdentifier = student._id || student.photoId || student.rollNumber
+    
+    // Immediately update ONLY the specific student to show loading state
     setStudents(prevStudents => 
       prevStudents.map(s => 
-        (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
+        (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
           ? { ...s, photoUploading: true }
           : s
       )
@@ -204,7 +205,7 @@ const TeacherDashboard = () => {
     
     setFilteredStudents(prevFiltered => 
       prevFiltered.map(s => 
-        (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
+        (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
           ? { ...s, photoUploading: true }
           : s
       )
@@ -221,13 +222,11 @@ const TeacherDashboard = () => {
       // Get the photo URL from the response
       const photoUrl = response.data.photoUrl
       
-      console.log("Photo upload successful, URL:", photoUrl)
-      
-      // Immediately update the local state to show the photo
+      // Immediately update ONLY the specific student to show the photo
       if (photoUrl) {
         setStudents(prevStudents => 
           prevStudents.map(s => 
-            (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
+            (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
               ? { 
                   ...s, 
                   photoUrl: photoUrl, 
@@ -242,7 +241,7 @@ const TeacherDashboard = () => {
         // Also update filteredStudents immediately for instant UI update
         setFilteredStudents(prevFiltered => 
           prevFiltered.map(s => 
-            (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
+            (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
               ? { 
                   ...s, 
                   photoUrl: photoUrl, 
@@ -253,6 +252,8 @@ const TeacherDashboard = () => {
               : s
           )
         )
+      } else {
+        throw new Error("No photo URL received from server")
       }
       
       setMessage("✅ Photo uploaded successfully!")
@@ -264,12 +265,20 @@ const TeacherDashboard = () => {
       }, 100)
     } catch (error) {
       console.error("Upload error:", error)
-      setMessage(error.response?.data?.message || "Error uploading photo")
       
-      // Remove loading state on error
+      let errorMessage = "Error uploading photo"
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      setMessage(errorMessage)
+      
+      // Remove loading state on error for ONLY the specific student
       setStudents(prevStudents => 
         prevStudents.map(s => 
-          (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
+          (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
             ? { ...s, photoUploading: false }
             : s
         )
@@ -277,7 +286,7 @@ const TeacherDashboard = () => {
       
       setFilteredStudents(prevFiltered => 
         prevFiltered.map(s => 
-          (s._id === student._id || s.photoId === student.photoId || s.rollNumber === student.rollNumber)
+          (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
             ? { ...s, photoUploading: false }
             : s
         )
@@ -306,7 +315,7 @@ const TeacherDashboard = () => {
     }
   }
 
-  return (
+    return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       
@@ -326,7 +335,7 @@ const TeacherDashboard = () => {
                   <p className="text-xs text-gray-500">Teacher Portal</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={handleSubmitAllRecords}
                 disabled={uploading}
                 className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition-colors flex items-center space-x-1 disabled:opacity-50"
@@ -369,7 +378,7 @@ const TeacherDashboard = () => {
             </div>
             
           </div>
-        </div>
+            </div>
 
         {/* Message Display */}
         {message && (
@@ -395,16 +404,16 @@ const TeacherDashboard = () => {
             <div className="text-sm text-blue-700">
               <p>Currently, only <strong>{availableClasses[0]}</strong> has student data available.</p>
               <p>To add data for other classes, please ask the admin to upload Excel files for those classes.</p>
-            </div>
+          </div>
           </div>
         )}
 
         {/* Student Photo Management Table */}
         <div className="bg-white rounded-lg shadow-sm">
-          <div className="overflow-x-auto">
+            <div className="overflow-x-auto">
             <table className="w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
+                <thead className="bg-gray-50">
+                  <tr>
                   <th className="px-1 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-tight">
                     ID
                   </th>
@@ -420,20 +429,20 @@ const TeacherDashboard = () => {
                   <th className="px-1 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-tight">
                     STATUS
                   </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
                 {Array.isArray(filteredStudents) && filteredStudents.length > 0 ? filteredStudents.map((student, index) => (
                   <tr key={student._id || student.rollNumber || index}>
                     <td className="px-1 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-900">
                       {(student.rollNumber || student.photoId || student.roll_number || "DSC_0200").substring(0, 8)}
-                    </td>
+                      </td>
                     <td className="px-1 sm:px-4 py-2 text-xs sm:text-sm text-gray-900">
                       {(student.name || student.fullName || student.studentName || "ADAPA SHANMUKHA RAO").substring(0, 15)}...
-                    </td>
+                      </td>
                     <td className="px-1 sm:px-4 py-2 text-xs sm:text-sm text-gray-500">
                       {(student.class || student.className || student.class_name || "10th CLASS").replace(" CLASS", "")}
-                    </td>
+                      </td>
                     <td className="px-1 sm:px-4 py-2">
                       <div className="flex flex-col items-center space-y-2">
 
@@ -468,26 +477,26 @@ const TeacherDashboard = () => {
                         )}
                         <div className="flex flex-col sm:flex-row gap-1">
                           {!student.photoUrl && !student.photoUploading ? (
-                            <button 
+                  <button
                               onClick={() => handleAddPhoto(student)}
                               className="bg-green-500 text-white px-1 sm:px-3 py-1 rounded text-xs hover:bg-green-600"
-                            >
+                  >
                               Add
-                            </button>
+                  </button>
                           ) : student.photoUploading ? (
-                            <button 
+                  <button
                               disabled
                               className="bg-gray-400 text-white px-1 sm:px-3 py-1 rounded text-xs cursor-not-allowed"
-                            >
+                  >
                               Uploading...
-                            </button>
+                  </button>
                           ) : (
-                            <button 
+                      <button
                               onClick={() => handlePhotoUpload(student)}
                               className="bg-blue-600 text-white px-1 sm:px-3 py-1 rounded text-xs hover:bg-blue-700"
-                            >
+                      >
                               Update
-                            </button>
+                      </button>
                           )}
                         </div>
                       </div>
@@ -512,9 +521,9 @@ const TeacherDashboard = () => {
                 )}
               </tbody>
             </table>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
       </div>
 
       {/* Photo Upload Modal */}
