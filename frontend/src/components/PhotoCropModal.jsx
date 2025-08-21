@@ -236,7 +236,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
       cropArea.height
     )
     
-    return croppedCanvas.toDataURL('image/jpeg', 0.9)
+    return croppedCanvas.toDataURL('image/jpeg', 1.0) // Maximum quality
   }
 
   const handleSave = async () => {
@@ -285,11 +285,14 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
     try {
       const response = await downloadSinglePhoto(student.photoUrl)
       
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]))
+      // Create download link with high quality and proper naming
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/jpeg' }))
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', `${student.photoId}_${student.fullName}.jpg`)
+      
+      // Use photo ID as filename for better organization
+      const fileName = student.photoId ? `${student.photoId}.jpg` : `${student.fullName || 'photo'}.jpg`
+      link.setAttribute('download', fileName)
       document.body.appendChild(link)
       link.click()
       link.remove()

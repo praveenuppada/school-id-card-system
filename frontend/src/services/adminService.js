@@ -16,23 +16,26 @@ export const downloadExcel = (schoolName) => {
   })
 }
 
-// Download photos as ZIP for a school
+// Download photos as ZIP for a school (high quality)
 export const downloadPhotos = (schoolName) => {
-  return axios.get(`/admin/download-photos/${encodeURIComponent(schoolName)}`, {
+  return axios.get(`/admin/download-photos/${encodeURIComponent(schoolName)}?quality=high`, {
     responseType: 'blob'
   })
 }
 
-// Download single photo
+// Download single photo (high quality)
 export const downloadSinglePhoto = (photoUrl, fileName) => {
   return axios.get(photoUrl, {
-    responseType: 'blob'
+    responseType: 'blob',
+    headers: {
+      'Accept': 'image/jpeg,image/png,image/*'
+    }
   })
 }
 
-// Crop and upload photo
+// Crop and upload photo (high quality)
 export const cropPhoto = (formData) => {
-  return axios.post('/admin/crop-photo', formData, {
+  return axios.post('/admin/crop-photo?quality=high', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }

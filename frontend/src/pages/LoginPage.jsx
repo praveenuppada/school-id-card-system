@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import { Shield, User, Lock, ArrowLeft, Eye, EyeOff, Fingerprint, Smartphone, TestTube } from "lucide-react"
-import biometricAuth from "../services/biometricAuth"
+import { Shield, User, Lock, ArrowLeft, Eye, EyeOff, TestTube, ChevronDown } from "lucide-react"
+import usernameStorage from "../services/usernameStorage"
 import apiTest from "../services/apiTest"
 
 const LoginPage = () => {
@@ -12,30 +12,21 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [biometricAvailable, setBiometricAvailable] = useState(false)
-  const [hasStoredCredentials, setHasStoredCredentials] = useState(false)
-  const [showBiometricPrompt, setShowBiometricPrompt] = useState(false)
   const [showApiTest, setShowApiTest] = useState(false)
   const [testResults, setTestResults] = useState(null)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
 
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  // Check biometric availability on component mount
+  // Load last used username on component mount
   useEffect(() => {
-    const checkBiometric = async () => {
-      const available = await biometricAuth.isBiometricAvailable()
-      setBiometricAvailable(available)
-      setHasStoredCredentials(biometricAuth.hasStoredCredentials())
-      
-      // Auto-show biometric prompt if credentials are stored
-      if (available && biometricAuth.hasStoredCredentials()) {
-        setShowBiometricPrompt(true)
-      }
+    const lastUsername = usernameStorage.getLastUsedUsername(role)
+    if (lastUsername) {
+      setEmail(lastUsername)
     }
-    
-    checkBiometric()
-  }, [])
+  }, [role])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -47,15 +38,8 @@ const LoginPage = () => {
     if (result.success) {
       console.log("🚀 Login successful, preparing navigation...")
       
-      // Offer to save biometric credentials for admin
-      if (role === "admin" && biometricAvailable && !hasStoredCredentials) {
-        try {
-          await biometricAuth.registerBiometric(email, password, role)
-          console.log("✅ Biometric credentials saved")
-        } catch (error) {
-          console.log("⚠️ Could not save biometric credentials:", error.message)
-        }
-      }
+      // Save username for future autocomplete
+      usernameStorage.saveUsername(email, role)
       
       const targetPath = role === "admin" ? "/admin" : "/teacher"
       console.log("🎯 Target path:", targetPath)
@@ -69,33 +53,35 @@ const LoginPage = () => {
     setLoading(false)
   }
 
-  const handleBiometricLogin = async () => {
-    setLoading(true)
-    setError("")
-
-    try {
-      const result = await biometricAuth.authenticateBiometric()
-      
-      if (result.success) {
-        const loginResult = await login(result.username, result.password, result.role)
-        
-        if (loginResult.success) {
-          const targetPath = result.role === "admin" ? "/admin" : "/teacher"
-          navigate(targetPath, { replace: true })
-        } else {
-          setError(loginResult.error)
-        }
-      }
-    } catch (error) {
-      setError("Biometric authentication failed. Please use password login.")
-      setShowBiometricPrompt(false)
-    }
-
-    setLoading(false)
+  // Handle username input changes and autocomplete
+  const handleUsernameChange = (e) => {
+    const value = e.target.value
+    setEmail(value)
+    
+    // Get autocomplete suggestions
+    const autocompleteSuggestions = usernameStorage.getAutocompleteSuggestions(value, role)
+    setSuggestions(autocompleteSuggestions)
+    setShowSuggestions(autocompleteSuggestions.length > 0 && value.length > 0)
   }
 
-  const handleSkipBiometric = () => {
-    setShowBiometricPrompt(false)
+  // Handle suggestion selection
+  const handleSuggestionSelect = (username) => {
+    setEmail(username)
+    setShowSuggestions(false)
+    setSuggestions([])
+  }
+
+  // Handle role change
+  const handleRoleChange = (newRole) => {
+    setRole(newRole)
+    // Load last used username for the selected role
+    const lastUsername = usernameStorage.getLastUsedUsername(newRole)
+    if (lastUsername) {
+      setEmail(lastUsername)
+    } else {
+      setEmail("")
+    }
+    setShowSuggestions(false)
   }
 
   const handleApiTest = async () => {
@@ -121,36 +107,7 @@ const LoginPage = () => {
           Back to Home
         </Link>
 
-        {/* Biometric Login Prompt */}
-        {showBiometricPrompt && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Fingerprint className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Quick Login</h3>
-              <p className="text-gray-600">Use your fingerprint or face ID to sign in</p>
-            </div>
-            
-            <div className="space-y-4">
-              <button
-                onClick={handleBiometricLogin}
-                disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
-              >
-                <Fingerprint className="h-5 w-5" />
-                <span>{loading ? "Authenticating..." : "Use Biometric Login"}</span>
-              </button>
-              
-              <button
-                onClick={handleSkipBiometric}
-                className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Use Password Instead
-              </button>
-            </div>
-          </div>
-        )}
+
 
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl p-10">
@@ -166,7 +123,7 @@ const LoginPage = () => {
           <div className="grid grid-cols-2 gap-4 mb-6">
             <button
               type="button"
-              onClick={() => setRole("admin")}
+              onClick={() => handleRoleChange("admin")}
               className={`p-4 rounded-lg border-2 transition-all ${
                 role === "admin" 
                   ? "border-blue-500 bg-blue-50 text-blue-700" 
@@ -181,7 +138,7 @@ const LoginPage = () => {
             </button>
             <button
               type="button"
-              onClick={() => setRole("teacher")}
+              onClick={() => handleRoleChange("teacher")}
               className={`p-4 rounded-lg border-2 transition-all ${
                 role === "teacher" 
                   ? "border-yellow-500 bg-yellow-50 text-yellow-700" 
@@ -210,11 +167,42 @@ const LoginPage = () => {
                 <input
                   type="text"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={handleUsernameChange}
+                  onFocus={() => {
+                    const autocompleteSuggestions = usernameStorage.getAutocompleteSuggestions(email, role)
+                    setSuggestions(autocompleteSuggestions)
+                    setShowSuggestions(autocompleteSuggestions.length > 0 && email.length > 0)
+                  }}
+                  onBlur={() => {
+                    // Delay hiding suggestions to allow clicks
+                    setTimeout(() => setShowSuggestions(false), 150)
+                  }}
+                  className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder={role === "admin" ? "Enter admin username" : "Enter teacher username"}
                   required
                 />
+                {suggestions.length > 0 && (
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                )}
+                
+                {/* Autocomplete Suggestions */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto mt-1">
+                    {suggestions.map((username, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleSuggestionSelect(username)}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none first:rounded-t-lg last:rounded-b-lg"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <User className="h-4 w-4 text-gray-400" />
+                          <span className="text-gray-900">{username}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -248,20 +236,17 @@ const LoginPage = () => {
               {loading ? "Signing in..." : "Sign In"}
             </button>
 
-            {/* Biometric Status */}
-            {biometricAvailable && (
-              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            {/* Username Autocomplete Info */}
+            {usernameStorage.getUsernamesForRole(role).length > 0 && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center space-x-2">
-                  <Smartphone className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-700">
-                    {hasStoredCredentials 
-                      ? "Biometric login available - Use fingerprint or face ID" 
-                      : "Biometric authentication supported - Will be saved after first login"
-                    }
+                  <User className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-700">
+                    Saved usernames available - Start typing to see suggestions
                   </span>
                 </div>
               </div>
-                        )}
+            )}
             </form>
 
             {/* API Test Section */}

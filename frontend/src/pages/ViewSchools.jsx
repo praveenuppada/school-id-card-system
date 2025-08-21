@@ -171,11 +171,14 @@ const ViewSchools = () => {
     try {
       const response = await downloadSinglePhoto(student.photoUrl)
       
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]))
+      // Create download link with high quality and proper naming
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/jpeg' }))
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', `${student.photoId}_${student.fullName}.jpg`)
+      
+      // Use photo ID as filename for better organization
+      const fileName = student.photoId ? `${student.photoId}.jpg` : `${student.fullName || 'photo'}.jpg`
+      link.setAttribute('download', fileName)
       document.body.appendChild(link)
       link.click()
       link.remove()
@@ -484,9 +487,10 @@ const ViewSchools = () => {
                            <div key={index} className="bg-gray-100 rounded-lg p-2 text-center">
                              {student.photoUrl ? (
                                <img 
-                                 src={student.photoUrl} 
+                                 src={`${student.photoUrl}?quality=high`} 
                                  alt={student.fullName}
                                  className="w-16 h-20 object-cover rounded mx-auto mb-2"
+                                 style={{ imageRendering: 'high-quality' }}
                                  onError={(e) => {
                                    e.target.style.display = 'none'
                                    e.target.nextSibling.style.display = 'flex'
