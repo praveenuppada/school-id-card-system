@@ -34,12 +34,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
     const file = e.target.files[0]
     
     if (file && file.type.startsWith("image/")) {
-      setSelectedFile(file)
-      const url = URL.createObjectURL(file)
-      setPreviewUrl(url)
-      setCapturedImage(null)
-      
-      // Auto-save the photo instantly
+      // Auto-save immediately without setting preview states
       onSave(file, currentStudent || student)
     } else {
       alert("Please select a valid image file.")
@@ -60,12 +55,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       input.onchange = (e) => {
         const file = e.target.files[0]
         if (file) {
-          setSelectedFile(file)
-          const url = URL.createObjectURL(file)
-          setPreviewUrl(url)
-          setCapturedImage(null)
-          
-          // Auto-save the photo instantly
+          // Auto-save immediately without setting preview states
           onSave(file, currentStudent || student)
         }
       }
@@ -98,17 +88,15 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       canvas.height = video.videoHeight
       context.drawImage(video, 0, 0)
       
+      // Create file immediately without waiting for blob
       canvas.toBlob((blob) => {
         const file = new File([blob], "captured-photo.jpg", { type: "image/jpeg" })
-        setSelectedFile(file)
-        setCapturedImage(canvas.toDataURL())
-        setPreviewUrl(canvas.toDataURL())
         
-        // Auto-save the captured photo instantly
+        // Auto-save immediately without setting preview states
         onSave(file, currentStudent || student)
-      }, "image/jpeg")
+      }, "image/jpeg", 0.8) // Slightly lower quality for faster processing
       
-      // Stop camera
+      // Stop camera immediately
       const stream = video.srcObject
       if (stream) {
         stream.getTracks().forEach(track => track.stop())

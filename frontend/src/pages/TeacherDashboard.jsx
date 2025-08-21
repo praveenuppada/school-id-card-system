@@ -356,22 +356,22 @@ const TeacherDashboard = () => {
         {/* Student Photo Management Table */}
         <div className="bg-white rounded-lg shadow-sm">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PHOTO ID
+                  <th className="px-1 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-tight">
+                    ID
                   </th>
-                  <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    FULL NAME
+                  <th className="px-1 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-tight">
+                    NAME
                   </th>
-                  <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-1 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-tight">
                     CLASS
                   </th>
-                  <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    PHOTO UPLOAD
+                  <th className="px-1 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-tight">
+                    PHOTO
                   </th>
-                  <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-1 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-tight">
                     STATUS
                   </th>
                 </tr>
@@ -379,16 +379,16 @@ const TeacherDashboard = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {Array.isArray(filteredStudents) && filteredStudents.length > 0 ? filteredStudents.map((student, index) => (
                   <tr key={student._id || student.rollNumber || index}>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {student.rollNumber || student.photoId || student.roll_number || "DSC_0200"}
+                    <td className="px-1 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-900">
+                      {(student.rollNumber || student.photoId || student.roll_number || "DSC_0200").substring(0, 8)}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {student.name || student.fullName || student.studentName || "ADAPA SHANMUKHA RAO"}
+                    <td className="px-1 sm:px-4 py-2 text-xs sm:text-sm text-gray-900">
+                      {(student.name || student.fullName || student.studentName || "ADAPA SHANMUKHA RAO").substring(0, 15)}...
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {student.class || student.className || student.class_name || "10th CLASS"}
+                    <td className="px-1 sm:px-4 py-2 text-xs sm:text-sm text-gray-500">
+                      {(student.class || student.className || student.class_name || "10th CLASS").replace(" CLASS", "")}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-1 sm:px-4 py-2">
                       <div className="flex flex-col items-center space-y-2">
 
                         
@@ -396,46 +396,48 @@ const TeacherDashboard = () => {
                         {student.photoUrl ? (
                           <div className="relative">
                             <div 
-                              className="w-16 h-16 rounded border-4 border-green-500 bg-cover bg-center"
+                              className="w-8 h-8 sm:w-16 sm:h-16 rounded border-2 border-green-500 bg-cover bg-center"
                               style={{ 
-                                backgroundImage: `url(${student.photoUrl})`,
-                                width: '64px', 
-                                height: '64px'
+                                backgroundImage: `url(${student.photoUrl})`
                               }}
                             />
-                            <div className="text-xs text-green-600 mt-1">
-                              ✅ Photo Available
+                            <div className="text-xs text-green-600 mt-1 hidden sm:block">
+                              ✅ Available
                             </div>
                           </div>
                         ) : (
-                          <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center border-2 border-red-500">
-                            <span className="text-gray-400 text-xs">No Photo</span>
+                          <div className="w-8 h-8 sm:w-16 sm:h-16 bg-gray-200 rounded flex items-center justify-center border-2 border-red-500">
+                            <span className="text-gray-400 text-xs hidden sm:block">No Photo</span>
+                            <span className="text-red-500 text-xs sm:hidden">✗</span>
                           </div>
                         )}
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col sm:flex-row gap-1">
                           {!student.photoUrl ? (
                             <button 
                               onClick={() => handleAddPhoto(student)}
-                              className="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600"
+                              className="bg-green-500 text-white px-1 sm:px-3 py-1 rounded text-xs hover:bg-green-600"
                             >
-                              Add Photo
+                              Add
                             </button>
                           ) : (
                             <button 
                               onClick={() => handlePhotoUpload(student)}
-                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700"
+                              className="bg-blue-600 text-white px-1 sm:px-3 py-1 rounded text-xs hover:bg-blue-700"
                             >
-                              Update Photo
+                              Update
                             </button>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    <td className="px-1 sm:px-4 py-2">
+                      <span className={`inline-flex items-center px-1 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         (student.photoUrl || student.photoUploaded) ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                       }`}>
-                        {(student.photoUrl || student.photoUploaded) ? "Submitted" : "Pending"}
+                        {(student.photoUrl || student.photoUploaded) ? "✓" : "✗"}
+                        <span className="hidden sm:inline ml-1">
+                          {(student.photoUrl || student.photoUploaded) ? "Submitted" : "Pending"}
+                        </span>
                       </span>
                     </td>
                   </tr>

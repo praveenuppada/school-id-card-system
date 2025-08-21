@@ -44,14 +44,33 @@ const WelcomePage = () => {
                 <span className="text-white font-bold text-sm">H</span>
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900">Harsha ID Solutions</h1>
+                <h1 className="text-sm sm:text-lg font-bold text-blue-600">Harsha ID Solutions</h1>
                 <p className="text-xs text-gray-500">A Complete ID World...</p>
               </div>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-4">
+                <button
+                  onClick={() => setShowAboutUs(true)}
+                  className="text-gray-600 hover:text-gray-900 transition-colors flex items-center space-x-1"
+                >
+                  <Info className="h-4 w-4" />
+                  <span>About Us</span>
+                </button>
+                
+                <a
+                  href="tel:+918977219777"
+                  className="text-green-600 hover:text-green-700 transition-colors flex items-center space-x-1"
+                >
+                  <Phone className="h-4 w-4" />
+                  <span>Call Us</span>
+                </a>
+              </div>
+              
               <Link
                 to="/login"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
               >
                 Login
               </Link>
