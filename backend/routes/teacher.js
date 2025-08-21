@@ -3,6 +3,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { verifyToken, requireTeacher } = require('../middleware/auth');
 const Student = require('../models/Student');
+const School = require('../models/School');
 
 const router = express.Router();
 
@@ -34,11 +35,20 @@ router.use(verifyToken, requireTeacher);
 // Get teacher profile
 router.get('/profile', async (req, res) => {
   try {
+    // Fetch the actual school name from the database
+    let schoolName = 'School Dashboard';
+    if (req.user.schoolId) {
+      const school = await School.findById(req.user.schoolId);
+      if (school) {
+        schoolName = school.name;
+      }
+    }
+
     const profile = {
       username: req.user.username,
       schoolId: req.user.schoolId,
       role: req.user.role,
-      schoolName: 'Teacher\'s School' // You can enhance this to get actual school name
+      schoolName: schoolName
     };
 
     res.json({
@@ -50,6 +60,44 @@ router.get('/profile', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to get profile: ' + error.message
+    });
+  }
+});
+
+// Get school information for current teacher
+router.get('/school-info', async (req, res) => {
+  try {
+    let schoolInfo = {
+      schoolName: 'School Dashboard',
+      schoolId: req.user.schoolId
+    };
+
+    if (req.user.schoolId) {
+      const school = await School.findById(req.user.schoolId);
+      if (school) {
+        schoolInfo = {
+          schoolName: school.name,
+          schoolId: school._id,
+          address: school.address,
+          contactPerson: school.contactPerson,
+          contactEmail: school.contactEmail,
+          contactPhone: school.contactPhone,
+          principalName: school.principalName,
+          totalStudents: school.totalStudents,
+          establishedYear: school.establishedYear
+        };
+      }
+    }
+
+    res.json({
+      success: true,
+      ...schoolInfo
+    });
+  } catch (error) {
+    console.error('School info error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get school info: ' + error.message
     });
   }
 });
