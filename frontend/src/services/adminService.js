@@ -57,6 +57,9 @@ export const deleteExcelData = (schoolId) => axios.delete(`/admin/delete-excel/$
 // Delete only photos for a school
 export const deletePhotos = (schoolId) => axios.delete(`/admin/delete-photos/${schoolId}`)
 
+// Delete single photo for a student
+export const deleteSinglePhoto = (studentId, photoId) => axios.delete(`/admin/delete-photo/${studentId}/${photoId}`)
+
 // Upload Excel file
 export const uploadExcel = (formData) => {
   return axios.post('/admin/upload-excel', formData, {

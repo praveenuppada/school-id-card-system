@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { School, Download, Package, Trash2, FileText, Edit, Camera, ArrowLeft, Crop, Download as DownloadIcon } from "lucide-react"
-import { getSchools, getSchoolData, downloadExcel, downloadPhotos, deleteSchool, downloadSinglePhoto } from "../services/adminService"
+import { getSchools, getSchoolData, downloadExcel, downloadPhotos, deleteSchool, downloadSinglePhoto, deleteSinglePhoto } from "../services/adminService"
 import PhotoCropModal from "../components/PhotoCropModal"
 
 const ViewSchools = () => {
@@ -203,6 +203,38 @@ const ViewSchools = () => {
         ...schoolData,
         teacherUpdates: updatedStudents
       })
+    }
+  }
+
+  const handleDeletePhoto = async (student) => {
+    if (!student || !student._id || !student.photoId) {
+      alert('Cannot delete photo: Missing student information')
+      return
+    }
+
+    if (!confirm(`Are you sure you want to delete the photo for ${student.fullName} (${student.photoId})?`)) {
+      return
+    }
+
+    try {
+      await deleteSinglePhoto(student._id, student.photoId)
+      
+      // Update local state to remove the photo
+      if (schoolData) {
+        const updatedStudents = schoolData.teacherUpdates.map(s => 
+          s._id === student._id 
+            ? { ...s, photoUrl: null, photoUploaded: false }
+            : s
+        )
+        setSchoolData({
+          ...schoolData,
+          teacherUpdates: updatedStudents
+        })
+      }
+      
+      alert('Photo deleted successfully!')
+    } catch (error) {
+      alert('Failed to delete photo. Please try again.')
     }
   }
 
@@ -522,6 +554,13 @@ const ViewSchools = () => {
                                    title="Download Photo"
                                  >
                                    <DownloadIcon className="h-3 w-3 mx-auto" />
+                                 </button>
+                                 <button
+                                   onClick={() => handleDeletePhoto(student)}
+                                   className="flex-1 bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors"
+                                   title="Delete Photo"
+                                 >
+                                   <Trash2 className="h-3 w-3 mx-auto" />
                                  </button>
                                </div>
                              )}

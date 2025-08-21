@@ -161,11 +161,9 @@ const WelcomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <img
-                src="/images/harsha-logo.jpeg"
-                alt="Harsha ID Solutions"
-                className="h-12 w-auto filter brightness-0 invert"
-              />
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">H</span>
+              </div>
             </div>
             <div className="text-center md:text-right">
               <p className="text-gray-400">© Harsha ID Solutions. All rights reserved.</p>

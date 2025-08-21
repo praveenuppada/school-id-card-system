@@ -223,17 +223,7 @@ const LoginPage = () => {
               {loading ? "Signing in..." : "Sign In"}
             </button>
 
-            {/* Username Autocomplete Info */}
-            {usernameStorage.getUsernamesForRole(role).length > 0 && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm text-blue-700">
-                    Saved usernames available - Start typing to see suggestions
-                  </span>
-                </div>
-              </div>
-            )}
+
             </form>
 
 
