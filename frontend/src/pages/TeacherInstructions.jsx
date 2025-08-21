@@ -1,122 +1,133 @@
-import React from "react";
-import Sidebar from "../components/Sidebar";
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { FileText, ArrowLeft, CheckCircle } from "lucide-react"
+import Sidebar from "../components/Sidebar.jsx"
 
-export default function TeacherInstructions() {
+const TeacherInstructions = () => {
+  const navigate = useNavigate()
+
   return (
-    <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
-      <Sidebar role="TEACHER" />
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
       
-      {/* Main Content Container */}
-      <div className="flex-1 w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16 overflow-x-hidden" style={{ overflowX: 'hidden' }}>
-          
-          {/* Header Section */}
-          <div className="mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-3 sm:mb-0">
-                <h1 className="text-xl font-bold text-gray-900">Teacher Instructions</h1>
-                <p className="text-sm text-gray-500">How to use the photo upload system</p>
+      <div className="flex-1">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">H</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">Teacher Instructions</h1>
+                  <p className="text-xs text-gray-500">How to use the Teacher Portal</p>
+                </div>
               </div>
             </div>
           </div>
+        </header>
 
-          {/* Instructions Content */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-lg shadow-sm p-8">
+            <div className="flex items-center space-x-3 mb-6">
+              <FileText className="h-8 w-8 text-blue-600" />
+              <h2 className="text-2xl font-bold text-gray-900">Teacher Portal Instructions</h2>
+            </div>
+
             <div className="space-y-6">
-              
-              {/* Step 1 */}
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  1
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a Class</h3>
-                  <p className="text-gray-600">
-                    Choose a class from the dropdown menu in the Teacher Dashboard. This will load all students for that class.
-                  </p>
-                </div>
+              <div className="bg-blue-50 rounded-lg p-6">
+                <h3 className="font-semibold text-blue-900 mb-3">Getting Started</h3>
+                <ul className="space-y-2 text-blue-800">
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <span>Select your class from the dropdown menu on the dashboard</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <span>View the list of students in your selected class</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <span>Upload photos for students who don't have photos yet</span>
+                  </li>
+                </ul>
               </div>
 
-              {/* Step 2 */}
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  2
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Student Photos</h3>
-                  <p className="text-gray-600 mb-3">
-                    For each student, you have two options to upload photos:
-                  </p>
-                  <div className="ml-4 space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                      <span className="text-gray-600"><strong>Take Photo:</strong> Click "Take Photo" to open your device camera and capture a photo</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                      <span className="text-gray-600"><strong>Choose File:</strong> Click "Choose File" to select an existing photo from your device</span>
-                    </div>
+              <div className="bg-green-50 rounded-lg p-6">
+                <h3 className="font-semibold text-green-900 mb-3">Photo Upload Process</h3>
+                <ol className="space-y-2 text-green-800 list-decimal list-inside">
+                  <li>Click on the "Take Photo" or "Choose File" button for a student</li>
+                  <li>Ensure the photo is clear and shows the student's face properly</li>
+                  <li>Click "Save" to upload the photo to the system</li>
+                  <li>If the photo is not satisfactory, click "Retake" to try again</li>
+                  <li>The status will change to "Submitted" once the photo is successfully uploaded</li>
+                </ol>
+              </div>
+
+              <div className="bg-yellow-50 rounded-lg p-6">
+                <h3 className="font-semibold text-yellow-900 mb-3">Important Guidelines</h3>
+                <ul className="space-y-2 text-yellow-800">
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span>Photos should be in JPG or PNG format</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span>Ensure good lighting for clear photos</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span>Student should be facing the camera directly</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span>Remove any hats or accessories that cover the face</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <CheckCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span>Use a neutral background when possible</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-purple-50 rounded-lg p-6">
+                <h3 className="font-semibold text-purple-900 mb-3">Troubleshooting</h3>
+                <div className="space-y-3 text-purple-800">
+                  <div>
+                    <h4 className="font-medium">Photo not uploading?</h4>
+                    <p className="text-sm">Check your internet connection and try again. If the problem persists, contact support.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Camera not working?</h4>
+                    <p className="text-sm">Make sure you've granted camera permissions to the website in your browser settings.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Wrong student selected?</h4>
+                    <p className="text-sm">Double-check the student name and photo ID before uploading.</p>
                   </div>
                 </div>
               </div>
 
-              {/* Step 3 */}
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  3
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Save Photos</h3>
-                  <p className="text-gray-600">
-                    After capturing or selecting a photo, click "Save" to upload it to the system. The photo will be marked as "Saved" once uploaded successfully.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 4 */}
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  4
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Submit All Records</h3>
-                  <p className="text-gray-600">
-                    Once you have uploaded photos for all students, click "Submit All Records" to send the photos to the admin for review and processing.
-                  </p>
-                </div>
-              </div>
-
-              {/* Tips Section */}
-              <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h3 className="text-lg font-semibold text-blue-900 mb-3">💡 Tips for Best Results</h3>
-                <ul className="space-y-2 text-blue-800">
-                  <li>• Ensure good lighting when taking photos</li>
-                  <li>• Make sure the student's face is clearly visible</li>
-                  <li>• Use high-quality photos for better ID card results</li>
-                  <li>• Save photos immediately after capturing to avoid losing them</li>
-                  <li>• You can retake photos if needed by clicking "Retake"</li>
-                </ul>
-              </div>
-
-              {/* Support Section */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Need Help?</h3>
-                <p className="text-gray-600 mb-3">
-                  If you encounter any issues or need assistance, please contact support:
+              <div className="bg-gray-50 rounded-lg p-6">
+                <h3 className="font-semibold text-gray-900 mb-3">Need Help?</h3>
+                <p className="text-gray-700 mb-3">
+                  If you encounter any issues or need assistance, please contact the technical support team.
                 </p>
-                <div className="flex items-center space-x-2 text-blue-600">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
-                  <span>Call: +91 8977219777</span>
-                </div>
+                <button
+                  onClick={() => navigate("/teacher/contact")}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Contact Support
+                </button>
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
     </div>
-  );
+  )
 }
+
+export default TeacherInstructions
+

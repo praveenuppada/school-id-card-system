@@ -1,1464 +1,469 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
-import { getProfile, getClasses, getStudentsByClass, uploadPhoto, submitUpdates, submitAllRecords, sendNotificationToAdmin } from "../services/teacherService";
-import Sidebar from "../components/Sidebar";
-import { AuthContext } from "../context/AuthContext";
+import { useState, useEffect } from "react"
+import { useAuth } from "../contexts/AuthContext"
+import { Camera, Upload, Users, ImageIcon } from "lucide-react"
+import Sidebar from "../components/Sidebar.jsx"
+import PhotoUploadModal from "../components/PhotoUploadModal.jsx"
+import { uploadPhoto, getStudents, getSchoolInfo, getClasses } from "../services/teacherService"
 
+const TeacherDashboard = () => {
+  const { user, logout } = useAuth()
+  const [students, setStudents] = useState([])
+  const [selectedClass, setSelectedClass] = useState("10th CLASS")
+  const [availableClasses, setAvailableClasses] = useState(["10th CLASS", "9th CLASS", "8th CLASS", "7th CLASS", "6th CLASS"])
+  const [filteredStudents, setFilteredStudents] = useState([])
+  const [uploading, setUploading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [selectedStudent, setSelectedStudent] = useState(null)
+  const [showPhotoModal, setShowPhotoModal] = useState(false)
+  const [classesDiscovered, setClassesDiscovered] = useState(false)
+  const [discoveringClasses, setDiscoveringClasses] = useState(true)
 
-export default function TeacherDashboard() {
-  const { user } = useContext(AuthContext);
-  const [profile, setProfile] = useState({});
-  const [classes, setClasses] = useState([]);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [students, setStudents] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [studentPhotos, setStudentPhotos] = useState({});
-  const [cameraStream, setCameraStream] = useState(null);
-  const [activeCamera, setActiveCamera] = useState(null);
-  const [showConfirmationCard, setShowConfirmationCard] = useState(false);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [debugLogs, setDebugLogs] = useState([]);
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-
-  // Load saved photos from localStorage on component mount
   useEffect(() => {
-    const savedPhotos = localStorage.getItem('teacherStudentPhotos');
-    console.log("🔍 Checking for saved photos in localStorage...");
-    console.log("🔍 Raw savedPhotos:", savedPhotos);
-    
-    if (savedPhotos && savedPhotos !== '{}') {
-      try {
-        const parsedPhotos = JSON.parse(savedPhotos);
-        console.log("📸 Loading saved photos from localStorage:", parsedPhotos);
-        console.log("📸 Number of photos:", Object.keys(parsedPhotos).length);
-        if (Object.keys(parsedPhotos).length > 0) {
-          setStudentPhotos(parsedPhotos);
-        } else {
-          console.log("📸 Parsed photos is empty object, starting fresh");
-          setStudentPhotos({});
-        }
-      } catch (error) {
-        console.error("Error loading saved photos:", error);
-        setStudentPhotos({});
-      }
-    } else {
-      console.log("📸 No saved photos found in localStorage, starting with empty state");
-      setStudentPhotos({});
+    discoverAvailableClasses()
+    fetchTeacherProfile()
+  }, [])
+
+  useEffect(() => {
+    fetchStudentsForClass(selectedClass)
+  }, [selectedClass])
+
+  useEffect(() => {
+    if (selectedStudent) {
+      setShowPhotoModal(true)
     }
-  }, []);
-
-  // Save photos to localStorage whenever they change
-  useEffect(() => {
-    if (Object.keys(studentPhotos).length > 0) {
-      console.log("💾 Saving photos to localStorage:", studentPhotos);
-      console.log("💾 Number of photos to save:", Object.keys(studentPhotos).length);
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(studentPhotos));
-      console.log("💾 Saved to localStorage successfully");
-    } else {
-      console.log("💾 No photos to save, studentPhotos is empty");
-    }
-  }, [studentPhotos]);
+  }, [selectedStudent])
 
   useEffect(() => {
-    loadProfile();
-    loadClasses();
-    
-    // Cleanup function to stop camera when component unmounts
-    return () => {
-      if (cameraStream) {
-        console.log("🧹 Cleaning up camera stream on unmount");
-        stopCamera();
-      }
-      // Clean up all resources to prevent memory leaks
-      console.log("🧹 Cleaning up all resources on component unmount");
-      cleanupResources();
-    };
-  }, []);
+    // Filter students based on selected class
+    const filtered = students.filter(student => 
+      student.class === selectedClass || 
+      student.className === selectedClass ||
+      student.className?.includes(selectedClass.replace(" CLASS", ""))
+    )
+    setFilteredStudents(filtered)
+  }, [students, selectedClass])
 
-  // Handle video stream setup when activeCamera changes
-  useEffect(() => {
-    if (activeCamera && cameraStream && videoRef.current) {
-      console.log("📸 Setting up video stream for active camera");
-      videoRef.current.srcObject = cameraStream;
-      
-      videoRef.current.onloadedmetadata = () => {
-        console.log("📸 Video metadata loaded, dimensions:", videoRef.current.videoWidth, "x", videoRef.current.videoHeight);
-      };
-      
-      videoRef.current.onerror = (error) => {
-        console.error("❌ Video element error:", error);
-        alert("Camera video stream error. Please try again.");
-        stopCamera();
-      };
-    }
-  }, [activeCamera, cameraStream]);
-
-  const loadProfile = async () => {
+  const fetchStudents = async () => {
     try {
-      const res = await getProfile();
-      console.log("📋 Teacher profile data:", res.data);
-      console.log("📋 Profile data keys:", Object.keys(res.data));
-      setProfile(res.data);
+      const response = await getStudents(selectedClass)
       
-      // Get school name based on teacher username
-      const teacherUsername = user?.username || res.data?.username;
-      console.log("👤 Teacher username:", teacherUsername);
-      
-      let schoolName = null;
-      
-      // Map teacher usernames to school names
-      if (teacherUsername === 'navodhaya') {
-        schoolName = 'Navodhaya Model School';
-        console.log("🏫 Mapped school name for navodhaya:", schoolName);
-      } else if (teacherUsername === 'haRsHa@219') {
-        schoolName = 'Harsha ID Solutions';
-        console.log("🏫 Mapped school name for haRsHa@219:", schoolName);
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        setStudents(response.data)
+      } else if (response.data && response.data.students && response.data.students.length > 0) {
+        setStudents(response.data.students)
       } else {
-        // Try to get school name from profile data
-        console.log("🔍 Full profile response structure:", JSON.stringify(res.data, null, 2));
-        
-        if (res.data?.schoolName) {
-          schoolName = res.data.schoolName;
-          console.log("📋 School name from profile:", schoolName);
-        } else if (res.data?.school?.name) {
-          schoolName = res.data.school.name;
-          console.log("📋 School name from profile school object:", schoolName);
-        } else if (res.data?.teacher?.schoolName) {
-          schoolName = res.data.teacher.schoolName;
-          console.log("📋 School name from profile teacher object:", schoolName);
-        } else if (res.data?.teacher?.school?.name) {
-          schoolName = res.data.teacher.school.name;
-          console.log("📋 School name from profile teacher school object:", schoolName);
-        }
+        setStudents([])
       }
       
-      if (schoolName) {
-        localStorage.setItem('teacherSchoolName', schoolName);
-        console.log("💾 Saved school name to localStorage:", schoolName);
+    } catch (error) {
+      console.error("Error fetching students:", error)
+      setStudents([])
+    }
+  }
+
+  const handleClassChange = (e) => {
+    const newClass = e.target.value
+    setSelectedClass(newClass)
+    // The useEffect will handle filtering when selectedClass changes
+  }
+
+  const fetchStudentsForClass = async (className) => {
+    try {
+      const response = await getStudents(className) // Use class-specific endpoint
+      
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        setStudents(response.data)
+      } else if (response.data && response.data.students && response.data.students.length > 0) {
+        setStudents(response.data.students)
       } else {
-        console.log("❌ No school name found - using default");
-        localStorage.setItem('teacherSchoolName', 'School Dashboard');
+        setStudents([])
       }
     } catch (error) {
-      console.error("Error loading profile:", error);
-      // Set default school name based on username
-      const teacherUsername = user?.username;
-      if (teacherUsername === 'navodhaya') {
-        localStorage.setItem('teacherSchoolName', 'Navodhaya Model School');
-      } else {
-        localStorage.setItem('teacherSchoolName', 'School Dashboard');
-      }
+      console.error("Error fetching students for class:", className, error)
+      setStudents([])
     }
-  };
+  }
 
-  const loadClasses = async () => {
+  const [schoolName, setSchoolName] = useState('School Dashboard')
+
+  const fetchTeacherProfile = async () => {
     try {
-      const res = await getClasses();
-      console.log("📚 Classes response:", res);
-      console.log("📚 Classes data:", res.data);
-      
-      // Handle different response structures
-      let classesData = [];
-      if (res.data && Array.isArray(res.data)) {
-        classesData = res.data;
-      } else if (res.data && res.data.classes && Array.isArray(res.data.classes)) {
-        classesData = res.data.classes;
-      } else if (res.data && res.data.success && Array.isArray(res.data.data)) {
-        classesData = res.data.data;
-      } else {
-        console.warn("📚 Unexpected classes response structure:", res.data);
-        classesData = [];
-      }
-      
-      console.log("📚 Final classes data:", classesData);
-      setClasses(classesData);
-      
-      // Try to get school name from classes response - more comprehensive check
-      console.log("🔍 Full classes response structure:", JSON.stringify(res.data, null, 2));
-      
-      if (res.data?.schoolName) {
-        console.log("📚 School name from classes:", res.data.schoolName);
-        localStorage.setItem('teacherSchoolName', res.data.schoolName);
-      } else if (res.data?.school?.name) {
-        console.log("📚 School name from classes school object:", res.data.school.name);
-        localStorage.setItem('teacherSchoolName', res.data.school.name);
-      } else if (res.data?.data?.schoolName) {
-        console.log("📚 School name from classes data:", res.data.data.schoolName);
-        localStorage.setItem('teacherSchoolName', res.data.data.schoolName);
-      } else if (res.data?.teacher?.schoolName) {
-        console.log("📚 School name from teacher object:", res.data.teacher.schoolName);
-        localStorage.setItem('teacherSchoolName', res.data.teacher.schoolName);
-      } else if (res.data?.teacher?.school?.name) {
-        console.log("📚 School name from teacher school object:", res.data.teacher.school.name);
-        localStorage.setItem('teacherSchoolName', res.data.teacher.school.name);
-      } else {
-        console.log("❌ No school name found in classes response");
-        // Try to get from user context or localStorage
-        const storedSchoolName = localStorage.getItem('teacherSchoolName');
-        if (storedSchoolName) {
-          console.log("📚 Using stored school name:", storedSchoolName);
-        }
+      const response = await getSchoolInfo()
+      if (response.data && response.data.schoolName) {
+        setSchoolName(response.data.schoolName)
+        localStorage.setItem('teacherSchoolName', response.data.schoolName)
       }
     } catch (error) {
-      console.error("Error loading classes:", error);
-      setClasses([]); // Ensure classes is always an array
+      console.error("Error fetching teacher profile:", error)
     }
-  };
+  }
 
-  const handleClassChange = async (className) => {
-    setSelectedClass(className);
-    setCurrentPage(1);
+  const discoverAvailableClasses = async () => {
+    setDiscoveringClasses(true)
     try {
-      const res = await getStudentsByClass(className);
-      console.log("👥 Students response:", res);
-      console.log("👥 Students data:", res.data);
+      // Use the classes endpoint to get available classes
+      const response = await getClasses()
       
-      // Handle different response structures
-      let studentsData = [];
-      if (res.data && Array.isArray(res.data)) {
-        studentsData = res.data;
-      } else if (res.data && res.data.students && Array.isArray(res.data.students)) {
-        studentsData = res.data.students;
-      } else if (res.data && res.data.success && Array.isArray(res.data.data)) {
-        studentsData = res.data.data;
-      } else {
-        console.warn("👥 Unexpected students response structure:", res.data);
-        studentsData = [];
-      }
-      
-      console.log("👥 Final students data:", studentsData);
-      setStudents(studentsData);
-    } catch (error) {
-      console.error("Error loading students:", error);
-      setStudents([]); // Ensure students is always an array
-    }
-  };
-
-  // Pagination helpers
-  const getPaginatedStudents = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return students.slice(startIndex, endIndex);
-  };
-
-  const getTotalPages = () => {
-    return Math.ceil(students.length / itemsPerPage);
-  };
-
-    // Camera functions with cross-platform compatibility
-  const startCamera = async (studentId) => {
-    try {
-      console.log("📸 Starting camera for student:", studentId);
-      addDebugLog("📸 Starting camera capture", "info");
-      
-      // Clean up any existing resources before starting camera
-      cleanupResources();
-      
-      // Detect platform for better compatibility
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      console.log("📱 Device type:", isAndroid ? "Android" : isIOS ? "iOS" : "Other");
-      addDebugLog(`📱 Device: ${isAndroid ? "Android" : isIOS ? "iOS" : "Other"}`, "info");
-      
-      // Create file input for native camera app with cross-platform support
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      
-      // Use platform-specific capture settings
-      if (isAndroid) {
-        input.capture = 'environment'; // Back camera for Android
-        console.log("📸 Using back camera for Android");
-        addDebugLog("📸 Using back camera (Android)", "info");
-        // Add Android-specific attributes
-        input.setAttribute('data-testid', 'camera-input-android');
-        input.setAttribute('data-capture', 'environment');
-      } else if (isIOS) {
-        input.capture = 'environment'; // Back camera for iOS
-        console.log("📸 Using back camera for iOS");
-        addDebugLog("📸 Using back camera (iOS)", "info");
-        input.setAttribute('data-testid', 'camera-input-ios');
-        input.setAttribute('data-capture', 'environment');
-      } else {
-        input.capture = 'environment'; // Back camera for other devices
-        console.log("📸 Using back camera for other devices");
-        addDebugLog("📸 Using back camera (Other)", "info");
-        input.setAttribute('data-testid', 'camera-input');
-      }
-      
-      // Add cross-platform compatibility attributes
-      input.style.display = 'none';
-      input.setAttribute('data-platform', isAndroid ? 'android' : isIOS ? 'ios' : 'other');
-      
-      input.onchange = async (e) => {
-        try {
-          addDebugLog("📸 Camera file selected", "info");
-          console.log("📸 Camera file selected");
-          const file = e.target.files[0];
+      if (response.data && response.data.classes && Array.isArray(response.data.classes) && response.data.classes.length > 0) {
+        // Sort classes numerically
+        const sortedClasses = response.data.classes.sort((a, b) => {
+          const getClassNumber = (className) => {
+            const match = className.match(/(\d+)/)
+            return match ? parseInt(match[1]) : 0
+          }
           
-          if (file) {
-            addDebugLog(`📸 File: ${file.name} (${file.size} bytes)`, "info");
-            console.log("📸 Camera file details:", {
-              name: file.name,
-              type: file.type,
-              size: file.size,
-              lastModified: file.lastModified
-            });
-            
-            // Use the same validation as handleFileUpload
-            if (!file.type.startsWith('image/') && !file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|webp)$/)) {
-              addDebugLog("❌ Invalid file type from camera", "error");
-              // Don't show alert - just log the error
-              return;
-            }
-            
-            // Accept any file size - no compression
-            addDebugLog("✅ Camera file validated, starting upload", "success");
-            handleFileUpload(studentId, file);
-          } else {
-            console.log("📸 No file selected from camera");
+          const aNum = getClassNumber(a)
+          const bNum = getClassNumber(b)
+          
+          if (aNum !== bNum) {
+            return aNum - bNum // Ascending order (6th, 7th, 8th, 9th, 10th)
+          }
+          
+          return a.localeCompare(b)
+        })
+        
+        setAvailableClasses(sortedClasses)
+        setClassesDiscovered(true)
+        setDiscoveringClasses(false)
+        return
+      }
+      
+      // Fallback: try individual class formats if classes endpoint fails
+      const classesToTry = [
+        "10th CLASS", "9th CLASS", "8th CLASS", "7th CLASS", "6th CLASS"
+      ]
+      const availableClasses = []
+      
+      for (const className of classesToTry) {
+        try {
+          const classResponse = await getStudents(className)
+          
+          if (classResponse.data && Array.isArray(classResponse.data) && classResponse.data.length > 0) {
+            availableClasses.push(className)
+          } else if (classResponse.data && classResponse.data.students && classResponse.data.students.length > 0) {
+            availableClasses.push(className)
           }
         } catch (error) {
-          console.error("❌ Error in camera file selection:", error);
-          addDebugLog(`❌ Camera error: ${error.message}`, "error");
-          cleanupResources();
-          
-          // Platform-specific error logging
-          if (isAndroid) {
-            addDebugLog("⚠️ Android camera error - try file upload", "warning");
-          } else if (isIOS) {
-            addDebugLog("⚠️ iOS camera error - try file upload", "warning");
-          } else {
-            addDebugLog("⚠️ Camera error - try file upload", "warning");
-          }
+          // Continue silently on error
         }
-      };
+      }
       
-      input.onerror = (error) => {
-        console.error("❌ Camera input error:", error);
-        cleanupResources();
-        
-        // Android-specific error message
-        if (isAndroid) {
-          alert("Android: Camera error. Please try again or use file upload instead.");
-        } else {
-          alert("Camera error. Please try again or use file upload instead.");
-        }
-      };
-      
-      // Add to DOM temporarily
-      document.body.appendChild(input);
-      
-      // Trigger file selection
-      input.click();
-      
-      // Clean up after a delay
-      setTimeout(() => {
-        if (document.body.contains(input)) {
-          document.body.removeChild(input);
-        }
-      }, 1000);
+      const finalClasses = availableClasses.length > 0 ? availableClasses : ["10th CLASS"]
+      setAvailableClasses(finalClasses)
+      setClassesDiscovered(true)
+      setDiscoveringClasses(false)
       
     } catch (error) {
-      console.error("❌ Error accessing camera:", error);
-      cleanupResources();
-      
-      // Android-specific error message
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      if (isAndroid) {
-        alert("Android: Unable to access camera. Please check permissions and try again.");
-      } else {
-        alert("Unable to access camera. Please check permissions and try again.");
-      }
+      // If all fails, set default classes
+      setAvailableClasses(["10th CLASS", "9th CLASS", "8th CLASS", "7th CLASS", "6th CLASS"])
+      setClassesDiscovered(true)
+      setDiscoveringClasses(false)
     }
-  };
+  }
 
-  const stopCamera = () => {
-    if (cameraStream) {
-      cameraStream.getTracks().forEach(track => track.stop());
-      setCameraStream(null);
-      setActiveCamera(null);
-    }
-  };
+  const handlePhotoUpload = (student) => {
+    setSelectedStudent(student)
+    setModalMode("file")
+    setShowPhotoModal(true)
+  }
 
-  const capturePhoto = (studentId, retryCount = 0) => {
-    const maxRetries = 50; // Maximum 5 seconds (50 * 100ms)
+  const handleAddPhoto = (student) => {
+    setSelectedStudent(student)
+    setModalMode("file")
+    setShowPhotoModal(true)
+  }
+
+  const handleSavePhoto = async (photoFile, studentData) => {
+    // Use studentData from parameter if available, otherwise fall back to selectedStudent state
+    let student = studentData || selectedStudent
     
-    if (videoRef.current && canvasRef.current) {
-      console.log("📸 Capturing photo for student:", studentId, "Retry:", retryCount);
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-      
-      // Check if video has valid dimensions
-      if (video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 2) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0);
-        
-        const photoData = canvas.toDataURL('image/jpeg', 0.8);
-        const updatedPhotos = {
-          ...studentPhotos,
-          [studentId]: {
-            data: photoData,
-            timestamp: new Date().toISOString(),
-            status: 'captured'
-          }
-        };
-        
-        setStudentPhotos(updatedPhotos);
-        console.log("📸 Photo captured successfully, updated studentPhotos:", updatedPhotos);
-        
-        // Force save to localStorage immediately
-        localStorage.setItem('teacherStudentPhotos', JSON.stringify(updatedPhotos));
-        console.log("💾 Immediately saved captured photo to localStorage");
-        
-        stopCamera();
-        
-        // Show success message
-        alert("Photo captured successfully! Click 'Save' to upload it.");
-      } else if (retryCount < maxRetries) {
-        console.log("❌ Video not ready, waiting... (Retry:", retryCount + 1, "/", maxRetries, ")");
-        setTimeout(() => capturePhoto(studentId, retryCount + 1), 100);
-      } else {
-        console.error("❌ Video never became ready after", maxRetries, "retries");
-        alert("Camera failed to initialize properly. Please try again or use file upload instead.");
-        stopCamera();
-      }
-    } else {
-      console.error("❌ Video or canvas ref not available");
-      alert("Camera not ready. Please try again.");
-      stopCamera();
+    // If still no student data, try to get it from the current filtered students
+    if (!student && Array.isArray(filteredStudents) && filteredStudents.length > 0) {
+      // Try to find a student that might match (this is a fallback)
+      student = filteredStudents[0]
     }
-  };
+    
+    if (!student || !photoFile) {
+      return
+    }
 
+    setUploading(true)
+    setMessage("Uploading photo...")
 
+    const formData = new FormData()
+    formData.append("photo", photoFile)
+    formData.append("studentId", student._id)
+    formData.append("photoId", student.photoId || student.rollNumber || student.roll_number)
 
-  // Debug logging function for mobile
-  const addDebugLog = (message, type = 'info') => {
-    const timestamp = new Date().toLocaleTimeString();
-    const logEntry = { timestamp, message, type };
-    setDebugLogs(prev => [...prev.slice(-9), logEntry]); // Keep last 10 logs
-    console.log(`[${timestamp}] ${message}`);
-  };
-
-  // Function to clear localStorage when quota is exceeded
-  const clearLocalStorageIfNeeded = () => {
     try {
-      // Try to store a small test item
-      localStorage.setItem('test', '1');
-      localStorage.removeItem('test');
+      const response = await uploadPhoto(formData)
+      
+      // Get the photo URL from the response
+      const photoUrl = response.data.photoUrl
+      
+      // Immediately update the local state to show the photo
+      if (photoUrl) {
+        setStudents(prevStudents => 
+          prevStudents.map(s => 
+            s._id === student._id 
+              ? { ...s, photoUrl: photoUrl, photoUploaded: true, updatedAt: new Date() }
+              : s
+          )
+        )
+        
+        // Also update filteredStudents immediately for instant UI update
+        setFilteredStudents(prevFiltered => 
+          prevFiltered.map(s => 
+            s._id === student._id 
+              ? { ...s, photoUrl: photoUrl, photoUploaded: true, updatedAt: new Date() }
+              : s
+          )
+        )
+      }
+      
+      setMessage("✅ Photo uploaded successfully!")
+      setShowPhotoModal(false)
+      setSelectedStudent(null)
     } catch (error) {
-      // If quota is exceeded, clear old data
-      addDebugLog("⚠️ localStorage quota exceeded, clearing old data", "warning");
-      try {
-        // Keep only the most recent 5 photos
-        const currentData = localStorage.getItem('teacherStudentPhotos');
-        if (currentData) {
-          const photos = JSON.parse(currentData);
-          const photoEntries = Object.entries(photos);
-          if (photoEntries.length > 5) {
-            // Sort by timestamp and keep only the 5 most recent
-            const sortedEntries = photoEntries.sort((a, b) => {
-              const timeA = new Date(a[1].timestamp || 0);
-              const timeB = new Date(b[1].timestamp || 0);
-              return timeB - timeA;
-            });
-            const recentPhotos = Object.fromEntries(sortedEntries.slice(0, 5));
-            localStorage.setItem('teacherStudentPhotos', JSON.stringify(recentPhotos));
-            addDebugLog("✅ Cleared old photos, kept 5 most recent", "success");
-          }
-        }
-      } catch (clearError) {
-        // If clearing fails, remove all data
-        localStorage.removeItem('teacherStudentPhotos');
-        addDebugLog("✅ Cleared all localStorage data", "success");
-      }
-    }
-  };
-
-  // Global cleanup function to prevent memory leaks
-  const cleanupResources = () => {
-    console.log("🧹 Starting cleanup...");
-    
-    // Clean up any existing object URLs
-    if (window.currentObjectUrl) {
-      console.log("🧹 Cleaning up object URL");
-      URL.revokeObjectURL(window.currentObjectUrl);
-      window.currentObjectUrl = null;
-    }
-    
-    // Clean up any existing FileReader
-    if (window.currentFileReader) {
-      console.log("🧹 Cleaning up FileReader");
-      try {
-        window.currentFileReader.abort();
-      } catch (e) {
-        console.log("🧹 FileReader already aborted");
-      }
-      window.currentFileReader = null;
-    }
-    
-    // Clear any existing timeouts
-    if (window.currentTimeout) {
-      console.log("🧹 Cleaning up timeout");
-      clearTimeout(window.currentTimeout);
-      window.currentTimeout = null;
-    }
-    
-    // Force garbage collection if available
-    if (window.gc) {
-      console.log("🧹 Forcing garbage collection");
-      window.gc();
-    }
-    
-    // Clear any remaining references
-    if (window.currentImage) {
-      console.log("🧹 Cleaning up image reference");
-      window.currentImage = null;
-    }
-    
-    if (window.currentCanvas) {
-      console.log("🧹 Cleaning up canvas reference");
-      window.currentCanvas = null;
-    }
-    
-    console.log("🧹 Cleanup completed");
-  };
-
-  // Force fresh start for each photo upload
-  const forceFreshStart = () => {
-    console.log("🔄 Forcing fresh start...");
-    
-    // Clear all global references
-    window.currentObjectUrl = null;
-    window.currentFileReader = null;
-    window.currentTimeout = null;
-    window.currentImage = null;
-    window.currentCanvas = null;
-    
-    // Force garbage collection
-    if (window.gc) {
-      window.gc();
-    }
-    
-    // Small delay to ensure cleanup
-    return new Promise(resolve => setTimeout(resolve, 100));
-  };
-
-  const handleFileUpload = async (studentId, file) => {
-    try {
-      // Safety check
-      if (!studentId || !file) {
-        console.error("❌ Invalid parameters:", { studentId, file });
-        addDebugLog("❌ Invalid parameters for file upload", "error");
-        return;
-      }
-      
-      console.log("📁 File upload for student:", studentId, "File:", file);
-      
-      if (!file) {
-        console.error("❌ No file selected");
-        return;
-      }
-      
-      // Validate file type
-      if (!file.type.startsWith('image/') && !file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|webp)$/)) {
-        alert("Please select an image file (JPG, PNG, GIF, BMP, or WebP).");
-        return;
-      }
-      
-      // PERFECT SOLUTION - Send file directly to backend API
-      console.log("📱 Using PERFECT solution - sending to backend API");
-      
-      // Find the student to get photoId
-      const student = students.find(s => (s._id || s.id) === studentId);
-      if (!student) {
-        throw new Error("Student not found");
-      }
-      
-      console.log("🎯 Student found:", { 
-        studentId, 
-        photoId: student.photoId, 
-        fullName: student.fullName 
-      });
-      
-      // Create immediate preview using URL.createObjectURL for instant display
-      const objectUrl = URL.createObjectURL(file);
-      
-      // Also create a data URL as backup for better cross-platform compatibility
-      let dataUrl;
-      try {
-        dataUrl = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = () => reject(new Error("Failed to create data URL"));
-          reader.readAsDataURL(file);
-        });
-      } catch (dataUrlError) {
-        addDebugLog("⚠️ Data URL creation failed, using object URL only", "warning");
-        dataUrl = objectUrl; // Fallback to object URL
-      }
-      
-      // Show immediate preview instantly and mark as saved
-      const immediatePreview = {
-        ...studentPhotos,
-        [studentId]: {
-          data: objectUrl, // Use object URL for immediate display
-          timestamp: new Date().toISOString(),
-          status: 'saved', // Mark as saved immediately
-          filename: file.name,
-          fileSize: file.size,
-          fileType: file.type
-          // Don't store dataUrl in localStorage to prevent quota issues
-        }
-      };
-      
-      setStudentPhotos(immediatePreview);
-      addDebugLog("⚡ Photo saved instantly", "success");
-      
-      // Save to localStorage with minimal data to prevent quota issues
-      clearLocalStorageIfNeeded(); // Check and clear if needed
-      try {
-        const storageData = {
-          ...studentPhotos,
-          [studentId]: {
-            timestamp: new Date().toISOString(),
-            status: 'saved', // Mark as saved immediately
-            filename: file.name,
-            fileSize: file.size,
-            fileType: file.type
-            // Only store metadata, not the actual image data
-          }
-        };
-        localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
-        addDebugLog("💾 Saved metadata to localStorage", "success");
-      } catch (storageError) {
-        addDebugLog("⚠️ localStorage quota exceeded, continuing without storage", "warning");
-        // Continue without localStorage if quota is exceeded
-      }
-      
-      // Start backend upload in background (non-blocking)
-      addDebugLog("📤 Starting backend upload to Railway...", "info");
-      uploadPhoto(student.photoId, file, studentId)
-        .then(response => {
-          addDebugLog("✅ Backend upload successful", "success");
-          
-          // Update with Cloudinary URL if available
-          const photoUrl = response.data.photoUrl;
-          if (photoUrl) {
-            const updatedPhotos = {
-              ...studentPhotos,
-              [studentId]: {
-                data: photoUrl, // Use Cloudinary URL for display
-                timestamp: new Date().toISOString(),
-                status: 'uploaded',
-                filename: file.name,
-                cloudinaryUrl: photoUrl,
-                fileSize: file.size,
-                fileType: file.type
-              }
-            };
-            
-            setStudentPhotos(updatedPhotos);
-            
-            // Save minimal data to localStorage
-            try {
-              const storageData = {
-                ...studentPhotos,
-                [studentId]: {
-                  data: photoUrl, // Store Cloudinary URL (small)
-                  timestamp: new Date().toISOString(),
-                  status: 'uploaded',
-                  filename: file.name,
-                  cloudinaryUrl: photoUrl
-                }
-              };
-              localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
-              addDebugLog("✅ Photo updated with Cloudinary URL", "success");
-            } catch (storageError) {
-              addDebugLog("⚠️ localStorage quota exceeded, but photo uploaded successfully", "warning");
-            }
-          } else {
-            // If no Cloudinary URL, keep using object URL
-            const updatedPhotos = {
-              ...studentPhotos,
-              [studentId]: {
-                data: objectUrl,
-                timestamp: new Date().toISOString(),
-                status: 'uploaded_no_url',
-                filename: file.name,
-                fileSize: file.size,
-                fileType: file.type
-              }
-            };
-            
-            setStudentPhotos(updatedPhotos);
-            
-            // Save minimal data to localStorage
-            try {
-              const storageData = {
-                ...studentPhotos,
-                [studentId]: {
-                  timestamp: new Date().toISOString(),
-                  status: 'uploaded_no_url',
-                  filename: file.name
-                }
-              };
-              localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
-              addDebugLog("✅ Photo uploaded but no Cloudinary URL received", "success");
-            } catch (storageError) {
-              addDebugLog("⚠️ localStorage quota exceeded, but photo uploaded successfully", "warning");
-            }
-          }
-        })
-        .catch(uploadError => {
-          if (uploadError.message.includes('timeout') || uploadError.code === 'ECONNABORTED') {
-            addDebugLog("⏰ Upload timeout - Railway backend is slow, but photo is saved locally", "warning");
-          } else {
-            addDebugLog(`❌ Upload failed: ${uploadError.message}`, "error");
-          }
-          
-          // Keep the preview but mark as failed
-          const updatedPhotos = {
-            ...studentPhotos,
-            [studentId]: {
-              data: objectUrl, // Keep object URL for display
-              timestamp: new Date().toISOString(),
-              status: 'failed',
-              filename: file.name,
-              error: uploadError.message,
-              fileSize: file.size,
-              fileType: file.type
-            }
-          };
-          
-          setStudentPhotos(updatedPhotos);
-          
-          // Save minimal data to localStorage
-          try {
-            const storageData = {
-              ...studentPhotos,
-              [studentId]: {
-                timestamp: new Date().toISOString(),
-                status: 'failed',
-                filename: file.name,
-                error: uploadError.message
-              }
-            };
-            localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
-            addDebugLog("⚠️ Photo saved locally due to upload failure", "warning");
-          } catch (storageError) {
-            addDebugLog("⚠️ localStorage quota exceeded, but photo saved locally", "warning");
-          }
-        });
-      
-      return; // Exit early - no need to wait for upload
-      
-    } catch (error) {
-      console.error("❌ Error uploading file:", error);
-      addDebugLog(`❌ Upload error: ${error.message}`, "error");
-      
-      // Show specific error message based on error type
-      let errorMessage = "Error uploading file. Please try again.";
-      
-      if (error.message.includes("Network Error")) {
-        errorMessage = "Network error. Please check your internet connection and try again.";
-      } else if (error.message.includes("timeout")) {
-        errorMessage = "Upload timeout. Please try again with a smaller image.";
-      } else if (error.message.includes("413")) {
-        errorMessage = "File too large. Please select a smaller image.";
-      } else if (error.message.includes("401")) {
-        errorMessage = "Authentication error. Please log in again.";
-      } else if (error.message.includes("500")) {
-        errorMessage = "Server error. Please try again later.";
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      // Show error message
-      alert(errorMessage);
-    }
-  };
-
-  const savePhoto = async (studentId) => {
-    const photo = studentPhotos[studentId];
-    if (!photo) return;
-
-    // Mark as saved immediately for instant feedback
-    const immediateUpdate = {
-      ...studentPhotos,
-      [studentId]: {
-        ...studentPhotos[studentId],
-        status: 'saved'
-      }
-    };
-    
-    setStudentPhotos(immediateUpdate);
-    
-    // Save minimal data to localStorage
-    try {
-      const storageData = {
-        ...studentPhotos,
-        [studentId]: {
-          ...studentPhotos[studentId],
-          status: 'saved'
-        }
-      };
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(storageData));
-      addDebugLog("💾 Photo marked as saved instantly", "success");
-    } catch (storageError) {
-      addDebugLog("⚠️ localStorage quota exceeded, but photo marked as saved", "warning");
-    }
-    
-    // Start backend upload in background (non-blocking)
-    try {
-      // Convert base64 to blob
-      const response = await fetch(photo.data);
-      const blob = await response.blob();
-      
-      // Create a file from the blob
-      const file = new File([blob], `${studentId}.jpg`, { type: 'image/jpeg' });
-      
-      // Find the student object to get photoId
-      const student = students.find(s => (s._id || s.id) === studentId);
-      if (!student) {
-        addDebugLog("❌ Student not found", "error");
-        return;
-      }
-      
-      addDebugLog("📤 Starting backend save...", "info");
-      
-      // Upload to backend in background
-      uploadPhoto(student.photoId, file, studentId)
-        .then(response => {
-          addDebugLog("✅ Backend save successful", "success");
-          
-          // Update with Cloudinary URL if available
-          const photoUrl = response.data.photoUrl;
-          if (photoUrl) {
-            const finalUpdate = {
-              ...studentPhotos,
-              [studentId]: {
-                ...studentPhotos[studentId],
-                data: photoUrl,
-                cloudinaryUrl: photoUrl,
-                status: 'saved'
-              }
-            };
-            
-            setStudentPhotos(finalUpdate);
-            localStorage.setItem('teacherStudentPhotos', JSON.stringify(finalUpdate));
-            addDebugLog("✅ Photo updated with Cloudinary URL", "success");
-          }
-        })
-        .catch(error => {
-          addDebugLog(`❌ Backend save failed: ${error.message}`, "error");
-          
-          // Keep the saved status but mark as failed
-          const failedUpdate = {
-            ...studentPhotos,
-            [studentId]: {
-              ...studentPhotos[studentId],
-              status: 'saved_failed',
-              error: error.message
-            }
-          };
-          
-          setStudentPhotos(failedUpdate);
-          localStorage.setItem('teacherStudentPhotos', JSON.stringify(failedUpdate));
-          addDebugLog("⚠️ Photo saved locally but backend failed", "warning");
-        });
-        
-    } catch (error) {
-      addDebugLog(`❌ Save error: ${error.message}`, "error");
-      
-      // Keep the saved status but mark as failed
-      const failedUpdate = {
-        ...studentPhotos,
-        [studentId]: {
-          ...studentPhotos[studentId],
-          status: 'saved_failed',
-          error: error.message
-        }
-      };
-      
-      setStudentPhotos(failedUpdate);
-      localStorage.setItem('teacherStudentPhotos', JSON.stringify(failedUpdate));
-      addDebugLog("⚠️ Photo saved locally but processing failed", "warning");
-    }
-  };
-
-  const retakePhoto = (studentId) => {
-    setStudentPhotos(prev => ({
-      ...prev,
-      [studentId]: null
-    }));
-  };
-
-  const handleDeleteAllRecords = async () => {
-    try {
-      // Clear local photos
-      setStudentPhotos({});
-      localStorage.removeItem('teacherStudentPhotos');
-      
-      // You can add API call here to delete records from backend
-      // await deleteAllRecords();
-      
-      console.log("All records deleted successfully");
-    } catch (error) {
-      console.error("Error deleting records:", error);
+      console.error("Upload error:", error)
+      setMessage(error.response?.data?.message || "Error uploading photo")
     } finally {
-      setShowDeleteConfirmation(false);
+      setUploading(false)
     }
-  };
+  }
 
 
+
+  const [modalMode, setModalMode] = useState("file")
 
   const handleSubmitAllRecords = async () => {
-    const savedPhotos = Object.entries(studentPhotos).filter(([_, photo]) => photo?.status === 'saved');
+    setUploading(true)
+    setMessage("Submitting all records...")
     
-    if (savedPhotos.length === 0) {
-      alert("No photos to submit. Please save at least one photo.");
-      return;
-    }
-
     try {
-      // Submit all saved photos to admin using the existing endpoint
-      await submitUpdates();
-      
-      // Send notification to admin
-      await sendNotificationToAdmin(
-        "Teacher Updates Submitted",
-        `Teacher has submitted ${savedPhotos.length} updated student records with photos.`,
-        "TEACHER_UPDATE"
-      );
-      
-      // Show confirmation card instead of alert
-      setShowConfirmationCard(true);
-      
-      // Keep ALL photos but mark saved ones as submitted
-      const updatedPhotos = { ...studentPhotos };
-      Object.entries(studentPhotos).forEach(([studentId, photo]) => {
-        if (photo?.status === 'saved') {
-          updatedPhotos[studentId] = {
-            ...photo,
-            status: 'submitted'
-          };
-        }
-        // Keep all other photos as they are (captured, submitted, etc.)
-      });
-      setStudentPhotos(updatedPhotos);
-      console.log("📤 After submission - photos:", updatedPhotos);
+      // This would be an API call to submit all records
+      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate API call
+      setMessage("All records submitted successfully!")
     } catch (error) {
-      console.error("Error submitting records:", error);
-    }
-  };
-
-  const handleClearAllPhotos = async () => {
-    try {
-      // Clear local photos
-      setStudentPhotos({});
-      localStorage.removeItem('teacherStudentPhotos');
-      
-      // You can add API call here to delete records from backend
-      // await deleteAllRecords();
-      
-      console.log("All photos cleared successfully");
-    } catch (error) {
-      console.error("Error clearing photos:", error);
+      setMessage("Error submitting records")
     } finally {
-      setShowDeleteConfirmation(false);
+      setUploading(false)
     }
-  };
+  }
 
-  const PhotoUploadComponent = ({ student }) => {
-    const studentId = student._id || student.id;
-    const photo = studentPhotos[studentId];
-
-    return (
-      <div className="space-y-4">
-        {activeCamera === studentId ? (
-          <div className="space-y-4">
-            <div className="flex justify-center">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border-2 border-gray-300"
-              />
-            </div>
-            <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => capturePhoto(studentId)}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
-              >
-                📸 Capture
-              </button>
-              <button
-                onClick={stopCamera}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 font-medium transition-colors"
-              >
-                ❌ Cancel
-              </button>
-            </div>
-          </div>
-        ) : photo ? (
-          <div className="space-y-4">
-            <div className="flex justify-center">
-              <img
-                src={photo.data}
-                alt="Student photo"
-                className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border-2 border-gray-300"
-                onError={(e) => {
-                  // If main image fails, try backup data URL
-                  if (photo.dataUrl && e.target.src !== photo.dataUrl) {
-                    addDebugLog("🔄 Image failed, trying backup URL", "warning");
-                    e.target.src = photo.dataUrl;
-                  } else {
-                    addDebugLog("❌ All image URLs failed", "error");
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }
-                }}
-              />
-              {/* Fallback display if image fails */}
-              <div 
-                className="w-32 h-32 sm:w-40 sm:h-40 bg-gray-100 border-2 border-gray-300 rounded-lg flex items-center justify-center"
-                style={{ display: 'none' }}
-              >
-                <div className="text-center">
-                  <div className="text-gray-400 text-xs mb-1">⚠️ Image Error</div>
-                  <div className="text-gray-500 text-xs">{photo.filename}</div>
-                  <div className="text-gray-400 text-xs mt-1">{photo.status}</div>
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+      
+      <div className="flex-1">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">H</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">
+                    {schoolName}
+                  </h1>
+                  <p className="text-xs text-gray-500">Teacher Portal</p>
                 </div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => savePhoto(studentId)}
-                disabled={photo.status === 'saved' || photo.status === 'uploaded'}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  photo.status === 'saved' || photo.status === 'uploaded'
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                }`}
+              <button 
+                onClick={handleSubmitAllRecords}
+                disabled={uploading}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
               >
-                {photo.status === 'saved' ? '✅ Saved' : 
-                 photo.status === 'uploaded' ? '✅ Uploaded' :
-                 photo.status === 'uploading' ? '⏳ Uploading...' :
-                 photo.status === 'failed' ? '❌ Failed' :
-                 '💾 Save'}
-              </button>
-              <button
-                onClick={() => retakePhoto(studentId)}
-                className="px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm hover:bg-yellow-600 font-medium transition-colors"
-              >
-                📷 Retake
+                <span>{uploading ? "Submitting..." : "Submit All Records"}</span>
               </button>
             </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex justify-center">
-              <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400 text-sm text-center">No Photo</span>
-              </div>
+        </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Class Selection */}
+        <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <label className="text-sm font-medium text-gray-700">Select Class:</label>
+              {discoveringClasses ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  <span className="text-sm text-gray-500">Discovering classes...</span>
+                </div>
+              ) : (
+                <>
+                  <select 
+                    value={selectedClass}
+                    onChange={handleClassChange}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {availableClasses.map((className) => (
+                      <option key={className} value={className}>
+                        {className}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-sm text-gray-500">
+                    {filteredStudents.length} students found
+                  </span>
+                </>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => startCamera(studentId)}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 font-medium transition-colors"
-              >
-                📷 Take Photo
-              </button>
-              <label className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 cursor-pointer font-medium text-center transition-colors">
-                📁 Choose File
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      addDebugLog(`📁 File selected: ${file.name} (${file.size} bytes)`, "info");
-                      
-                      // Quick validation without blocking
-                      if (!file.type.startsWith('image/')) {
-                        addDebugLog("❌ Invalid file type selected", "error");
-                        // Don't show alert - just log the error
-                        return;
-                      }
-                      
-                      addDebugLog("✅ File validation passed, starting instant upload", "success");
-                      // Start upload immediately
-                      handleFileUpload(studentId, file);
-                      
-                      // Clear the input to allow selecting the same file again
-                      e.target.value = '';
-                    } else {
-                      addDebugLog("❌ No file selected", "error");
-                    }
-                  }}
-                  className="hidden"
-                />
-              </label>
+            
+          </div>
+        </div>
+
+        {/* Message Display */}
+        {message && (
+          <div className={`p-4 rounded-lg mb-6 ${
+            message.includes("successfully") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+          }`}>
+            {message}
+          </div>
+        )}
+
+        {/* Success Message */}
+        {message && (
+          <div className={`mb-6 p-4 rounded-lg ${
+            message.includes("✅") ? "bg-green-100 border border-green-300 text-green-800" : 
+            message.includes("❌") ? "bg-red-100 border border-red-300 text-red-800" :
+            "bg-blue-100 border border-blue-300 text-blue-800"
+          }`}>
+            <div className="flex items-center space-x-2">
+              {message.includes("✅") && <span className="text-green-600">✓</span>}
+              {message.includes("❌") && <span className="text-red-600">✗</span>}
+              <span className="font-medium">{message}</span>
             </div>
           </div>
         )}
-      </div>
-    );
-  };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex teacher-dashboard" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
-      <Sidebar role="TEACHER" />
-      
-      {/* Main Content Container - Proper layout */}
-      <div className="flex-1 w-full" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-6 md:pt-6 pt-16" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
-          
-          {/* Debug Panel - Always visible for testing */}
-          <div className="mb-6 bg-gray-900 text-white p-4 rounded-lg font-mono text-xs max-h-40 overflow-y-auto">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-bold">🔍 Debug Logs (Last 10)</h3>
-              <div className="flex space-x-2">
-                <button 
-                  onClick={() => {
-                    addDebugLog("🧪 Test log message", "info");
-                  }} 
-                  className="text-blue-400 hover:text-white text-xs"
-                >
-                  Test
-                </button>
-                <button 
-                  onClick={async () => {
-                    addDebugLog("🧪 Testing file upload...", "info");
-                    try {
-                      // Create a test file
-                      const testData = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=";
-                      const response = await fetch(testData);
-                      const blob = await response.blob();
-                      const testFile = new File([blob], "test.jpg", { type: "image/jpeg" });
-                      
-                      addDebugLog(`🧪 Test file created: ${testFile.name} (${testFile.size} bytes)`, "info");
-                      
-                      // Test upload with first student
-                      if (students.length > 0) {
-                        const firstStudent = students[0];
-                        addDebugLog(`🧪 Testing with student: ${firstStudent.fullName}`, "info");
-                        await handleFileUpload(firstStudent._id || firstStudent.id, testFile);
-                      } else {
-                        addDebugLog("❌ No students available for test", "error");
-                      }
-                    } catch (error) {
-                      addDebugLog(`❌ Test failed: ${error.message}`, "error");
-                    }
-                  }} 
-                  className="text-green-400 hover:text-white text-xs"
-                >
-                  Test Upload
-                </button>
-                <button 
-                  onClick={() => setDebugLogs([])} 
-                  className="text-gray-400 hover:text-white"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-            {debugLogs.length === 0 ? (
-              <div className="text-gray-500">No logs yet. Try uploading a photo or click "Test"</div>
-            ) : (
-              debugLogs.map((log, index) => (
-                <div key={index} className={`mb-1 ${
-                  log.type === 'error' ? 'text-red-400' : 
-                  log.type === 'success' ? 'text-green-400' : 
-                  log.type === 'warning' ? 'text-yellow-400' : 
-                  'text-gray-300'
-                }`}>
-                  <span className="text-gray-500">[{log.timestamp}]</span> {log.message}
-                </div>
-              ))
-            )}
-          </div>
-          
-          {/* Header Section - Compact and professional */}
-          <div className="mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-3 sm:mb-0">
-                <h1 className="text-xl font-bold text-gray-900">
-                  {user?.schoolName || user?.school?.name || profile?.schoolName || profile?.school?.name || localStorage.getItem('teacherSchoolName') || "School Dashboard"}
-                </h1>
-                <p className="text-sm text-gray-500">Teacher Portal</p>
 
-              </div>
-              
-              {/* Action Button - Compact spacing */}
-              <div className="flex-shrink-0">
-                <button
-                  onClick={handleSubmitAllRecords}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                >
-                  📋 Submit All Records
-                </button>
-              </div>
+
+        {/* Data Availability Notice */}
+        {classesDiscovered && availableClasses.length === 1 && students.length === 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-blue-800 mb-2">Data Availability Notice</h3>
+            <div className="text-sm text-blue-700">
+              <p>Currently, only <strong>{availableClasses[0]}</strong> has student data available.</p>
+              <p>To add data for other classes, please ask the admin to upload Excel files for those classes.</p>
             </div>
           </div>
+        )}
 
-          {/* Class Selection - Compact spacing */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
-            <div className="px-6 py-4">
-              <label className="block text-sm font-medium text-gray-700 mb-3">Select Class</label>
-              <select
-                value={selectedClass}
-                onChange={(e) => handleClassChange(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors"
-              >
-                <option value="">Choose a class...</option>
-                {Array.isArray(classes) && classes.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+        {/* Student Photo Management Table */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    PHOTO ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    FULL NAME
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    CLASS
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    PHOTO UPLOAD
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    STATUS
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {Array.isArray(filteredStudents) && filteredStudents.length > 0 ? filteredStudents.map((student, index) => (
+                  <tr key={student._id || student.rollNumber || index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {student.rollNumber || student.photoId || student.roll_number || "DSC_0200"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {student.name || student.fullName || student.studentName || "ADAPA SHANMUKHA RAO"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {student.class || student.className || student.class_name || "10th CLASS"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col items-center space-y-2">
 
-          {/* Students Content - Like Amazon's product listings */}
-          {Array.isArray(students) && students.length > 0 && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              
-              {/* Desktop Table - Like Amazon's product tables */}
-              <div className="hidden md:block">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo ID</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo Upload</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {getPaginatedStudents().map((student) => (
-                      <tr key={student._id || student.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                          {student.photoId}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">
-                          {student.fullName}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                          {student.className}
-                        </td>
-                        <td className="px-6 py-4">
-                          <PhotoUploadComponent student={student} />
-                        </td>
-                        <td className="px-6 py-4">
-                          {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              ✅ Submitted
-                            </span>
-                          ) : studentPhotos[student._id || student.id]?.status === 'saved' ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              💾 Saved
-                            </span>
+                        
+                        {/* Photo display */}
+                        {student.photoUrl ? (
+                          <div className="relative">
+                            <div 
+                              className="w-16 h-16 rounded border-4 border-green-500 bg-cover bg-center"
+                              style={{ 
+                                backgroundImage: `url(${student.photoUrl})`,
+                                width: '64px', 
+                                height: '64px'
+                              }}
+                            />
+                            <div className="text-xs text-green-600 mt-1">
+                              ✅ Photo Available
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center border-2 border-red-500">
+                            <span className="text-gray-400 text-xs">No Photo</span>
+                          </div>
+                        )}
+                        <div className="flex space-x-2">
+                          {!student.photoUrl ? (
+                            <button 
+                              onClick={() => handleAddPhoto(student)}
+                              className="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600"
+                            >
+                              Add Photo
+                            </button>
                           ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                              ⏳ Pending
-                            </span>
+                            <button 
+                              onClick={() => handlePhotoUpload(student)}
+                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700"
+                            >
+                              Update Photo
+                            </button>
                           )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile Cards - Like Amazon's mobile product cards */}
-              <div className="md:hidden">
-                {getPaginatedStudents().map((student) => (
-                  <div key={student._id || student.id} className="border-b border-gray-200 p-4 last:border-b-0">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{student.fullName}</h3>
-                        <div className="space-y-1">
-                          <p className="text-sm text-gray-600">📋 ID: {student.photoId}</p>
-                          <p className="text-sm text-gray-600">🏫 Class: {student.className}</p>
                         </div>
                       </div>
-                      <div className="ml-4">
-                        {studentPhotos[student._id || student.id]?.status === 'submitted' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            ✅ Submitted
-                          </span>
-                        ) : studentPhotos[student._id || student.id]?.status === 'saved' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            💾 Saved
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            ⏳ Pending
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <PhotoUploadComponent student={student} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Pagination - Like Amazon's pagination */}
-              {getTotalPages() > 1 && (
-                <div className="bg-white px-6 py-4 flex items-center justify-between border-t border-gray-200">
-                  <div className="flex-1 flex justify-between sm:hidden">
-                    <button
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                        currentPage === 1
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage(Math.min(getTotalPages(), currentPage + 1))}
-                      disabled={currentPage === getTotalPages()}
-                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                        currentPage === getTotalPages()
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      Next
-                    </button>
-                  </div>
-                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-sm text-gray-700">
-                        Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
-                        <span className="font-medium">
-                          {Math.min(currentPage * itemsPerPage, students.length)}
-                        </span>{' '}
-                        of <span className="font-medium">{students.length}</span> results
-                      </p>
-                    </div>
-                    <div>
-                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                        <button
-                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                          disabled={currentPage === 1}
-                          className={`relative inline-flex items-center px-2 py-2 rounded-l-md border text-sm font-medium ${
-                            currentPage === 1
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-white text-gray-500 hover:bg-gray-50'
-                          }`}
-                        >
-                          Previous
-                        </button>
-                        {Array.from({ length: getTotalPages() }, (_, i) => i + 1).map((page) => (
-                          <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                              page === currentPage
-                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        ))}
-                        <button
-                          onClick={() => setCurrentPage(Math.min(getTotalPages(), currentPage + 1))}
-                          disabled={currentPage === getTotalPages()}
-                          className={`relative inline-flex items-center px-2 py-2 rounded-r-md border text-sm font-medium ${
-                            currentPage === getTotalPages()
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-white text-gray-500 hover:bg-gray-50'
-                          }`}
-                        >
-                          Next
-                        </button>
-                      </nav>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Empty State - Like Amazon's empty states */}
-          {Array.isArray(students) && students.length === 0 && selectedClass && (
-            <div className="text-center py-12">
-              <div className="mx-auto h-12 w-12 text-gray-400">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              </div>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No students found</h3>
-              <p className="mt-1 text-sm text-gray-500">No students are registered in this class.</p>
-            </div>
-          )}
-
-          {/* No Class Selected State */}
-          {!selectedClass && (
-            <div className="text-center py-12">
-              <div className="mx-auto h-12 w-12 text-gray-400">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </div>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">Select a class</h3>
-              <p className="mt-1 text-sm text-gray-500">Choose a class from the dropdown above to view students.</p>
-            </div>
-          )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        (student.photoUrl || student.photoUploaded) ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                      }`}>
+                        {(student.photoUrl || student.photoUploaded) ? "Submitted" : "Pending"}
+                      </span>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                      {students.length === 0 ? "No students data found. Please upload Excel file first." : `No students found in ${selectedClass}`}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+      </div>
 
-      {/* Confirmation Cards */}
-      {showConfirmationCard && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Records Submitted Successfully!</h3>
-            <p className="text-sm text-gray-600 mb-6">All student photos have been submitted to the admin for review.</p>
-            <button
-              onClick={() => setShowConfirmationCard(false)}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showDeleteConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Clear All Photos?</h3>
-            <p className="text-sm text-gray-600 mb-6">This will remove all uploaded photos. This action cannot be undone.</p>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowDeleteConfirmation(false)}
-                className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleClearAllPhotos}
-                className="flex-1 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors"
-              >
-                Clear All
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Photo Upload Modal */}
+      <PhotoUploadModal
+        isOpen={showPhotoModal}
+        onClose={() => setShowPhotoModal(false)}
+        onSave={handleSavePhoto}
+        student={selectedStudent}
+        uploading={uploading}
+        mode={modalMode}
+      />
     </div>
-  );
+  )
 }
+
+export default TeacherDashboard

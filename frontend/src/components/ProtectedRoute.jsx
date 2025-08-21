@@ -1,13 +1,26 @@
-import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom"
+import { useAuth } from "../contexts/AuthContext"
 
-export default function ProtectedRoute({ allowedRoles }) {
-  const token = localStorage.getItem('REACT_APP_JWT_STORAGE_KEY');
-  const storedRole = localStorage.getItem("role");
+const ProtectedRoute = ({ children, role }) => {
+  const { user, loading } = useAuth()
 
-  if (!token || !allowedRoles.includes(storedRole)) {
-    return <Navigate to="/" />;
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
 
-  return <Outlet />;
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (role) {
+    const expectedRole = role === "admin" ? "ROLE_ADMIN" : "ROLE_TEACHER"
+    if (user.role !== expectedRole) {
+      console.log("🚫 Role mismatch:", { userRole: user.role, expectedRole, role })
+      return <Navigate to="/" replace />
+    }
+  }
+
+  return children
 }
+
+export default ProtectedRoute
