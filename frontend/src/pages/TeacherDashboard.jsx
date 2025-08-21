@@ -265,7 +265,7 @@ const TeacherDashboard = () => {
                   <span className="text-white font-bold text-sm">H</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">
+                  <h1 className="text-sm font-bold text-gray-900">
                     {schoolName}
                   </h1>
                   <p className="text-xs text-gray-500">Teacher Portal</p>
@@ -274,7 +274,7 @@ const TeacherDashboard = () => {
               <button 
                 onClick={handleSubmitAllRecords}
                 disabled={uploading}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
+                className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition-colors flex items-center space-x-1 disabled:opacity-50"
               >
                 <span>{uploading ? "Submitting..." : "Submit All Records"}</span>
               </button>
@@ -318,22 +318,13 @@ const TeacherDashboard = () => {
 
         {/* Message Display */}
         {message && (
-          <div className={`p-4 rounded-lg mb-6 ${
-            message.includes("successfully") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-          }`}>
-            {message}
-          </div>
-        )}
-
-        {/* Success Message */}
-        {message && (
           <div className={`mb-6 p-4 rounded-lg ${
-            message.includes("✅") ? "bg-green-100 border border-green-300 text-green-800" : 
+            message.includes("✅") || message.includes("successfully") ? "bg-green-100 border border-green-300 text-green-800" : 
             message.includes("❌") ? "bg-red-100 border border-red-300 text-red-800" :
             "bg-blue-100 border border-blue-300 text-blue-800"
           }`}>
             <div className="flex items-center space-x-2">
-              {message.includes("✅") && <span className="text-green-600">✓</span>}
+              {(message.includes("✅") || message.includes("successfully")) && <span className="text-green-600">✓</span>}
               {message.includes("❌") && <span className="text-red-600">✗</span>}
               <span className="font-medium">{message}</span>
             </div>

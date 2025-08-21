@@ -10,9 +10,6 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       setCurrentStudent(student)
       
       // Reset modal state when student changes
-      setSelectedFile(null)
-      setPreviewUrl(null)
-      setCapturedImage(null)
       setShowCamera(false)
       
       // Auto-start camera if mode is "retake" - no delay
@@ -22,9 +19,6 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
     }
   }, [student, mode])
   
-  const [selectedFile, setSelectedFile] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState(null)
-  const [capturedImage, setCapturedImage] = useState(null)
   const [showCamera, setShowCamera] = useState(false)
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
@@ -34,8 +28,10 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
     const file = e.target.files[0]
     
     if (file && file.type.startsWith("image/")) {
-      // Auto-save immediately without setting preview states
+      // Auto-save immediately without any preview or delay
       onSave(file, currentStudent || student)
+      // Close modal immediately after saving
+      setTimeout(() => onClose(), 100)
     } else {
       alert("Please select a valid image file.")
     }
@@ -55,8 +51,10 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       input.onchange = (e) => {
         const file = e.target.files[0]
         if (file) {
-          // Auto-save immediately without setting preview states
+          // Auto-save immediately without any preview or delay
           onSave(file, currentStudent || student)
+          // Close modal immediately after saving
+          setTimeout(() => onClose(), 100)
         }
       }
       
@@ -92,8 +90,10 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       canvas.toBlob((blob) => {
         const file = new File([blob], "captured-photo.jpg", { type: "image/jpeg" })
         
-        // Auto-save immediately without setting preview states
+        // Auto-save immediately without any preview or delay
         onSave(file, currentStudent || student)
+        // Close modal immediately after saving
+        setTimeout(() => onClose(), 100)
       }, "image/jpeg", 0.8) // Slightly lower quality for faster processing
       
       // Stop camera immediately
@@ -106,18 +106,11 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
   }
 
   const handleSave = () => {
-    if (selectedFile) {
-      // Pass both file and student data to onSave
-      onSave(selectedFile, currentStudent || student)
-    } else {
-      alert("Please select a file first.")
-    }
+    // This function is no longer needed since we auto-save
+    onClose()
   }
 
   const handleClose = () => {
-    setSelectedFile(null)
-    setPreviewUrl(null)
-    setCapturedImage(null)
     setShowCamera(false)
     
     // Stop camera if running
@@ -151,26 +144,12 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
             <span className="text-sm text-blue-700">
-              {uploading ? "Uploading photo..." : "Ready to upload photo"}
+              {uploading ? "Uploading photo..." : "Photos will be saved instantly"}
             </span>
           </div>
-          {selectedFile && (
-            <p className="text-xs text-blue-600 mt-1">
-              File: {selectedFile.name} ({selectedFile.size} bytes)
-            </p>
-          )}
         </div>
 
-        {/* Photo Preview */}
-        {previewUrl && (
-          <div className="mb-4">
-            <img
-              src={previewUrl}
-              alt="Preview"
-              className="w-full h-48 object-cover rounded-lg"
-            />
-          </div>
-        )}
+        {/* Photo Preview - Removed for faster uploads */}
 
         {/* Camera View */}
         {showCamera && (
@@ -192,7 +171,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
         )}
 
         {/* Upload Options */}
-        {!previewUrl && !showCamera && (
+        {!showCamera && (
           <div className="space-y-3 mb-4">
             <div className="text-center mb-3">
               <p className="text-sm text-gray-600">Photos will be saved automatically</p>
