@@ -47,17 +47,44 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
   }
 
   const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' } 
-      })
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        setShowCamera(true)
+    // Check if it's a mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    
+    if (isMobile) {
+      // For mobile, use file input with camera capture
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'image/*'
+      input.capture = 'environment' // Use back camera
+      
+      input.onchange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+          setSelectedFile(file)
+          const url = URL.createObjectURL(file)
+          setPreviewUrl(url)
+          setCapturedImage(null)
+          
+          // Auto-save the photo instantly
+          onSave(file, currentStudent || student)
+        }
       }
-    } catch (error) {
-      console.error("Error accessing camera:", error)
-      alert("Unable to access camera. Please use file upload instead.")
+      
+      input.click()
+    } else {
+      // For desktop, use web camera
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'user' } 
+        })
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+          setShowCamera(true)
+        }
+      } catch (error) {
+        console.error("Error accessing camera:", error)
+        alert("Unable to access camera. Please use file upload instead.")
+      }
     }
   }
 
@@ -189,7 +216,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
                 className="w-full flex items-center justify-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
               >
                 <Camera className="h-5 w-5" />
-                <span>Take Photo (Auto-save)</span>
+                <span>Take Photo with Camera App</span>
               </button>
             )}
             

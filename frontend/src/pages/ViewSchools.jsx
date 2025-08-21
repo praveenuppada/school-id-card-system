@@ -211,7 +211,7 @@ const ViewSchools = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:pl-6 pl-16">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <button
@@ -269,11 +269,11 @@ const ViewSchools = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex space-x-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-6">
               <button 
                 onClick={handleDownloadExcel}
                 disabled={dataLoading || !schoolData}
-                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 <Download className="h-4 w-4" />
                 <span>Download Excel</span>
@@ -281,7 +281,7 @@ const ViewSchools = () => {
               <button 
                 onClick={handleDownloadPhotos}
                 disabled={dataLoading || !schoolData}
-                className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center space-x-2 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 <Package className="h-4 w-4" />
                 <span>Download Photos</span>
@@ -289,7 +289,7 @@ const ViewSchools = () => {
               <button 
                 onClick={handleDeleteSchool}
                 disabled={dataLoading}
-                className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center space-x-2 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 <Trash2 className="h-4 w-4" />
                 <span>Delete School</span>
@@ -308,7 +308,7 @@ const ViewSchools = () => {
               <>
                 {/* Tabs */}
                 <div className="border-b border-gray-200 mb-6">
-                  <nav className="flex space-x-8">
+                  <nav className="flex flex-wrap gap-2 sm:gap-8">
                     {[
                       { id: "overview", label: "Overview", icon: FileText },
                       { id: "excel", label: "Original Excel Data", icon: FileText },
@@ -318,13 +318,13 @@ const ViewSchools = () => {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
+                        className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                           activeTab === tab.id
                             ? "border-yellow-500 text-yellow-600"
                             : "border-transparent text-gray-500 hover:text-gray-700"
                         }`}
                       >
-                        <tab.icon className="h-4 w-4" />
+                        <tab.icon className="h-3 w-3 sm:h-4 sm:w-4" />
                         <span>{tab.label}</span>
                       </button>
                     ))}

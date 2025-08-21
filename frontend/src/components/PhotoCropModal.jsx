@@ -170,6 +170,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
 
   const handleTouchStart = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     const touch = e.touches[0]
     const mouseEvent = new MouseEvent('mousedown', {
       clientX: touch.clientX,
@@ -180,6 +181,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
 
   const handleTouchMove = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     const touch = e.touches[0]
     const mouseEvent = new MouseEvent('mousemove', {
       clientX: touch.clientX,
@@ -190,6 +192,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
 
   const handleTouchEnd = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     handleMouseUp()
   }
 
@@ -308,7 +311,7 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg p-4 sm:p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-900">
             Crop Photo - {student?.fullName} ({student?.photoId})
@@ -326,13 +329,14 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
             ref={canvasRef}
             width={400}
             height={400}
-            className="border border-gray-300 rounded-lg cursor-crosshair"
+            className="border border-gray-300 rounded-lg cursor-crosshair w-full max-w-md mx-auto"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            style={{ touchAction: 'none' }}
           />
         </div>
 
@@ -343,20 +347,20 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
            </div>
          )}
 
-         <div className="flex justify-between items-center">
-           <div className="flex space-x-2">
+         <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+           <div className="flex flex-wrap gap-2">
              <button
                onClick={handleReset}
-               className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+               className="flex items-center space-x-1 sm:space-x-2 bg-gray-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg hover:bg-gray-700 transition-colors text-xs sm:text-sm"
              >
-               <RotateCcw className="h-4 w-4" />
+               <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4" />
                <span>Reset</span>
              </button>
              <button
                onClick={handleDownload}
-               className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+               className="flex items-center space-x-1 sm:space-x-2 bg-green-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg hover:bg-green-700 transition-colors text-xs sm:text-sm"
              >
-               <Download className="h-4 w-4" />
+               <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                <span>Download</span>
              </button>
            </div>
@@ -364,21 +368,21 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
            <button
              onClick={handleSave}
              disabled={loading || saved}
-             className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+             className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
            >
              {loading ? (
                <>
-                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                 <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
                  <span>Saving...</span>
                </>
              ) : saved ? (
                <>
-                 <CheckCircle className="h-4 w-4" />
+                 <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                  <span>Saved!</span>
                </>
              ) : (
                <>
-                 <Save className="h-4 w-4" />
+                 <Save className="h-3 w-3 sm:h-4 sm:w-4" />
                  <span>Save Crop</span>
                </>
              )}
