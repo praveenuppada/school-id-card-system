@@ -533,12 +533,16 @@ router.get('/download-photos/:schoolName', async (req, res) => {
     for (const student of students) {
       try {
         console.log(`📥 Downloading photo for: ${student.fullName} (${student.photoId})`);
-        console.log(`🔗 Photo URL: ${student.photoUrl}`);
+        
+        // Use high quality URL if available, otherwise fall back to regular URL
+        const photoUrl = student.photoUrlHighQuality || student.photoUrl;
+        console.log(`🔗 Photo URL: ${photoUrl}`);
+        console.log(`🎯 Using ${student.photoUrlHighQuality ? 'high quality' : 'regular'} version`);
         
         // Download photo from Cloudinary
         const photoBuffer = await new Promise((resolve, reject) => {
           const https = require('https');
-          const request = https.get(student.photoUrl, (response) => {
+          const request = https.get(photoUrl, (response) => {
             if (response.statusCode !== 200) {
               reject(new Error(`HTTP ${response.statusCode}: ${response.statusMessage}`));
               return;

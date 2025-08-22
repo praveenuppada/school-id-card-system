@@ -28,6 +28,10 @@ const studentSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  photoUrlHighQuality: {
+    type: String,
+    trim: true
+  },
   photoUploaded: {
     type: Boolean,
     default: false

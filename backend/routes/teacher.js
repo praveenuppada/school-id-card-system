@@ -264,46 +264,81 @@ router.post('/upload-photo', upload.fields([
 
     console.log(`🎯 FINAL: Updating student: ${student.fullName} (ID: ${student._id}, PhotoID: ${student.photoId})`);
 
-    // Upload to Cloudinary with maximum quality preservation
+    // Optimized Cloudinary upload for faster processing
     const uniquePhotoId = `${student._id}_${Date.now()}`;
+    
+    // Upload optimized version for fast processing
     const uploadResult = await cloudinary.uploader.upload(
       `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
       {
         public_id: `student_photos/${uniquePhotoId}`,
         overwrite: true,
-        quality: 'auto:best', // Maximum quality
-        fetch_format: 'auto', // Preserve original format
-        flags: 'preserve_transparency', // Preserve transparency if any
+        quality: 'auto:low', // Faster upload with lower quality
+        fetch_format: 'auto',
         transformation: [
-          { quality: 'auto:best' }, // Ensure best quality
-          { fetch_format: 'auto' }  // Preserve original format
-        ]
+          { quality: 'auto:low' }, // Optimize for speed
+          { fetch_format: 'auto' }
+        ],
+        // Optimize for concurrent uploads
+        resource_type: 'image',
+        eager: [], // No eager transformations for faster upload
+        eager_async: false,
+        eager_notification_url: null
       }
     );
 
-    // Update ONLY this specific student record
-    const updateResult = await Student.findByIdAndUpdate(
-      student._id,
+    // Also upload high quality version for downloads (async, doesn't block upload)
+    const highQualityUpload = cloudinary.uploader.upload(
+      `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
       {
-        photoUrl: uploadResult.secure_url,
-        photoUploaded: true,
-        updatedBy: req.user.username,
-        updatedAt: new Date()
-      },
-      { new: true }
+        public_id: `student_photos_high_quality/${uniquePhotoId}`,
+        overwrite: true,
+        quality: 'auto:best', // Maximum quality for downloads
+        fetch_format: 'auto',
+        transformation: [
+          { quality: 'auto:best' }, // Ensure best quality
+          { fetch_format: 'auto' }
+        ],
+        resource_type: 'image'
+      }
+    ).catch(error => {
+      console.log('High quality upload failed (non-blocking):', error.message);
+      return null;
+    });
+
+    // Optimized database update - use updateOne for faster operation
+    const updateResult = await Student.updateOne(
+      { _id: student._id },
+      {
+        $set: {
+          photoUrl: uploadResult.secure_url,
+          photoUrlHighQuality: null, // Will be updated when high quality upload completes
+          photoUploaded: true,
+          updatedBy: req.user.username,
+          updatedAt: new Date()
+        }
+      }
     );
 
-    console.log(`✅ Successfully updated photo for student: ${updateResult.fullName}`);
-    console.log(`📸 Photo URL: ${uploadResult.secure_url}`);
-    console.log(`📸 Updated student data:`, {
-      _id: updateResult._id,
-      fullName: updateResult.fullName,
-      photoId: updateResult.photoId,
-      photoUrl: updateResult.photoUrl,
-      photoUploaded: updateResult.photoUploaded,
-      updatedBy: updateResult.updatedBy,
-      updatedAt: updateResult.updatedAt
+    // Update high quality URL when it's ready (non-blocking)
+    highQualityUpload.then(highQualityResult => {
+      if (highQualityResult) {
+        Student.updateOne(
+          { _id: student._id },
+          {
+            $set: {
+              photoUrlHighQuality: highQualityResult.secure_url
+            }
+          }
+        ).catch(error => {
+          console.log('Failed to update high quality URL:', error.message);
+        });
+      }
     });
+
+    console.log(`✅ Successfully updated photo for student: ${student.fullName}`);
+    console.log(`📸 Photo URL: ${uploadResult.secure_url}`);
+    console.log(`📸 Database update result:`, updateResult);
 
     res.json({
       success: true,

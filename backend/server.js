@@ -37,18 +37,36 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// Rate limiting
+// Optimized rate limiting for concurrent uploads
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 500, // Increased limit for concurrent uploads
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again later.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
+
+// Specific rate limit for photo uploads
+const uploadLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 50, // Allow 50 uploads per minute per IP
+  message: {
+    success: false,
+    message: 'Too many photo uploads, please slow down.'
+  },
+  skipSuccessfulRequests: true, // Don't count successful uploads
+});
+
 app.use(limiter);
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Body parsing middleware - optimized for large files
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// MongoDB Connection with better error handling
+// MongoDB Connection with optimized settings for concurrent operations
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
@@ -56,6 +74,11 @@ const connectDB = async () => {
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
       socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+      maxPoolSize: 50, // Increased connection pool for concurrent operations
+      minPoolSize: 10, // Minimum connections
+      maxIdleTimeMS: 30000, // Close idle connections after 30s
+      retryWrites: true, // Enable retry for write operations
+      w: 'majority', // Write concern for better reliability
     });
     console.log('✅ MongoDB connected successfully');
   } catch (err) {
@@ -71,7 +94,7 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/teacher', teacherRoutes);
+app.use('/api/teacher', uploadLimiter, teacherRoutes); // Apply upload limiter to teacher routes
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -98,14 +121,13 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
   res.status(404).json({ 
     success: false, 
-    message: 'Route not found' 
+    message: 'Route not found'
   });
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log('🚀 School ID Card Backend Server started');
-  console.log(`🌐 Server running on: http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
 });
 

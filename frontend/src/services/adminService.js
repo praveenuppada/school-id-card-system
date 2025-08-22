@@ -25,7 +25,15 @@ export const downloadPhotos = (schoolName) => {
 
 // Download single photo (high quality)
 export const downloadSinglePhoto = (photoUrl, fileName) => {
-  return axios.get(photoUrl, {
+  // If the URL contains Cloudinary, add quality parameter for high quality
+  let downloadUrl = photoUrl;
+  if (photoUrl.includes('cloudinary.com')) {
+    // Add quality parameter for high quality download
+    const separator = photoUrl.includes('?') ? '&' : '?';
+    downloadUrl = `${photoUrl}${separator}quality=auto:best&fetch_format=auto`;
+  }
+  
+  return axios.get(downloadUrl, {
     responseType: 'blob',
     headers: {
       'Accept': 'image/jpeg,image/png,image/*'

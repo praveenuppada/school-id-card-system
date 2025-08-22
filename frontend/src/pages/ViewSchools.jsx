@@ -169,7 +169,10 @@ const ViewSchools = () => {
 
   const handleDownloadSinglePhoto = async (student) => {
     try {
-      const response = await downloadSinglePhoto(student.photoUrl)
+      // Use high quality URL if available, otherwise fall back to regular URL
+      const photoUrl = student.photoUrlHighQuality || student.photoUrl;
+      
+      const response = await downloadSinglePhoto(photoUrl)
       
       // Create download link with high quality and proper naming
       const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/jpeg' }))
@@ -186,7 +189,7 @@ const ViewSchools = () => {
       
       alert('Photo downloaded successfully!')
     } catch (error) {
-
+      console.error('Download error:', error)
       alert('Failed to download photo. Please try again.')
     }
   }
@@ -528,7 +531,7 @@ const ViewSchools = () => {
                            <div key={index} className="bg-gray-100 rounded-lg p-2 text-center">
                              {student.photoUrl ? (
                                <img 
-                                 src={`${student.photoUrl}?quality=high`} 
+                                 src={student.photoUrlHighQuality || `${student.photoUrl}?quality=high`} 
                                  alt={student.fullName}
                                  className="w-16 h-20 object-cover rounded mx-auto mb-2"
                                  style={{ imageRendering: 'high-quality' }}

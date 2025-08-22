@@ -24,47 +24,60 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
 
+  // Optimized image processing for faster uploads
+  const processImageForUpload = (file, callback) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+    
+    img.onload = () => {
+      // Optimize size for faster upload - max 500x500
+      const maxSize = 500
+      let { width, height } = img
+      
+      if (width > height) {
+        if (width > maxSize) {
+          height = (height * maxSize) / width
+          width = maxSize
+        }
+      } else {
+        if (height > maxSize) {
+          width = (width * maxSize) / height
+          height = maxSize
+        }
+      }
+      
+      canvas.width = width
+      canvas.height = height
+      
+      // Use faster rendering
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'low'
+      ctx.drawImage(img, 0, 0, width, height)
+      
+      // Create optimized blob for faster upload
+      canvas.toBlob((blob) => {
+        const optimizedFile = new File([blob], file.name || 'photo.jpg', { 
+          type: 'image/jpeg' 
+        })
+        callback(optimizedFile)
+      }, 'image/jpeg', 0.4) // Reduced quality for faster upload
+    }
+    
+    img.src = URL.createObjectURL(file)
+  }
+
   const handleFileSelect = (e) => {
     const file = e.target.files[0]
     
     if (file && file.type.startsWith("image/")) {
-      // Resize image for faster upload
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      const img = new Image()
-      
-      img.onload = () => {
-        // Resize to max 600x600 for faster upload
-        const maxSize = 600
-        let { width, height } = img
-        
-        if (width > height) {
-          if (width > maxSize) {
-            height = (height * maxSize) / width
-            width = maxSize
-          }
-        } else {
-          if (height > maxSize) {
-            width = (width * maxSize) / height
-            height = maxSize
-          }
-        }
-        
-        canvas.width = width
-        canvas.height = height
-        
-        ctx.drawImage(img, 0, 0, width, height)
-        
-        canvas.toBlob((blob) => {
-          const resizedFile = new File([blob], file.name, { type: 'image/jpeg' })
-          // Auto-save immediately without any preview or delay
-          onSave(resizedFile, currentStudent || student)
-          // Close modal after a short delay to ensure state updates
-          setTimeout(() => onClose(), 200)
-        }, 'image/jpeg', 0.5)
-      }
-      
-      img.src = URL.createObjectURL(file)
+      // Process image immediately without delay
+      processImageForUpload(file, (optimizedFile) => {
+        // Auto-save immediately without any preview or delay
+        onSave(optimizedFile, currentStudent || student)
+        // Close modal immediately
+        setTimeout(() => onClose(), 50)
+      })
     } else {
       alert("Please select a valid image file.")
     }
@@ -75,7 +88,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     
     if (isMobile) {
-      // For mobile, use file input with camera capture
+      // For mobile, use file input with camera capture - fastest method
       const input = document.createElement('input')
       input.type = 'file'
       input.accept = 'image/*'
@@ -84,10 +97,11 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       input.onchange = (e) => {
         const file = e.target.files[0]
         if (file) {
-          // Auto-save immediately without any preview or delay
-          onSave(file, currentStudent || student)
-          // Close modal immediately after saving
-          setTimeout(() => onClose(), 100)
+          // Process and upload immediately
+          processImageForUpload(file, (optimizedFile) => {
+            onSave(optimizedFile, currentStudent || student)
+            setTimeout(() => onClose(), 50)
+          })
         }
       }
       
@@ -96,14 +110,17 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       // For desktop, use web camera
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: 'user' } 
+          video: { 
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          } 
         })
         if (videoRef.current) {
           videoRef.current.srcObject = stream
           setShowCamera(true)
         }
       } catch (error) {
-
         alert("Unable to access camera. Please use file upload instead.")
       }
     }
@@ -115,8 +132,8 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
       
-      // Resize to max 600x600 for faster upload
-      const maxSize = 600
+      // Optimize size for faster upload - max 500x500
+      const maxSize = 500
       let { videoWidth, videoHeight } = video
       
       if (videoWidth > videoHeight) {
@@ -133,17 +150,22 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       
       canvas.width = videoWidth
       canvas.height = videoHeight
+      
+      // Use faster rendering
+      context.imageSmoothingEnabled = true
+      context.imageSmoothingQuality = 'low'
       context.drawImage(video, 0, 0, videoWidth, videoHeight)
       
-      // Create file immediately without waiting for blob
+      // Create optimized file immediately
       canvas.toBlob((blob) => {
         const file = new File([blob], "captured-photo.jpg", { type: "image/jpeg" })
         
-        // Auto-save immediately without any preview or delay
-        onSave(file, currentStudent || student)
-        // Close modal after a short delay to ensure state updates
-        setTimeout(() => onClose(), 200)
-      }, "image/jpeg", 0.5) // Lower quality for faster processing and smaller files
+        // Process and upload immediately
+        processImageForUpload(file, (optimizedFile) => {
+          onSave(optimizedFile, currentStudent || student)
+          setTimeout(() => onClose(), 50)
+        })
+      }, "image/jpeg", 0.4) // Reduced quality for faster processing
       
       // Stop camera immediately
       const stream = video.srcObject

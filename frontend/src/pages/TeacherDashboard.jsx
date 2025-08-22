@@ -161,11 +161,7 @@ const TeacherDashboard = () => {
     }
   }
 
-  const handlePhotoUpload = (student) => {
-    setSelectedStudent(student)
-    setModalMode("file")
-    setShowPhotoModal(true)
-  }
+
 
   const handleAddPhoto = (student) => {
     setSelectedStudent(student)
@@ -184,7 +180,7 @@ const TeacherDashboard = () => {
     }
     
     if (!student || !photoFile) {
-
+      console.error("Missing student or photo file")
       return
     }
 
@@ -222,60 +218,44 @@ const TeacherDashboard = () => {
       // Get the photo URL from the response
       const photoUrl = response.data.photoUrl
       
-      // Debug: Log the response to see what we're getting
-      console.log("Upload response:", response.data)
-      console.log("Photo URL received:", photoUrl)
-      
       // Immediately update ONLY the specific student to show the photo
       if (photoUrl) {
-        console.log("Updating student with photo URL:", photoUrl)
-        console.log("Student identifier:", studentIdentifier)
+        const updateStudentData = {
+          photoUrl: photoUrl, 
+          photoUploaded: true, 
+          photoUploading: false, 
+          updatedAt: new Date() 
+        }
         
-        setStudents(prevStudents => {
-          const updatedStudents = prevStudents.map(s => 
+        // Optimized state updates for concurrent uploads
+        setStudents(prevStudents => 
+          prevStudents.map(s => 
             (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
-              ? { 
-                  ...s, 
-                  photoUrl: photoUrl, 
-                  photoUploaded: true, 
-                  photoUploading: false, 
-                  updatedAt: new Date() 
-                }
+              ? { ...s, ...updateStudentData }
               : s
           )
-          console.log("Updated students:", updatedStudents)
-          return updatedStudents
-        })
+        )
         
-        // Also update filteredStudents immediately for instant UI update
-        setFilteredStudents(prevFiltered => {
-          const updatedFiltered = prevFiltered.map(s => 
+        setFilteredStudents(prevFiltered => 
+          prevFiltered.map(s => 
             (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
-              ? { 
-                  ...s, 
-                  photoUrl: photoUrl, 
-                  photoUploaded: true, 
-                  photoUploading: false, 
-                  updatedAt: new Date() 
-                }
+              ? { ...s, ...updateStudentData }
               : s
           )
-          console.log("Updated filtered students:", updatedFiltered)
-          return updatedFiltered
-        })
+        )
       } else {
         throw new Error("No photo URL received from server")
       }
       
       setMessage("✅ Photo uploaded successfully!")
       
-      // Add a small delay to ensure state updates are reflected
+      // Reduced delay for faster UI response
       setTimeout(() => {
         setShowPhotoModal(false)
         setSelectedStudent(null)
-      }, 100)
+      }, 50)
     } catch (error) {
-
+      console.error("Upload error:", error)
       
       let errorMessage = "Error uploading photo"
       if (error.response?.data?.message) {
@@ -483,7 +463,7 @@ const TeacherDashboard = () => {
                             <div 
                               className="w-8 h-8 sm:w-16 sm:h-16 rounded border-2 border-green-500 bg-cover bg-center"
                               style={{ 
-                                backgroundImage: `url(${student.photoUrl})`
+                                backgroundImage: `url(${student.photoUrlHighQuality || student.photoUrl})`
                               }}
                             />
                             <div className="text-xs text-green-600 mt-1 hidden sm:block">
@@ -513,7 +493,7 @@ const TeacherDashboard = () => {
                   </button>
                           ) : (
                       <button
-                              onClick={() => handlePhotoUpload(student)}
+                              onClick={() => handleAddPhoto(student)}
                               className="bg-blue-600 text-white px-1 sm:px-3 py-1 rounded text-xs hover:bg-blue-700"
                       >
                               Update
