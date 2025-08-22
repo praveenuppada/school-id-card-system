@@ -112,7 +112,7 @@ const TeacherInstructions = () => {
               <div className="bg-gray-50 rounded-lg p-6">
                 <h3 className="font-semibold text-gray-900 mb-3">Need Help?</h3>
                 <p className="text-gray-700 mb-3">
-                  If you encounter any issues or need assistance, please contact the technical support team.
+                  If you encounter any issues or need assistance, please contact the technical support team at <strong>harshaidsolutions@gmail.com</strong>.
                 </p>
                 <button
                   onClick={() => navigate("/teacher/contact")}

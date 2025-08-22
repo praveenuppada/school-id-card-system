@@ -331,7 +331,7 @@ const ViewSchools = () => {
                 className="flex items-center justify-center space-x-2 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 <Package className="h-4 w-4" />
-                <span>Download Photos</span>
+                <span>Download All Photos</span>
               </button>
               <button 
                 onClick={handleDeleteSchool}
