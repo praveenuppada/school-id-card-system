@@ -32,22 +32,19 @@ export const getClasses = () => axios.get("/teacher/classes")
 // Optimized Photo Upload for Concurrent Uploads
 export const uploadPhoto = async (formData, retryCount = 0) => {
   const maxRetries = 2
-  const baseTimeout = 15000 // 15 seconds for high quality uploads
+  const baseTimeout = 30000 // 30 seconds for maximum quality uploads
   
   try {
     const response = await axios.post("/teacher/upload-photo", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      timeout: baseTimeout + (retryCount * 3000), // Increase timeout for retries
-      // Optimize for concurrent uploads
+      timeout: baseTimeout + (retryCount * 5000), // Increase timeout for retries
       maxRedirects: 0,
-      validateStatus: (status) => status < 500, // Don't throw on 4xx errors
+      validateStatus: (status) => status < 500,
     })
-    
     return response
   } catch (error) {
-    // Retry logic for network errors or timeouts
     if (retryCount < maxRetries && (
       error.code === 'ECONNABORTED' || 
       error.code === 'NETWORK_ERROR' ||
@@ -55,10 +52,9 @@ export const uploadPhoto = async (formData, retryCount = 0) => {
       error.response?.status >= 500
     )) {
       console.log(`🔄 Retrying upload (attempt ${retryCount + 1}/${maxRetries})`)
-      await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))) // Exponential backoff
+      await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)))
       return uploadPhoto(formData, retryCount + 1)
     }
-    
     throw error
   }
 }

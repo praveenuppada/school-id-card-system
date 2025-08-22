@@ -62,9 +62,9 @@ const uploadLimiter = rateLimit({
 
 app.use(limiter);
 
-// Body parsing middleware - optimized for large files
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Increase body size limit for high quality images
+app.use(express.json({ limit: '100mb' }))
+app.use(express.urlencoded({ extended: true, limit: '100mb' }))
 
 // MongoDB Connection with optimized settings for concurrent operations
 const connectDB = async () => {

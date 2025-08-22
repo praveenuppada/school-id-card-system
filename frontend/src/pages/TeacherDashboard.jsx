@@ -496,7 +496,7 @@ const TeacherDashboard = () => {
                               onClick={() => handleAddPhoto(student)}
                               className="bg-blue-600 text-white px-1 sm:px-3 py-1 rounded text-xs hover:bg-blue-700"
                       >
-                              Update
+                              Retake
                       </button>
                           )}
                         </div>

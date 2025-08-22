@@ -158,202 +158,102 @@ router.get('/students', async (req, res) => {
   }
 });
 
-// Upload student photo - Handle both 'file' and 'photo' field names
-router.post('/upload-photo', upload.fields([
-  { name: 'file', maxCount: 1 },
-  { name: 'photo', maxCount: 1 }
-]), async (req, res) => {
+// Upload photo
+router.post('/upload-photo', upload.single('file'), async (req, res) => {
   try {
-    const { photoId, studentId } = req.body;
-    
-    // Try to get file from either field
-    let file = null;
-    if (req.files && req.files.file && req.files.file[0]) {
-      file = req.files.file[0];
-      console.log('📸 File found in "file" field');
-    } else if (req.files && req.files.photo && req.files.photo[0]) {
-      file = req.files.photo[0];
-      console.log('📸 File found in "photo" field');
-    }
+    const { studentId, photoId } = req.body
+    const file = req.file
 
-    console.log('📸 Teacher photo upload request received:');
-    console.log('  - photoId:', photoId);
-    console.log('  - studentId:', studentId);
-    console.log('  - file size:', file ? file.size : 'No file');
+    console.log('📸 Photo upload request received:')
+    console.log('  - studentId:', studentId)
+    console.log('  - photoId:', photoId)
+    console.log('  - file size:', file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : 'No file')
 
     if (!file) {
       return res.status(400).json({
         success: false,
         message: 'No file uploaded'
-      });
+      })
     }
 
-    if (!photoId) {
+    if (!studentId || !photoId) {
       return res.status(400).json({
         success: false,
-        message: 'Photo ID is required'
-      });
+        message: 'Student ID and Photo ID are required'
+      })
     }
 
-    // CRITICAL FIX: Use studentId as the primary identifier
-    let student = null;
-    
-    if (studentId) {
-      // Find by student ID first - this is the most reliable way
-      student = await Student.findById(studentId);
-      if (student) {
-        console.log(`✅ Found student by ID: ${studentId}`);
-        console.log(`  - Name: ${student.fullName}`);
-        console.log(`  - PhotoId: ${student.photoId}`);
-        console.log(`  - Expected PhotoId: ${photoId}`);
-        
-        // Verify the photoId matches (optional check)
-        if (student.photoId !== photoId) {
-          console.log(`⚠️ PhotoId mismatch! Student has ${student.photoId}, but request has ${photoId}`);
-          console.log(`🔧 Continuing anyway since we have the correct studentId`);
-        }
-      } else {
-        console.log(`❌ Student not found with ID: ${studentId}`);
-        return res.status(404).json({
-          success: false,
-          message: 'Student not found with ID: ' + studentId
-        });
-      }
-    } else {
-      // Fallback: find by photoId (less reliable)
-      const studentsWithPhotoId = await Student.find({ photoId });
-      console.log(`🔍 Found ${studentsWithPhotoId.length} students with photoId: ${photoId}`);
-      
-      if (studentsWithPhotoId.length === 1) {
-        student = studentsWithPhotoId[0];
-        console.log(`✅ Found single student with photoId: ${photoId}`);
-      } else if (studentsWithPhotoId.length > 1) {
-        // Multiple students with same photoId - this is the problem!
-        console.log(`⚠️ WARNING: Multiple students found with photoId: ${photoId}`);
-        console.log(`📋 Students found:`);
-        studentsWithPhotoId.forEach((s, index) => {
-          console.log(`  ${index + 1}. ID: ${s._id}, Name: ${s.fullName}, PhotoId: ${s.photoId}`);
-        });
-        
-        // Return error instead of using first one
-        return res.status(400).json({
-          success: false,
-          message: `Multiple students found with photoId: ${photoId}. Please use studentId to specify the correct student.`
-        });
-      } else {
-        // Try to find by ID (in case photoId is actually the student ID)
-        student = await Student.findById(photoId);
-        if (student) {
-          console.log(`✅ Found student by photoId as ID: ${photoId}`);
-        } else {
-          console.log(`❌ No student found with photoId: ${photoId}`);
-          return res.status(404).json({
-            success: false,
-            message: 'Student not found with photoId: ' + photoId
-          });
-        }
-      }
-    }
-
+    // Find student
+    const student = await Student.findById(studentId)
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student not found'
-      });
+      })
     }
 
-    console.log(`🎯 FINAL: Updating student: ${student.fullName} (ID: ${student._id}, PhotoID: ${student.photoId})`);
+    console.log(`✅ Found student: ${student.fullName} (PhotoID: ${student.photoId})`)
 
-    // Optimized Cloudinary upload for faster processing
-    const uniquePhotoId = `${student._id}_${Date.now()}`;
-    
-    // Upload optimized version for fast processing
+    // Generate unique photo ID for Cloudinary
+    const uniquePhotoId = `${student._id}_${Date.now()}`
+
+    // Upload to Cloudinary with MAXIMUM quality preservation
+    console.log('☁️ Uploading to Cloudinary with maximum quality...')
     const uploadResult = await cloudinary.uploader.upload(
       `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
       {
         public_id: `student_photos/${uniquePhotoId}`,
         overwrite: true,
-        quality: 'auto:best', // High quality upload
-        fetch_format: 'auto',
+        quality: 'auto:best', // Maximum quality preservation
+        fetch_format: 'auto', // Preserve original format
+        flags: 'preserve_transparency', // Preserve transparency if any
         transformation: [
           { quality: 'auto:best' }, // Ensure best quality
-          { fetch_format: 'auto' }
+          { fetch_format: 'auto' }, // Preserve original format
+          { flags: 'preserve_transparency' } // Preserve transparency
         ],
-        // Optimize for concurrent uploads
-        resource_type: 'image',
-        eager: [], // No eager transformations for faster upload
-        eager_async: false,
+        // Additional quality settings for maximum preservation
+        eager: [
+          { quality: 'auto:best', fetch_format: 'auto' }
+        ],
+        eager_async: true,
         eager_notification_url: null
       }
-    );
+    )
 
-    // Also upload high quality version for downloads (async, doesn't block upload)
-    const highQualityUpload = cloudinary.uploader.upload(
-      `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
-      {
-        public_id: `student_photos_high_quality/${uniquePhotoId}`,
-        overwrite: true,
-        quality: 'auto:best', // Maximum quality for downloads
-        fetch_format: 'auto',
-        transformation: [
-          { quality: 'auto:best' }, // Ensure best quality
-          { fetch_format: 'auto' }
-        ],
-        resource_type: 'image'
-      }
-    ).catch(error => {
-      console.log('High quality upload failed (non-blocking):', error.message);
-      return null;
-    });
+    console.log(`✅ Cloudinary upload successful: ${uploadResult.secure_url}`)
+    console.log(`📊 File size: ${(file.size / 1024 / 1024).toFixed(2)} MB`)
 
-    // Optimized database update - use updateOne for faster operation
+    // Update student record with high-quality URL
     const updateResult = await Student.updateOne(
-      { _id: student._id },
+      { _id: studentId },
       {
-        $set: {
-          photoUrl: uploadResult.secure_url,
-          photoUrlHighQuality: null, // Will be updated when high quality upload completes
-          photoUploaded: true,
-          updatedBy: req.user.username,
-          updatedAt: new Date()
-        }
+        photoUrl: uploadResult.secure_url,
+        photoUrlHighQuality: uploadResult.secure_url, // Store high-quality version
+        photoUploaded: true,
+        updatedBy: req.user.username,
+        updatedAt: new Date()
       }
-    );
+    )
 
-    // Update high quality URL when it's ready (non-blocking)
-    highQualityUpload.then(highQualityResult => {
-      if (highQualityResult) {
-        Student.updateOne(
-          { _id: student._id },
-          {
-            $set: {
-              photoUrlHighQuality: highQualityResult.secure_url
-            }
-          }
-        ).catch(error => {
-          console.log('Failed to update high quality URL:', error.message);
-        });
-      }
-    });
-
-    console.log(`✅ Successfully updated photo for student: ${student.fullName}`);
-    console.log(`📸 Photo URL: ${uploadResult.secure_url}`);
-    console.log(`📸 Database update result:`, updateResult);
+    console.log(`✅ Database updated successfully for student: ${student.fullName}`)
 
     res.json({
       success: true,
-      message: 'Photo uploaded successfully',
-      photoUrl: uploadResult.secure_url
-    });
+      message: 'Photo uploaded successfully with maximum quality',
+      photoUrl: uploadResult.secure_url,
+      photoUrlHighQuality: uploadResult.secure_url,
+      fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`
+    })
 
   } catch (error) {
-    console.error('Photo upload error:', error);
+    console.error('❌ Photo upload error:', error)
     res.status(500).json({
       success: false,
-      message: 'Error uploading photo: ' + error.message
-    });
+      message: 'Failed to upload photo: ' + error.message
+    })
   }
-});
+})
 
 // Submit updates
 router.post('/send-updated', async (req, res) => {

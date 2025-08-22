@@ -253,60 +253,39 @@ const PhotoCropModal = ({ isOpen, onClose, student, onPhotoUpdated }) => {
     return croppedCanvas.toDataURL('image/jpeg', 0.7) // Faster processing with good quality
   }
 
-  const handleSave = async () => {
-    if (!student) return
-    
-    setLoading(true)
-    setUploadProgress(0)
-    try {
-      const croppedDataUrl = cropImage()
-      if (!croppedDataUrl) return
-      
-      // Optimize blob creation for faster processing
-      const base64Data = croppedDataUrl.split(',')[1]
-      const byteCharacters = atob(base64Data)
-      const byteNumbers = new Array(byteCharacters.length)
-      
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
-      }
-      
-      const byteArray = new Uint8Array(byteNumbers)
-      const blob = new Blob([byteArray], { type: 'image/jpeg' })
-      
-      // Create form data with optimized file
-      const formData = new FormData()
-      formData.append('file', blob, `${student.photoId}.jpg`)
-      formData.append('photoId', student.photoId)
-      formData.append('studentId', student._id)
-      
-      // Upload cropped photo with progress tracking
-      const result = await cropPhoto(formData, (progress) => {
-        setUploadProgress(progress)
-      })
-      
-      if (result.data.success) {
-        setCroppedImage(croppedDataUrl)
-        setSaved(true)
-        onPhotoUpdated && onPhotoUpdated(result.data.photoUrl)
-        
-        // Show success message and close after 300ms (instant feedback)
-        setTimeout(() => {
-          onClose()
-          setSaved(false)
-        }, 300)
-      }
-    } catch (error) {
+  const handleSave = () => {
+    if (!croppedImage) return
 
-      if (error.message === 'Upload timeout') {
-        alert('Upload took too long. Please try again.')
-      } else {
-        alert('Failed to save cropped photo. Please try again.')
-      }
-    } finally {
-      setLoading(false)
-      setUploadProgress(0)
-    }
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    
+    // Set canvas size to cropped dimensions for maximum quality
+    canvas.width = cropArea.width
+    canvas.height = cropArea.height
+    
+    // Enable high-quality rendering
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high' // Use highest quality rendering
+    
+    // Draw cropped image with maximum quality
+    ctx.drawImage(
+      imageRef.current,
+      cropArea.x,
+      cropArea.y,
+      cropArea.width,
+      cropArea.height,
+      0,
+      0,
+      cropArea.width,
+      cropArea.height
+    )
+
+    // Convert to blob with maximum quality
+    canvas.toBlob((blob) => {
+      const file = new File([blob], 'cropped-photo.jpg', { type: 'image/jpeg' })
+      onSave(file)
+      onClose()
+    }, 'image/jpeg', 1.0) // Maximum quality (100%) for MB-level preservation
   }
 
   const handleDownload = async () => {

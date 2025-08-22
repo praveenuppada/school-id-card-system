@@ -31,8 +31,8 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
     const img = new Image()
     
     img.onload = () => {
-      // Maintain high quality - max 1200x1200 for good quality
-      const maxSize = 1200
+      // Calculate dimensions while maintaining aspect ratio
+      const maxSize = 2000 // Increased to 2000x2000 for maximum quality preservation
       let { width, height } = img
       
       if (width > height) {
@@ -47,21 +47,24 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
         }
       }
       
+      // Set canvas size to calculated dimensions
       canvas.width = width
       canvas.height = height
       
-      // Use high quality rendering
+      // Enable high-quality rendering
       ctx.imageSmoothingEnabled = true
-      ctx.imageSmoothingQuality = 'high'
+      ctx.imageSmoothingQuality = 'high' // Use highest quality rendering
+      
+      // Draw image with high quality
       ctx.drawImage(img, 0, 0, width, height)
       
-      // Create high quality blob for upload
+      // Convert to blob with maximum quality
       canvas.toBlob((blob) => {
         const optimizedFile = new File([blob], file.name || 'photo.jpg', { 
           type: 'image/jpeg' 
         })
         callback(optimizedFile)
-      }, 'image/jpeg', 0.9) // High quality (90%) for MBs
+      }, 'image/jpeg', 1.0) // Maximum quality (100%) for MB-level preservation
     }
     
     img.src = URL.createObjectURL(file)
@@ -130,42 +133,29 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current
       const canvas = canvasRef.current
-      const context = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d')
       
-      // Maintain high quality - max 1200x1200 for good quality
-      const maxSize = 1200
-      let { videoWidth, videoHeight } = video
+      // Set canvas size to video dimensions for maximum quality
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
       
-      if (videoWidth > videoHeight) {
-        if (videoWidth > maxSize) {
-          videoHeight = (videoHeight * maxSize) / videoWidth
-          videoWidth = maxSize
-        }
-      } else {
-        if (videoHeight > maxSize) {
-          videoWidth = (videoWidth * maxSize) / videoHeight
-          videoHeight = maxSize
-        }
-      }
+      // Enable high-quality rendering
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high' // Use highest quality rendering
       
-      canvas.width = videoWidth
-      canvas.height = videoHeight
+      // Draw video frame to canvas
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
       
-      // Use high quality rendering
-      context.imageSmoothingEnabled = true
-      context.imageSmoothingQuality = 'high'
-      context.drawImage(video, 0, 0, videoWidth, videoHeight)
-      
-      // Create high quality file immediately
+      // Convert to blob with maximum quality and upload immediately
       canvas.toBlob((blob) => {
-        const file = new File([blob], "captured-photo.jpg", { type: "image/jpeg" })
+        const file = new File([blob], 'captured-photo.jpg', { type: 'image/jpeg' })
         
-        // Process and upload immediately
+        // Process and upload immediately with maximum quality
         processImageForUpload(file, (optimizedFile) => {
           onSave(optimizedFile, currentStudent || student)
           setTimeout(() => onClose(), 50)
         })
-      }, "image/jpeg", 0.9) // High quality (90%) for MBs
+      }, 'image/jpeg', 1.0) // Maximum quality (100%) for MB-level preservation
       
       // Stop camera immediately
       const stream = video.srcObject
