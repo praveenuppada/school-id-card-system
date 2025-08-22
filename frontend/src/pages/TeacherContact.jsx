@@ -50,18 +50,18 @@ const TeacherContact = () => {
     // Create WhatsApp URL
     const whatsappUrl = `https://wa.me/918977219777?text=${encodedMessage}`
     
-    // Open WhatsApp in new tab
-    window.open(whatsappUrl, '_blank')
+    // Redirect to WhatsApp (this will open WhatsApp app or web)
+    window.location.href = whatsappUrl
     
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    })
-    
-    alert('Message sent to WhatsApp!')
+    // Reset form after a short delay
+    setTimeout(() => {
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      })
+    }, 1000)
   }
 
   return (
