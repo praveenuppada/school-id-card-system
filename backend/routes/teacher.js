@@ -168,6 +168,8 @@ router.post('/upload-photo', upload.single('file'), async (req, res) => {
     console.log('  - studentId:', studentId)
     console.log('  - photoId:', photoId)
     console.log('  - file size:', file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : 'No file')
+    console.log('  - file mimetype:', file ? file.mimetype : 'No file')
+    console.log('  - file buffer length:', file ? file.buffer.length : 'No file')
 
     if (!file) {
       return res.status(400).json({
@@ -180,6 +182,14 @@ router.post('/upload-photo', upload.single('file'), async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Student ID and Photo ID are required'
+      })
+    }
+
+    // Validate file size
+    if (file.size > 50 * 1024 * 1024) { // 50MB limit
+      return res.status(400).json({
+        success: false,
+        message: 'File size too large. Maximum size is 50MB.'
       })
     }
 
@@ -197,8 +207,23 @@ router.post('/upload-photo', upload.single('file'), async (req, res) => {
     // Generate unique photo ID for Cloudinary
     const uniquePhotoId = `${student._id}_${Date.now()}`
 
+    // Check Cloudinary configuration
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      console.error('❌ Cloudinary configuration missing')
+      return res.status(500).json({
+        success: false,
+        message: 'Cloudinary configuration error. Please contact administrator.'
+      })
+    }
+
     // Upload to Cloudinary with MAXIMUM quality preservation
     console.log('☁️ Uploading to Cloudinary with maximum quality...')
+    console.log('☁️ Cloudinary config:', {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY ? '***' : 'MISSING',
+      api_secret: process.env.CLOUDINARY_API_SECRET ? '***' : 'MISSING'
+    })
+
     const uploadResult = await cloudinary.uploader.upload(
       `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
       {
@@ -237,6 +262,7 @@ router.post('/upload-photo', upload.single('file'), async (req, res) => {
     )
 
     console.log(`✅ Database updated successfully for student: ${student.fullName}`)
+    console.log(`📊 Update result:`, updateResult)
 
     res.json({
       success: true,
@@ -248,9 +274,24 @@ router.post('/upload-photo', upload.single('file'), async (req, res) => {
 
   } catch (error) {
     console.error('❌ Photo upload error:', error)
+    console.error('❌ Error stack:', error.stack)
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to upload photo'
+    
+    if (error.message.includes('cloudinary')) {
+      errorMessage = 'Cloudinary upload failed. Please try again.'
+    } else if (error.message.includes('timeout')) {
+      errorMessage = 'Upload timeout. Please try again.'
+    } else if (error.message.includes('network')) {
+      errorMessage = 'Network error. Please check your connection and try again.'
+    } else {
+      errorMessage = error.message
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Failed to upload photo: ' + error.message
+      message: errorMessage
     })
   }
 })

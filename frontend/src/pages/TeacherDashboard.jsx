@@ -208,7 +208,7 @@ const TeacherDashboard = () => {
     )
 
     const formData = new FormData()
-    formData.append("photo", photoFile)
+    formData.append("file", photoFile)
     formData.append("studentId", student._id)
     formData.append("photoId", student.photoId || student.rollNumber || student.roll_number)
 
@@ -247,30 +247,21 @@ const TeacherDashboard = () => {
         throw new Error("No photo URL received from server")
       }
       
-      setMessage("✅ Photo uploaded successfully!")
+      setMessage("Photo uploaded successfully!")
+      setTimeout(() => setMessage(""), 2000)
       
-      // Reduced delay for faster UI response
-      setTimeout(() => {
-        setShowPhotoModal(false)
-        setSelectedStudent(null)
-      }, 50)
     } catch (error) {
       console.error("Upload error:", error)
       
-      let errorMessage = "Error uploading photo"
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message
-      } else if (error.message) {
-        errorMessage = error.message
+      // Reset loading state for the specific student
+      const resetStudentData = {
+        photoUploading: false
       }
       
-      setMessage(errorMessage)
-      
-      // Remove loading state on error for ONLY the specific student
       setStudents(prevStudents => 
         prevStudents.map(s => 
           (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
-            ? { ...s, photoUploading: false }
+            ? { ...s, ...resetStudentData }
             : s
         )
       )
@@ -278,10 +269,27 @@ const TeacherDashboard = () => {
       setFilteredStudents(prevFiltered => 
         prevFiltered.map(s => 
           (s._id === studentIdentifier || s.photoId === studentIdentifier || s.rollNumber === studentIdentifier)
-            ? { ...s, photoUploading: false }
+            ? { ...s, ...resetStudentData }
             : s
         )
       )
+      
+      // Show specific error message
+      let errorMessage = "Failed to upload photo. Please try again."
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message.includes('timeout')) {
+        errorMessage = "Upload timeout. Please try again."
+      } else if (error.message.includes('network')) {
+        errorMessage = "Network error. Please check your connection."
+      } else if (error.message.includes('cloudinary')) {
+        errorMessage = "Photo upload service error. Please try again."
+      }
+      
+      setMessage(errorMessage)
+      setTimeout(() => setMessage(""), 5000)
+      
     } finally {
       setUploading(false)
     }
@@ -326,18 +334,11 @@ const TeacherDashboard = () => {
                   <p className="text-xs text-gray-500">Teacher Portal</p>
                 </div>
               </div>
-              <button
-                onClick={handleSubmitAllRecords}
-                disabled={uploading}
-                className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition-colors flex items-center space-x-1 disabled:opacity-50"
-              >
-                <span>{uploading ? "Submitting..." : "Submit All Records"}</span>
-              </button>
             </div>
           </div>
         </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
         {/* Class Selection */}
         <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
           <div className="flex items-center justify-between">
@@ -525,6 +526,23 @@ const TeacherDashboard = () => {
               </div>
             </div>
           </div>
+      </div>
+
+      {/* Footer with Submit All Records Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:pl-6 pl-16">
+          <div className="flex justify-center">
+            <button
+              onClick={handleSubmitAllRecords}
+              disabled={uploading}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            >
+              <span className="font-medium">
+                {uploading ? "Submitting..." : "Submit All Records"}
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Photo Upload Modal */}
