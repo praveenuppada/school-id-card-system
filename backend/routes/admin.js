@@ -373,10 +373,12 @@ router.delete('/delete-photos/:schoolId', async (req, res) => {
   }
 });
 
-// Delete entire school (school, Excel, photos, teachers)
+// Delete school with all associated data
 router.delete('/delete-school/:schoolId', async (req, res) => {
   try {
     const { schoolId } = req.params;
+    
+    console.log(`🗑️ Delete school request for schoolId: ${schoolId}`);
     
     // Find school
     const school = await School.findById(schoolId);
@@ -387,37 +389,58 @@ router.delete('/delete-school/:schoolId', async (req, res) => {
       });
     }
 
-    // Delete students and their photos
-    const students = await Student.find({ schoolId });
-    for (const student of students) {
-      if (student.photoUrl) {
-        try {
-          const publicId = `student_photos/${student.photoId}`;
-          await cloudinary.uploader.destroy(publicId);
-        } catch (cloudinaryError) {
-          console.log(`Failed to delete photo from Cloudinary for ${student.photoId}:`, cloudinaryError.message);
+    console.log(`✅ Found school: ${school.name} (ID: ${school._id})`);
+
+    // Get all students for this school in one query
+    const students = await Student.find({ schoolId }).select('photoId photoUrl');
+    console.log(`📊 Found ${students.length} students to delete`);
+
+    // Bulk delete operations for faster performance
+    const deletePromises = [];
+
+    // Delete photos from Cloudinary in parallel (non-blocking)
+    if (students.length > 0) {
+      const cloudinaryDeletes = students.map(async (student) => {
+        if (student.photoUrl) {
+          try {
+            const publicId = `student_photos/${student.photoId}`;
+            await cloudinary.uploader.destroy(publicId);
+            console.log(`✅ Deleted photo from Cloudinary: ${student.photoId}`);
+          } catch (cloudinaryError) {
+            console.log(`⚠️ Failed to delete photo from Cloudinary for ${student.photoId}:`, cloudinaryError.message);
+          }
         }
-      }
+      });
+      
+      // Don't wait for Cloudinary deletes to complete
+      Promise.allSettled(cloudinaryDeletes);
     }
-    await Student.deleteMany({ schoolId });
 
-    // Delete teachers associated with this school
-    await User.deleteMany({ schoolId, role: 'ROLE_TEACHER' });
-
+    // Bulk delete students
+    deletePromises.push(Student.deleteMany({ schoolId }));
+    
+    // Bulk delete teachers
+    deletePromises.push(User.deleteMany({ schoolId, role: 'ROLE_TEACHER' }));
+    
     // Delete the school
-    await School.findByIdAndDelete(schoolId);
+    deletePromises.push(School.findByIdAndDelete(schoolId));
+
+    // Execute all deletes in parallel
+    await Promise.all(deletePromises);
+
+    console.log(`✅ Successfully deleted school: ${school.name}`);
 
     res.json({
       success: true,
       message: `Successfully deleted school "${school.name}" with all associated data`,
       deletedCount: {
         students: students.length,
-        teachers: await User.countDocuments({ schoolId, role: 'ROLE_TEACHER' })
+        teachers: 0 // Will be updated if needed
       }
     });
 
   } catch (error) {
-    console.error('Delete school error:', error);
+    console.error('❌ Delete school error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to delete school: ' + error.message
@@ -566,8 +589,8 @@ router.get('/download-photos/:schoolName', async (req, res) => {
           request.on('error', reject);
         });
 
-        // Add to ZIP with descriptive filename
-        const fileName = `${student.photoId}_${student.fullName.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
+        // Add to ZIP with photo ID only filename
+        const fileName = `${student.photoId}.jpg`;
         zip.file(fileName, photoBuffer);
         
         console.log(`✅ Added photo to ZIP: ${fileName}`);

@@ -24,15 +24,15 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
 
-  // Optimized image processing for faster uploads
+  // Optimized image processing for high quality uploads
   const processImageForUpload = (file, callback) => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     const img = new Image()
     
     img.onload = () => {
-      // Optimize size for faster upload - max 500x500
-      const maxSize = 500
+      // Maintain high quality - max 1200x1200 for good quality
+      const maxSize = 1200
       let { width, height } = img
       
       if (width > height) {
@@ -50,18 +50,18 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       canvas.width = width
       canvas.height = height
       
-      // Use faster rendering
+      // Use high quality rendering
       ctx.imageSmoothingEnabled = true
-      ctx.imageSmoothingQuality = 'low'
+      ctx.imageSmoothingQuality = 'high'
       ctx.drawImage(img, 0, 0, width, height)
       
-      // Create optimized blob for faster upload
+      // Create high quality blob for upload
       canvas.toBlob((blob) => {
         const optimizedFile = new File([blob], file.name || 'photo.jpg', { 
           type: 'image/jpeg' 
         })
         callback(optimizedFile)
-      }, 'image/jpeg', 0.4) // Reduced quality for faster upload
+      }, 'image/jpeg', 0.9) // High quality (90%) for MBs
     }
     
     img.src = URL.createObjectURL(file)
@@ -132,8 +132,8 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
       
-      // Optimize size for faster upload - max 500x500
-      const maxSize = 500
+      // Maintain high quality - max 1200x1200 for good quality
+      const maxSize = 1200
       let { videoWidth, videoHeight } = video
       
       if (videoWidth > videoHeight) {
@@ -151,12 +151,12 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
       canvas.width = videoWidth
       canvas.height = videoHeight
       
-      // Use faster rendering
+      // Use high quality rendering
       context.imageSmoothingEnabled = true
-      context.imageSmoothingQuality = 'low'
+      context.imageSmoothingQuality = 'high'
       context.drawImage(video, 0, 0, videoWidth, videoHeight)
       
-      // Create optimized file immediately
+      // Create high quality file immediately
       canvas.toBlob((blob) => {
         const file = new File([blob], "captured-photo.jpg", { type: "image/jpeg" })
         
@@ -165,7 +165,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onSave, student, uploading, mode = 
           onSave(optimizedFile, currentStudent || student)
           setTimeout(() => onClose(), 50)
         })
-      }, "image/jpeg", 0.4) // Reduced quality for faster processing
+      }, "image/jpeg", 0.9) // High quality (90%) for MBs
       
       // Stop camera immediately
       const stream = video.srcObject

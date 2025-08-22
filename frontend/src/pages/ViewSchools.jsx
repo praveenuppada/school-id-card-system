@@ -117,16 +117,49 @@ const ViewSchools = () => {
       )
       if (confirmDelete) {
         try {
-          await deleteSchool(selectedSchool)
+          // Show loading state
+          const deleteButton = document.querySelector('button[onclick="handleDeleteSchool()"]');
+          if (deleteButton) {
+            deleteButton.textContent = 'Deleting...';
+            deleteButton.disabled = true;
+          }
+          
+          console.log('🗑️ Attempting to delete school:', selectedSchool)
+          const response = await deleteSchool(selectedSchool)
+          console.log('✅ Delete school response:', response)
+          
           alert(`School ${selectedSchoolData.name || selectedSchoolData.schoolName || selectedSchoolData.username} deleted successfully`)
+          
           // Remove from local state and refresh schools list
           setSchools(schools.filter(school => school._id !== selectedSchool))
           setSelectedSchool("")
           setSchoolData(null)
           await fetchSchools() // Refresh the list
         } catch (error) {
-    
-          alert('Failed to delete school. Please try again.')
+          console.error('❌ Delete school error:', error)
+          
+          let errorMessage = 'Failed to delete school. Please try again.'
+          
+          if (error.response?.status === 401) {
+            errorMessage = 'Authentication failed. Please log in again.'
+            // Redirect to login
+            window.location.href = '/login'
+          } else if (error.response?.status === 404) {
+            errorMessage = 'School not found or already deleted.'
+          } else if (error.response?.data?.message) {
+            errorMessage = error.response.data.message
+          } else if (error.message) {
+            errorMessage = error.message
+          }
+          
+          alert(errorMessage)
+        } finally {
+          // Reset button state
+          const deleteButton = document.querySelector('button[onclick="handleDeleteSchool()"]');
+          if (deleteButton) {
+            deleteButton.textContent = 'Delete School';
+            deleteButton.disabled = false;
+          }
         }
       }
     }
@@ -179,8 +212,8 @@ const ViewSchools = () => {
       const link = document.createElement('a')
       link.href = url
       
-      // Use photo ID as filename for better organization
-      const fileName = student.photoId ? `${student.photoId}.jpg` : `${student.fullName || 'photo'}.jpg`
+      // Use photo ID as filename only
+      const fileName = student.photoId ? `${student.photoId}.jpg` : 'photo.jpg'
       link.setAttribute('download', fileName)
       document.body.appendChild(link)
       link.click()

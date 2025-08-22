@@ -32,14 +32,14 @@ export const getClasses = () => axios.get("/teacher/classes")
 // Optimized Photo Upload for Concurrent Uploads
 export const uploadPhoto = async (formData, retryCount = 0) => {
   const maxRetries = 2
-  const baseTimeout = 8000 // 8 seconds base timeout
+  const baseTimeout = 15000 // 15 seconds for high quality uploads
   
   try {
     const response = await axios.post("/teacher/upload-photo", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      timeout: baseTimeout + (retryCount * 2000), // Increase timeout for retries
+      timeout: baseTimeout + (retryCount * 3000), // Increase timeout for retries
       // Optimize for concurrent uploads
       maxRedirects: 0,
       validateStatus: (status) => status < 500, // Don't throw on 4xx errors

@@ -273,10 +273,10 @@ router.post('/upload-photo', upload.fields([
       {
         public_id: `student_photos/${uniquePhotoId}`,
         overwrite: true,
-        quality: 'auto:low', // Faster upload with lower quality
+        quality: 'auto:best', // High quality upload
         fetch_format: 'auto',
         transformation: [
-          { quality: 'auto:low' }, // Optimize for speed
+          { quality: 'auto:best' }, // Ensure best quality
           { fetch_format: 'auto' }
         ],
         // Optimize for concurrent uploads

@@ -28,27 +28,30 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    
-    
-    const token = localStorage.getItem("token")
-    const storedUser = localStorage.getItem("user")
-    
-
-    
-    if (token && storedUser) {
-      try {
-        const userData = JSON.parse(storedUser)
-        setUser(userData)
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-  
-      } catch (error) {
-  
-        localStorage.removeItem("token")
-        localStorage.removeItem("user")
+    const initializeAuth = async () => {
+      const token = localStorage.getItem("token")
+      const storedUser = localStorage.getItem("user")
+      
+      if (token && storedUser) {
+        try {
+          const userData = JSON.parse(storedUser)
+          setUser(userData)
+          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+          
+          // Validate token with backend
+          await validateToken()
+        } catch (error) {
+          console.error('Token validation failed:', error)
+          localStorage.removeItem("token")
+          localStorage.removeItem("user")
+          delete axios.defaults.headers.common["Authorization"]
+        }
+      } else {
+        setLoading(false)
       }
     }
     
-    setLoading(false)
+    initializeAuth()
   }, [])
 
   const validateToken = async () => {
