@@ -127,7 +127,7 @@ const WelcomePage = () => {
               <div className="text-gray-600">Schools Served</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">1L+</div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">5L+</div>
               <div className="text-gray-600">ID Cards Created</div>
             </div>
             <div>
